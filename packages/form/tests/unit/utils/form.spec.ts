@@ -108,6 +108,8 @@ describe('filterFunction', () => {
     expect(receivedArgs.prop).toBe('testProp');
     expect(receivedArgs.index).toBe(5);
     expect(receivedArgs.config).toEqual({ type: 'text' });
+    expect(receivedArgs.formValue).toEqual({ form: 'formValue' });
+    expect(receivedArgs.formValues).toBe(receivedArgs.formValue);
   });
 
   test('config 函数通过 mForm 读穿到宿主 context', () => {

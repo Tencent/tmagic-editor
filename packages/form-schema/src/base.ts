@@ -253,6 +253,8 @@ export type FilterFunction<T = boolean> = (
     values: FormValue;
     parent?: FormValue;
     formValue: FormValue;
+    /** 与 `formValue` 相同，对齐 Select.vue / SelectOptionFunction 的 `formValues` 别名 */
+    formValues: FormValue;
     prop: string;
     config: any;
     index?: number;

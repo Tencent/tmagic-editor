@@ -247,14 +247,13 @@ describe('validateTypeMatch', () => {
     expect(validateTypeMatch('a', mForm, propsOf(config))).toBe('a 类型应为数组\n\n请参考以下示例值：["a"]');
   });
 
-  test('select options 为函数 / group', () => {
+  test('select options 为函数时求值后做枚举校验', () => {
     const fnConfig = {
       type: 'select',
       options: () => [{ text: 'A', value: 1 }],
     };
     expect(validateTypeMatch(1, mForm, propsOf(fnConfig))).toBeUndefined();
-    // options 为函数（动态）时，跳过「不在可选项中」枚举校验
-    expect(validateTypeMatch(2, mForm, propsOf(fnConfig))).toBeUndefined();
+    expect(validateTypeMatch(2, mForm, propsOf(fnConfig))).toBe('2 不在可选项中\n\n请使用以下某一个值：1');
 
     const groupConfig = {
       type: 'select',
@@ -269,6 +268,77 @@ describe('validateTypeMatch', () => {
     };
     expect(validateTypeMatch('a', mForm, propsOf(groupConfig))).toBeUndefined();
     expect(validateTypeMatch('b', mForm, propsOf(groupConfig))).toBe('b 不在可选项中\n\n请使用以下某一个值："a"');
+  });
+
+  test('select options 函数返回空 / Promise / 非数组 / 抛错时跳过枚举', () => {
+    expect(validateTypeMatch(2, mForm, propsOf({ type: 'select', options: () => [] }))).toBeUndefined();
+    expect(
+      validateTypeMatch(2, mForm, propsOf({ type: 'select', options: () => Promise.resolve([{ value: 1 }]) })),
+    ).toBeUndefined();
+    expect(validateTypeMatch(2, mForm, propsOf({ type: 'select', options: () => ({ value: 1 }) }))).toBeUndefined();
+    expect(validateTypeMatch(2, mForm, propsOf({ type: 'select', options: () => null }))).toBeUndefined();
+    expect(
+      validateTypeMatch(
+        2,
+        mForm,
+        propsOf({
+          type: 'select',
+          options: () => {
+            throw new Error('options boom');
+          },
+        }),
+      ),
+    ).toBeUndefined();
+  });
+
+  test('select options 函数可读 model / formValue / formValues', () => {
+    const form = { ...mForm, values: { mode: 'a' } };
+    const byFormValues = {
+      type: 'select',
+      options: (_mForm: any, { formValues }: any) =>
+        formValues.mode === 'a' ? [{ text: 'A', value: 1 }] : [{ text: 'B', value: 2 }],
+    };
+    expect(validateTypeMatch(1, form, propsOf(byFormValues))).toBeUndefined();
+    expect(validateTypeMatch(2, form, propsOf(byFormValues))).toBe('2 不在可选项中\n\n请使用以下某一个值：1');
+
+    const byModel = {
+      type: 'select',
+      options: (_mForm: any, { model }: any) => [{ text: 'A', value: model.choice }],
+    };
+    expect(validateTypeMatch(1, mForm, propsOf(byModel, { choice: 1 }))).toBeUndefined();
+    expect(validateTypeMatch(2, mForm, propsOf(byModel, { choice: 1 }))).toBe(
+      '2 不在可选项中\n\n请使用以下某一个值：1',
+    );
+  });
+
+  test('radio-group / checkbox-group / cascader 函数 options 求值后做枚举校验', () => {
+    const radioOptions = () => [{ text: 'A', value: 1 }];
+    expect(validateTypeMatch(1, mForm, propsOf({ type: 'radio-group', options: radioOptions }))).toBeUndefined();
+    expect(validateTypeMatch(2, mForm, propsOf({ type: 'radio-group', options: radioOptions }))).toBe(
+      '2 不在可选项中\n\n请使用以下某一个值：1',
+    );
+
+    const checkboxOptions = () => [{ text: 'A', value: 'a' }];
+    expect(
+      validateTypeMatch(['a'], mForm, propsOf({ type: 'checkbox-group', options: checkboxOptions })),
+    ).toBeUndefined();
+    expect(validateTypeMatch(['b'], mForm, propsOf({ type: 'checkbox-group', options: checkboxOptions }))).toBe(
+      'b 不在可选项中\n\n请使用以下某一个值："a"',
+    );
+
+    const cascaderOptions = () => [
+      {
+        value: 'zhejiang',
+        label: 'Zhejiang',
+        children: [{ value: 'hangzhou', label: 'Hangzhou' }],
+      },
+    ];
+    expect(
+      validateTypeMatch(['zhejiang', 'hangzhou'], mForm, propsOf({ type: 'cascader', options: cascaderOptions })),
+    ).toBeUndefined();
+    expect(
+      validateTypeMatch(['zhejiang', 'ningbo'], mForm, propsOf({ type: 'cascader', options: cascaderOptions })),
+    ).toBe('zhejiang,ningbo 不在可选项中\n\n请使用以下某一个值："hangzhou"');
   });
 
   test('select allowCreate / remote 不做枚举', () => {
@@ -510,9 +580,31 @@ describe('validateTypeMatch', () => {
     expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'select', allowCreate: true }))).toBeUndefined();
   });
 
-  test('动态 type 函数解析', () => {
+  test('动态 type 函数解析后按解析出的 type 校验', () => {
     expect(validateTypeMatch('ok', mForm, propsOf({ type: () => 'text', name: 'field' }))).toBeUndefined();
     expect(validateTypeMatch(1, mForm, propsOf({ type: () => 'number', name: 'field' }))).toBeUndefined();
+    expect(validateTypeMatch('ok', mForm, propsOf({ type: () => 'number', name: 'field' }))).toMatch(/类型应为数字/);
+    expect(
+      validateTypeMatch(2, mForm, propsOf({ type: () => 'select', name: 'field', options: [{ text: 'A', value: 1 }] })),
+    ).toMatch(/不在可选项中/);
+    expect(
+      validateTypeMatch(
+        2,
+        mForm,
+        propsOf({ type: () => 'select', name: 'field', options: () => [{ text: 'A', value: 1 }] }),
+      ),
+    ).toMatch(/不在可选项中/);
+    expect(
+      validateTypeMatch(
+        'ok',
+        mForm,
+        propsOf({
+          type: () => {
+            throw new Error('type boom');
+          },
+        }),
+      ),
+    ).toBeUndefined();
   });
 
   test('type 为异步函数（返回 Promise）时跳过校验', () => {
@@ -522,6 +614,53 @@ describe('validateTypeMatch', () => {
     expect(validateTypeMatch(123, mForm, propsOf({ type: async () => 'number', name: 'field' }))).toBeUndefined();
     // 即便值类型明显不匹配，异步 type 也跳过校验
     expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: async () => 'text', name: 'field' }))).toBeUndefined();
+  });
+
+  test('异步 type / options / defaultValue / valueSeparator reject 时不产生未捕获 rejection', async () => {
+    const unhandled: any[] = [];
+    const onUnhandled = (reason: any) => unhandled.push(reason);
+    process.on('unhandledRejection', onUnhandled);
+
+    const options = [
+      {
+        value: 'zhejiang',
+        label: 'Zhejiang',
+        children: [{ value: 'hangzhou', label: 'Hangzhou' }],
+      },
+    ];
+
+    expect(
+      validateTypeMatch('ok', mForm, propsOf({ type: () => Promise.reject(new Error('type reject')) })),
+    ).toBeUndefined();
+    expect(
+      validateTypeMatch(
+        2,
+        mForm,
+        propsOf({ type: 'select', options: () => Promise.reject(new Error('options reject')) }),
+      ),
+    ).toBeUndefined();
+    expect(
+      validateTypeMatch(
+        '1',
+        mForm,
+        propsOf({ type: 'number', defaultValue: () => Promise.reject(new Error('defaultValue reject')) }),
+      ),
+    ).toBe('1 类型应为数字\n\n请参考以下示例值：123');
+    expect(
+      validateTypeMatch(
+        123,
+        mForm,
+        propsOf({
+          type: 'cascader',
+          options,
+          valueSeparator: () => Promise.reject(new Error('valueSeparator reject')),
+        }),
+      ),
+    ).toBeUndefined();
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    process.off('unhandledRejection', onUnhandled);
+    expect(unhandled).toEqual([]);
   });
 
   test('cascader valueSeparator 为异步函数（返回 Promise）时跳过校验', () => {

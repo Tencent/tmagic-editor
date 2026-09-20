@@ -56,6 +56,18 @@ const builtInTypeMatchRules = new Map<string, TypeMatchValidator>();
 const isPromise = (value: any): value is Promise<unknown> =>
   typeof value === 'object' && value !== null && typeof value.then === 'function';
 
+/**
+ * 同步校验无法等待 Promise。调用方会丢掉返回值，这里挂上空 handler，避免变成未捕获 rejection。
+ */
+const ignorePromise = (value: any): value is Promise<unknown> => {
+  if (!isPromise(value)) return false;
+  value.then(
+    () => {},
+    () => {},
+  );
+  return true;
+};
+
 /** 注册或覆盖某个字段 type 的 typeMatch 校验规则。`builtIn` 登记不受 `clearTypeMatchRules` / `deleteTypeMatchRule` 影响。 */
 export const registerTypeMatchRule = (type: string, validator: TypeMatchValidator, builtIn = false): void => {
   (builtIn ? builtInTypeMatchRules : extraTypeMatchRules).set(toLine(type), validator);
@@ -89,11 +101,14 @@ const resolveConfig = <T = any>(
   props: any,
 ): T | undefined => {
   if (typeof config === 'function') {
+    const formValue = readonly(mForm?.values || props.model);
     return (config as Function)(mForm, {
       values: readonly(mForm?.initValues || {}),
       model: readonly(props.model),
       parent: readonly(mForm?.parentValues || {}),
-      formValue: readonly(mForm?.values || props.model),
+      formValue,
+      // Select.vue / SelectOptionFunction 使用 formValues 别名
+      formValues: formValue,
       prop: props.prop,
       config: props.config,
       index: props.index,
@@ -200,7 +215,7 @@ const resolveFieldDefaultValue = (mForm: FormState | undefined, props: any): any
   if (typeof defaultValue === 'undefined' || defaultValue === 'undefined') return undefined;
   const resolvedDefaultValue = resolveConfig(mForm, defaultValue, props);
   // resolveConfig 返回 Promise（如 defaultValue 为异步函数）时无法同步获取默认值，回退到通用示例
-  if (isPromise(resolvedDefaultValue)) {
+  if (ignorePromise(resolvedDefaultValue)) {
     return undefined;
   }
   return resolvedDefaultValue;
@@ -331,9 +346,21 @@ const flattenSelectOptions = (options: any[]): any[] => {
   return values;
 };
 
-const resolveOptions = (props: any): any[] => {
-  const { options } = props.config || {};
-  return Array.isArray(options) ? options : [];
+/**
+ * 解析字段 options：静态数组原样返回；函数型与 `display` / `type` 一样当场求值。
+ *
+ * 函数返回 Promise、非数组或抛错时当作「还没有可选项」，交由调用方按空 options 跳过枚举。
+ * `remote` / `allowCreate` 仍由 `validateSelectValue` 单独放行，不在这里区分。
+ */
+const resolveOptions = (mForm: FormState | undefined, props: any): any[] => {
+  let resolved: unknown;
+  try {
+    resolved = resolveConfig(mForm, props.config?.options, props);
+  } catch {
+    return [];
+  }
+  if (ignorePromise(resolved) || !Array.isArray(resolved)) return [];
+  return resolved;
 };
 
 const includesOptionValue = (optionValues: any[], value: any) => optionValues.some((item) => Object.is(item, value));
@@ -440,9 +467,6 @@ const validateSelectValue = (
     return undefined;
   }
 
-  // 仅当 options 为静态数组时才校验值是否在可选项中，动态 options（函数形式）跳过
-  const isStaticOptions = Array.isArray(config.options);
-
   if (config.multiple) {
     if (!Array.isArray(value)) {
       return defaultMessage(
@@ -451,13 +475,13 @@ const validateSelectValue = (
         optionExampleSuggestion(optionValues, '["选项1", "选项2"]', true),
       );
     }
-    if (isStaticOptions && value.some((item) => !includesOptionValue(optionValues, item))) {
+    if (value.some((item) => !includesOptionValue(optionValues, item))) {
       return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(optionValues));
     }
     return undefined;
   }
 
-  if (isStaticOptions && !includesOptionValue(optionValues, value)) {
+  if (!includesOptionValue(optionValues, value)) {
     return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(optionValues));
   }
   return undefined;
@@ -470,7 +494,7 @@ const validateCascaderValue = (
   mForm: FormState | undefined,
   message: string | undefined,
 ): string | undefined => {
-  const options = resolveOptions(props) as CascaderOption[];
+  const options = resolveOptions(mForm, props) as CascaderOption[];
 
   if (!options.length) {
     return;
@@ -478,7 +502,7 @@ const validateCascaderValue = (
 
   const valueSeparator = resolveConfig<string | undefined>(mForm, config.valueSeparator, props);
   // resolveConfig 返回 Promise（如 valueSeparator 为异步函数）时无法同步确定分隔符，跳过校验
-  if (isPromise(valueSeparator)) {
+  if (ignorePromise(valueSeparator)) {
     return undefined;
   }
   const emitPath = config.emitPath !== false;
@@ -631,12 +655,12 @@ const validateBuiltinTypeMatch = (
   }
 
   if (fieldType === 'select') {
-    const optionValues = flattenSelectOptions(resolveOptions(props));
+    const optionValues = flattenSelectOptions(resolveOptions(mForm, props));
     return validateSelectValue(value, config, optionValues, message);
   }
 
   if (fieldType === 'radio-group') {
-    const optionValues = flattenSelectOptions(resolveOptions(props));
+    const optionValues = flattenSelectOptions(resolveOptions(mForm, props));
 
     if (optionValues.length === 0) {
       return undefined;
@@ -649,7 +673,7 @@ const validateBuiltinTypeMatch = (
   }
 
   if (fieldType === 'checkbox-group') {
-    const optionValues = flattenSelectOptions(resolveOptions(props));
+    const optionValues = flattenSelectOptions(resolveOptions(mForm, props));
 
     if (optionValues.length === 0) {
       return undefined;
@@ -727,12 +751,19 @@ export const validateTypeMatch = (
   }
 
   const rawFieldType = 'type' in (props.config || {}) ? props.config.type : '';
-  if (typeof rawFieldType !== 'string' || !rawFieldType) {
+  let resolvedType: unknown;
+  try {
+    resolvedType = resolveConfig<string>(mForm, rawFieldType, props);
+  } catch {
+    return undefined;
+  }
+  // 函数型 type 与 Container 的 resolveItemType 对齐；异步 type 无法同步判定，跳过
+  if (ignorePromise(resolvedType) || typeof resolvedType !== 'string' || !resolvedType) {
     return undefined;
   }
 
   // 统一将驼峰形式（如 radioGroup）归一化为连字符形式（radio-group），与内置规则的 key 保持一致
-  const fieldType = toLine(rawFieldType);
+  const fieldType = toLine(resolvedType);
 
   const customValidator = getTypeMatchRule(fieldType);
 

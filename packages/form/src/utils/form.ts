@@ -368,11 +368,14 @@ export const filterFunction = <T = any>(
   props: any,
 ) => {
   if (typeof config === 'function') {
+    const formValue = readonly(mForm?.values || props.model);
     return (config as FilterFunction<T>)(mForm, {
       values: readonly(mForm?.initValues || {}),
       model: readonly(props.model),
       parent: readonly(mForm?.parentValues || {}),
-      formValue: readonly(mForm?.values || props.model),
+      formValue,
+      // Select.vue / SelectOptionFunction 使用 formValues 别名
+      formValues: formValue,
       prop: props.prop,
       config: props.config,
       index: props.index,
