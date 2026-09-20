@@ -1,4 +1,5 @@
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { exit } from 'node:process';
 
@@ -32,19 +33,50 @@ interface TypeAssertionOption {
   datasoucreSuperClass?: string[];
 }
 
-const isFile = (filePath: string) => fs.existsSync(filePath) && fs.lstatSync(filePath).isFile();
-const isDirectory = (filePath: string) => fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory();
+const isFile = (filePath: string) => {
+  try {
+    return fs.statSync(filePath).isFile();
+  } catch {
+    return false;
+  }
+};
+
+const isDirectory = (filePath: string) => {
+  try {
+    return fs.statSync(filePath).isDirectory();
+  } catch {
+    return false;
+  }
+};
+
+const isModuleNotFoundError = (e: unknown): boolean => {
+  const code = typeof e === 'object' && e && 'code' in e ? String((e as { code: unknown }).code) : '';
+  return code === 'MODULE_NOT_FOUND' || code === 'ERR_MODULE_NOT_FOUND';
+};
+
+const splitCliArgs = (value: string): string[] => value.trim().split(/\s+/).filter(Boolean);
+
+/**
+ * 从文件或目录进程内解析模块 id。
+ * 不要把 id 拼进 shell —— specifier 来自解析后的源码。
+ */
+const resolveModule = (id: string, from: string): string => {
+  const absFrom = path.resolve(from);
+  const parent = isFile(absFrom) ? absFrom : path.join(absFrom, 'package.json');
+  return createRequire(parent).resolve(id);
+};
 
 const getRelativePath = (str: string, base: string) => (path.isAbsolute(str) ? path.relative(base, str) : str);
 
 const npmInstall = function (dependencies: Record<string, string>, cwd: string, npmConfig: NpmConfig = {}) {
   try {
     const { client = 'npm', registry, installArgs = '', keepPackageJsonClean } = npmConfig;
-    const install = {
+    const installCommands: Record<string, string> = {
       npm: 'install',
       yarn: 'add',
       pnpm: 'add',
-    }[client];
+    };
+    const install = installCommands[client];
 
     let packages = Object.entries(dependencies);
 
@@ -65,16 +97,24 @@ const npmInstall = function (dependencies: Record<string, string>, cwd: string, 
       return;
     }
 
-    const packageNames = packages.map(([name, version]) => (version ? `${name}@${version}` : name)).join(' ');
-
-    const installArgsString = `${installArgs ? ` ${installArgs}` : ''}`;
-    const registryString = `${registry ? ` --registry ${registry}` : ''}`;
-    const command = `${client} ${install}${installArgsString} ${packageNames}${registryString}`;
+    const args: string[] = [];
+    if (install) {
+      args.push(install);
+    }
+    if (installArgs) {
+      args.push(...splitCliArgs(installArgs));
+    }
+    for (const [name, version] of packages) {
+      args.push(version ? `${name}@${version}` : name);
+    }
+    if (registry) {
+      args.push('--registry', registry);
+    }
 
     execInfo(cwd);
-    execInfo(command);
+    execInfo([client, ...args].join(' '));
 
-    execSync(command, {
+    execFileSync(client, args, {
       stdio: 'inherit',
       cwd,
     });
@@ -293,10 +333,23 @@ const getComponentPackageImports = function ({
     });
 
     if (propertyMatch) {
-      let file = getIndexPath(path.resolve(path.dirname(indexPath), propertyMatch.source.value));
+      const specifier = propertyMatch.source.value;
+      if (typeof specifier !== 'string' || !specifier) {
+        return;
+      }
+
+      let file = getIndexPath(path.resolve(path.dirname(indexPath), specifier));
 
       if (!fs.existsSync(file)) {
-        file = propertyMatch.source.value;
+        try {
+          file = resolveModule(specifier, indexPath);
+        } catch (e) {
+          if (isModuleNotFoundError(e)) {
+            info(`无法解析组件包 import "${specifier}"（来自 ${indexPath}）`);
+            return;
+          }
+          throw e;
+        }
       }
 
       result.imports.push({
@@ -511,12 +564,8 @@ const setPackages = (packages: ModuleMainFilePath, app: App, packagePath: string
     }
   }
 
-  // 获取完整路径
-  const indexPath = execSync(`node -e "console.log(require.resolve('${moduleName.replace(/\\/g, '/')}'))"`, {
-    cwd,
-  })
-    .toString()
-    .replace('\n', '');
+  // 获取完整路径（进程内解析，避免把 specifier 插进 shell）
+  const indexPath = resolveModule(moduleName, cwd);
 
   const indexCode = fs.readFileSync(indexPath, { encoding: 'utf-8', flag: 'r' });
 
@@ -530,13 +579,7 @@ const setPackages = (packages: ModuleMainFilePath, app: App, packagePath: string
         return;
       }
 
-      let componentCwd = moduleName;
-
-      if (!isDirectory(moduleName)) {
-        componentCwd = path.join(cwd, `node_modules/${moduleName}`);
-      }
-
-      setPackages(packages, app, i.indexPath, componentCwd, i.type);
+      setPackages(packages, app, i.indexPath, path.dirname(indexPath), i.type);
     });
 
     return;
