@@ -90,21 +90,16 @@ vi.mock('@editor/utils/editor', () => ({
   getGuideLineFromCache: vi.fn(() => []),
 }));
 
-const localStorageMock = {
-  setItem: vi.fn(),
-  removeItem: vi.fn(),
-  getItem: vi.fn(),
-};
-
 beforeEach(() => {
   StageCoreCtor.mockClear();
   Object.keys(stageInstance.handlers).forEach((k) => delete stageInstance.handlers[k]);
-  vi.clearAllMocks();
-  globalThis.localStorage = localStorageMock as any;
+  vi.spyOn(globalThis.localStorage, 'setItem').mockImplementation(() => undefined);
+  vi.spyOn(globalThis.localStorage, 'removeItem').mockImplementation(() => undefined);
+  vi.spyOn(globalThis.localStorage, 'getItem').mockImplementation(() => null);
 });
 
 afterEach(() => {
-  delete (globalThis as any).localStorage;
+  vi.restoreAllMocks();
 });
 
 describe('useStage', () => {
@@ -262,14 +257,14 @@ describe('useStage', () => {
   test('change-guides 事件: 写入 localStorage', () => {
     useStage({} as any);
     stageInstance.handlers['change-guides'][0]({ type: 'h', guides: [10, 20] });
-    expect(localStorageMock.setItem).toHaveBeenCalled();
+    expect(globalThis.localStorage.setItem).toHaveBeenCalled();
     expect(uiService.set).toHaveBeenCalledWith('showGuides', true);
   });
 
   test('change-guides 事件: 空 guides 删除 localStorage', () => {
     useStage({} as any);
     stageInstance.handlers['change-guides'][0]({ type: 'v', guides: [] });
-    expect(localStorageMock.removeItem).toHaveBeenCalled();
+    expect(globalThis.localStorage.removeItem).toHaveBeenCalled();
   });
 
   test('page-el-update 事件 重置 stageLoading', () => {

@@ -37,8 +37,8 @@
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "^26.1.2",
-    "rolldown": "^1.2.2",
-    "rolldown-plugin-dts": "^0.28.0"
+    "@types/node": "^26.6.2",
+    "rolldown": "^1.2.9",
+    "rolldown-plugin-dts": "^0.28.6"
   }
 }

@@ -1,9 +1,9 @@
-import { resolve } from 'path';
+import { resolve } from 'node:path';
 
 import { defineConfig } from 'vitest/config';
 import Vue from '@vitejs/plugin-vue';
 
-const r = (p: string) => resolve(__dirname, p);
+const r = (p: string) => resolve(import.meta.dirname, p);
 
 const alias = {
   '@editor': r('./packages/editor/src'),

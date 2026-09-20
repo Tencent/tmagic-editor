@@ -118,7 +118,7 @@ const emit = defineEmits<{
   change: [v: string[]];
 }>();
 
-const modelValue = defineModel<string[] | any>('modelValue', { default: [] });
+const modelValue = defineModel<string[] | any>('modelValue', { default: () => [] });
 
 const optionComponent = getDesignConfig('components')?.option;
 

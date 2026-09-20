@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
-    "@vue/test-utils": "^2.4.11"
+    "@vue/test-utils": "^2.5.1"
   },
   "peerDependencies": {
     "@tmagic/design": "workspace:*",

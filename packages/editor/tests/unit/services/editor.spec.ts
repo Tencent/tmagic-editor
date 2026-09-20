@@ -340,12 +340,12 @@ describe('select', () => {
     expect(page?.id).toBe(NodeId.PAGE_ID);
   });
 
-  test('参数是id undefined', () => {
-    expect(() => editorService.select(NodeId.ERROR_NODE_ID)).rejects.toThrowError('获取不到组件信息');
+  test('参数是id undefined', async () => {
+    await expect(editorService.select(NodeId.ERROR_NODE_ID)).rejects.toThrowError('获取不到组件信息');
   });
 
-  test('参数是config 没有id', () => {
-    expect(() => editorService.select({ id: '', type: 'text' })).rejects.toThrowError('没有ID，无法选中');
+  test('参数是config 没有id', async () => {
+    await expect(editorService.select({ id: '', type: 'text' })).rejects.toThrowError('没有ID，无法选中');
   });
 });
 
@@ -399,11 +399,11 @@ describe('add', () => {
     expect(rootNode?.items.length).toBe(2);
   });
 
-  test('往root下添加普通节点', () => {
+  test('往root下添加普通节点', async () => {
     editorService.set('root', cloneDeep(root));
     // 根节点下只能加页面
     const rootNode = editorService.get('root');
-    expect(() =>
+    await expect(
       editorService.add(
         {
           type: 'text',
@@ -556,7 +556,7 @@ describe('remove', () => {
   });
 
   test('undefine', async () => {
-    expect(() => editorService.remove({ id: NodeId.ERROR_NODE_ID, type: 'text' })).rejects.toThrow();
+    await expect(editorService.remove({ id: NodeId.ERROR_NODE_ID, type: 'text' })).rejects.toThrow();
   });
 
   test('doNotSelect: true 不更新选中节点', async () => {
