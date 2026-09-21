@@ -17,6 +17,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { reactive } from 'vue';
 
 import { setDesignConfig } from '@tmagic/design';
 import { getDesignConfig } from '@tmagic/design/headless';
@@ -102,7 +103,7 @@ describe('validateTypeMatch', () => {
       'NaN 类型应为字符串\n\n请参考以下示例值："文本内容"',
     );
     expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'text' }))).toBe(
-      '[object Object] 类型应为字符串\n\n请参考以下示例值："文本内容"',
+      '{"a":1} 类型应为字符串\n\n请参考以下示例值："文本内容"',
     );
     expect(validateTypeMatch(true, mForm, propsOf({ type: 'text' }), '自定义错误')).toBe('自定义错误');
   });
@@ -199,6 +200,112 @@ describe('validateTypeMatch', () => {
     expect(validateTypeMatch(3, mForm, propsOf(config))).toBe('3 不在可选项中\n\n请使用以下某一个值：1；2');
   });
 
+  test('select 对象 option.value 按内容比较，兼容 Vue Proxy', () => {
+    const share = { componentType: 'share', modType: 42, name: '分享' };
+    const pop = { componentType: 'pop', name: '弹窗' };
+    const config = {
+      type: 'select',
+      options: [
+        { text: '弹窗', value: pop },
+        { text: '分享', value: share },
+      ],
+    };
+
+    expect(validateTypeMatch({ ...share }, mForm, propsOf(config))).toBeUndefined();
+    expect(validateTypeMatch(reactive({ ...share }), mForm, propsOf(config))).toBeUndefined();
+    expect(
+      validateTypeMatch(
+        { ...share },
+        mForm,
+        propsOf({ ...config, options: [{ text: '分享', value: reactive(share) }] }),
+      ),
+    ).toBeUndefined();
+    expect(validateTypeMatch({ ...share, modType: 99 }, mForm, propsOf(config))).toContain(
+      `${JSON.stringify({ ...share, modType: 99 })} 不在可选项中`,
+    );
+    expect(validateTypeMatch({ ...share, name: 'Share' }, mForm, propsOf(config))).toContain(
+      `${JSON.stringify({ ...share, name: 'Share' })} 不在可选项中`,
+    );
+
+    const byValueKey = { ...config, valueKey: 'modType' };
+    expect(validateTypeMatch({ ...share, name: 'Share' }, mForm, propsOf(byValueKey))).toBeUndefined();
+    expect(validateTypeMatch(reactive({ modType: 42 }), mForm, propsOf(byValueKey))).toBeUndefined();
+    expect(validateTypeMatch({ ...share, modType: 99 }, mForm, propsOf(byValueKey))).toContain(
+      `${JSON.stringify({ ...share, modType: 99 })} 不在可选项中`,
+    );
+
+    const multipleConfig = { ...config, multiple: true };
+    expect(validateTypeMatch([reactive({ ...share }), { ...pop }], mForm, propsOf(multipleConfig))).toBeUndefined();
+    expect(validateTypeMatch([reactive({ ...share, modType: 99 })], mForm, propsOf(multipleConfig))).toMatch(
+      /不在可选项中/,
+    );
+    expect(
+      validateTypeMatch(
+        [reactive({ componentType: 'share' }), { componentType: 'pop' }],
+        mForm,
+        propsOf({ ...multipleConfig, valueKey: 'componentType' }),
+      ),
+    ).toBeUndefined();
+    expect(
+      validateTypeMatch([{ componentType: 'copy' }], mForm, propsOf({ ...multipleConfig, valueKey: 'componentType' })),
+    ).toMatch(/不在可选项中/);
+
+    const checkboxGroup = {
+      type: 'checkbox-group',
+      options: [{ text: '分享', value: share }],
+    };
+    expect(validateTypeMatch([reactive({ ...share })], mForm, propsOf(checkboxGroup))).toBeUndefined();
+  });
+
+  test('cascader 对象 value 按内容比较，兼容 Vue Proxy', () => {
+    const options = [
+      {
+        value: { id: 'zhejiang' },
+        label: 'Zhejiang',
+        children: [{ value: { id: 'hangzhou' }, label: 'Hangzhou' }],
+      },
+    ];
+    expect(
+      validateTypeMatch(
+        [reactive({ id: 'zhejiang' }), { id: 'hangzhou' }],
+        mForm,
+        propsOf({ type: 'cascader', options }),
+      ),
+    ).toBeUndefined();
+    expect(
+      validateTypeMatch(
+        [{ id: 'zhejiang' }, { id: 'hangzhou' }],
+        mForm,
+        propsOf({
+          type: 'cascader',
+          options: [
+            {
+              value: reactive({ id: 'zhejiang' }),
+              label: 'Zhejiang',
+              children: [{ value: reactive({ id: 'hangzhou' }), label: 'Hangzhou' }],
+            },
+          ],
+        }),
+      ),
+    ).toBeUndefined();
+    expect(
+      validateTypeMatch([{ id: 'zhejiang' }, { id: 'ningbo' }], mForm, propsOf({ type: 'cascader', options })),
+    ).toMatch(/不在可选项中/);
+    expect(
+      validateTypeMatch(reactive({ id: 'hangzhou' }), mForm, propsOf({ type: 'cascader', options, emitPath: false })),
+    ).toBeUndefined();
+  });
+
+  test('cascader 同层内容相同的 value 会尝试所有匹配节点', () => {
+    const options = [
+      { value: { id: 1 }, children: [{ value: 'a' }] },
+      { value: { id: 1 }, children: [{ value: 'b' }] },
+    ];
+    expect(validateTypeMatch([{ id: 1 }, 'a'], mForm, propsOf({ type: 'cascader', options }))).toBeUndefined();
+    expect(validateTypeMatch([{ id: 1 }, 'b'], mForm, propsOf({ type: 'cascader', options }))).toBeUndefined();
+    expect(validateTypeMatch([{ id: 1 }, 'c'], mForm, propsOf({ type: 'cascader', options }))).toMatch(/不在可选项中/);
+  });
+
   test('可选项超过 20 个时建议仅举例前 5 个并标明总数', () => {
     const values = Array.from({ length: 21 }, (_, i) => i + 1);
     const config = {
@@ -232,7 +339,7 @@ describe('validateTypeMatch', () => {
     };
     expect(validateTypeMatch(['a'], mForm, propsOf(config))).toBeUndefined();
     expect(validateTypeMatch(['a', 'c'], mForm, propsOf(config))).toBe(
-      'a,c 不在可选项中\n\n请使用以下某一个值："a"；"b"',
+      '["a","c"] 不在可选项中\n\n请使用以下某一个值："a"；"b"',
     );
     // multiple 类型不匹配时，示例值基于真实 options（前 2 个值组成的数组）
     expect(validateTypeMatch('a', mForm, propsOf(config))).toBe('a 类型应为数组\n\n请参考以下示例值：["a","b"]');
@@ -323,7 +430,7 @@ describe('validateTypeMatch', () => {
       validateTypeMatch(['a'], mForm, propsOf({ type: 'checkbox-group', options: checkboxOptions })),
     ).toBeUndefined();
     expect(validateTypeMatch(['b'], mForm, propsOf({ type: 'checkbox-group', options: checkboxOptions }))).toBe(
-      'b 不在可选项中\n\n请使用以下某一个值："a"',
+      '["b"] 不在可选项中\n\n请使用以下某一个值："a"',
     );
 
     const cascaderOptions = () => [
@@ -338,7 +445,7 @@ describe('validateTypeMatch', () => {
     ).toBeUndefined();
     expect(
       validateTypeMatch(['zhejiang', 'ningbo'], mForm, propsOf({ type: 'cascader', options: cascaderOptions })),
-    ).toBe('zhejiang,ningbo 不在可选项中\n\n请使用以下某一个值："hangzhou"');
+    ).toBe('["zhejiang","ningbo"] 不在可选项中\n\n请使用以下某一个值："hangzhou"');
   });
 
   test('select allowCreate / remote 不做枚举', () => {
@@ -360,9 +467,7 @@ describe('validateTypeMatch', () => {
         { text: 'B', value: 'b' },
       ],
     };
-    expect(validateTypeMatch({ a: 1 }, mForm, propsOf(config))).toBe(
-      '[object Object] 类型不合法\n\n请参考以下示例值："a"',
-    );
+    expect(validateTypeMatch({ a: 1 }, mForm, propsOf(config))).toBe('{"a":1} 类型不合法\n\n请参考以下示例值："a"');
     // allowCreate + multiple + options：传非数组，示例取前 2 个真实 option 值组成数组
     expect(validateTypeMatch('a', mForm, propsOf({ ...config, multiple: true }))).toBe(
       'a 类型应为数组\n\n请参考以下示例值：["a","b"]',
@@ -389,7 +494,7 @@ describe('validateTypeMatch', () => {
     };
     expect(validateTypeMatch(['a', 'b'], mForm, propsOf(checkboxGroup))).toBeUndefined();
     expect(validateTypeMatch(['c'], mForm, propsOf(checkboxGroup))).toBe(
-      'c 不在可选项中\n\n请使用以下某一个值："a"；"b"',
+      '["c"] 不在可选项中\n\n请使用以下某一个值："a"；"b"',
     );
 
     // type 为驼峰形式 radioGroup，应通过 toLine 归一化后按 radio-group 规则校验
@@ -422,7 +527,7 @@ describe('validateTypeMatch', () => {
 
     expect(validateTypeMatch(['zhejiang', 'hangzhou'], mForm, propsOf({ type: 'cascader', options }))).toBeUndefined();
     expect(validateTypeMatch(['zhejiang', 'ningbo'], mForm, propsOf({ type: 'cascader', options }))).toBe(
-      'zhejiang,ningbo 不在可选项中\n\n请使用以下某一个值："hangzhou"',
+      '["zhejiang","ningbo"] 不在可选项中\n\n请使用以下某一个值："hangzhou"',
     );
     expect(
       validateTypeMatch('zhejiang/hangzhou', mForm, propsOf({ type: 'cascader', options, valueSeparator: '/' })),
@@ -435,17 +540,17 @@ describe('validateTypeMatch', () => {
   test('number-range / daterange / table', () => {
     expect(validateTypeMatch([1, 2], mForm, propsOf({ type: 'number-range' }))).toBeUndefined();
     expect(validateTypeMatch([1], mForm, propsOf({ type: 'number-range' }))).toBe(
-      '1 类型应为长度为 2 的数字数组\n\n请参考以下示例值：[0, 100]',
+      '[1] 类型应为长度为 2 的数字数组\n\n请参考以下示例值：[0, 100]',
     );
 
     expect(
       validateTypeMatch(['2020/01/01 00:00:00', '2020/01/02 00:00:00'], mForm, propsOf({ type: 'daterange' })),
     ).toBeUndefined();
     expect(validateTypeMatch(['2020-01-01', '2020-01-02'], mForm, propsOf({ type: 'daterange' }))).toMatch(
-      /^2020-01-01,2020-01-02 格式应为长度为 2 的 YYYY\/MM\/DD HH:mm:ss 数组\n\n请参考以下示例值：\["\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}", "\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}"\]$/,
+      /^\["2020-01-01","2020-01-02"\] 格式应为长度为 2 的 YYYY\/MM\/DD HH:mm:ss 数组\n\n请参考以下示例值：\["\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}", "\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}"\]$/,
     );
     expect(validateTypeMatch(['a'], mForm, propsOf({ type: 'daterange' }))).toMatch(
-      /^a 格式应为长度为 2 的 YYYY\/MM\/DD HH:mm:ss 数组\n\n请参考以下示例值：\["\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}", "\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}"\]$/,
+      /^\["a"\] 格式应为长度为 2 的 YYYY\/MM\/DD HH:mm:ss 数组\n\n请参考以下示例值：\["\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}", "\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}"\]$/,
     );
     expect(validateTypeMatch([1, 2], mForm, propsOf({ type: 'daterange', valueFormat: 'timestamp' }))).toBeUndefined();
     expect(validateTypeMatch('x', mForm, propsOf({ type: 'daterange', names: ['a', 'b'] }))).toBeUndefined();
@@ -453,18 +558,18 @@ describe('validateTypeMatch', () => {
     expect(validateTypeMatch([{ id: 1 }], mForm, propsOf({ type: 'table' }))).toBeUndefined();
     // table 无 options，类型不匹配示例回退到通用对象数组示例
     expect(validateTypeMatch({}, mForm, propsOf({ type: 'group-list' }))).toBe(
-      '[object Object] 类型应为对象数组\n\n请参考以下示例值：[{}]',
+      '{} 类型应为对象数组\n\n请参考以下示例值：[{}]',
     );
     // table / group-list 元素必须为对象，字符串数组不合法
     expect(validateTypeMatch(['a', 'b'], mForm, propsOf({ type: 'table' }))).toBe(
-      'a,b 类型应为对象数组\n\n请参考以下示例值：[{}]',
+      '["a","b"] 类型应为对象数组\n\n请参考以下示例值：[{}]',
     );
     expect(validateTypeMatch([1], mForm, propsOf({ type: 'group-list' }))).toBe(
-      '1 类型应为对象数组\n\n请参考以下示例值：[{}]',
+      '[1] 类型应为对象数组\n\n请参考以下示例值：[{}]',
     );
     // 数组中混入非对象元素也不合法
     expect(validateTypeMatch([{ id: 1 }, 'x'], mForm, propsOf({ type: 'grouplist' }))).toBe(
-      '[object Object],x 类型应为对象数组\n\n请参考以下示例值：[{}]',
+      '[{"id":1},"x"] 类型应为对象数组\n\n请参考以下示例值：[{}]',
     );
   });
 
@@ -501,7 +606,7 @@ describe('validateTypeMatch', () => {
   test('timerange 按 valueFormat 校验', () => {
     expect(validateTypeMatch(['12:00:00', '13:00:00'], mForm, propsOf({ type: 'timerange' }))).toBeUndefined();
     expect(validateTypeMatch(['bad'], mForm, propsOf({ type: 'timerange' }))).toMatch(
-      /^bad 格式应为长度为 2 的 HH:mm:ss 数组\n\n请参考以下示例值：\["\d{2}:\d{2}:\d{2}", "\d{2}:\d{2}:\d{2}"\]$/,
+      /^\["bad"\] 格式应为长度为 2 的 HH:mm:ss 数组\n\n请参考以下示例值：\["\d{2}:\d{2}:\d{2}", "\d{2}:\d{2}:\d{2}"\]$/,
     );
   });
 
@@ -534,7 +639,7 @@ describe('validateTypeMatch', () => {
     ).toBeUndefined();
     expect(
       validateTypeMatch(['ningbo'], mForm, propsOf({ type: 'cascader', options, multiple: true, emitPath: false })),
-    ).toBe('ningbo 不在可选项中\n\n请使用以下某一个值："hangzhou"');
+    ).toBe('["ningbo"] 不在可选项中\n\n请使用以下某一个值："hangzhou"');
   });
 
   test('cascader valueSeparator 时数组值', () => {
@@ -686,7 +791,7 @@ describe('validateTypeMatch', () => {
       '1 类型应为数字\n\n请参考以下示例值：123',
     );
     expect(validateTypeMatch({ a: 1 }, mForm, propsOf({ type: 'text', defaultValue: async () => '示例' }))).toBe(
-      '[object Object] 类型应为字符串\n\n请参考以下示例值："文本内容"',
+      '{"a":1} 类型应为字符串\n\n请参考以下示例值："文本内容"',
     );
   });
 });

@@ -217,7 +217,7 @@ describe('editorTypeMatchRules', () => {
     expect(run('data-source-field-select', 'text-value', { name: 'f', fieldConfig: { type: 'text' } })).toBeUndefined();
     expect(run('data-source-field-select', 123, { name: 'f', fieldConfig: { type: 'text' } })).toBeUndefined();
     expect(firstLine(run('data-source-field-select', { a: 1 }, { name: 'f', fieldConfig: { type: 'text' } }))).toBe(
-      '[object Object] 类型应为字符串',
+      '{"a":1} 类型应为字符串',
     );
     expect(run('data-source-field-select', 123, { name: 'f', fieldConfig: { type: 'number' } })).toBeUndefined();
     // fieldConfig 未声明 type 时不做类型校验

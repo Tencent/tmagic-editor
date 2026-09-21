@@ -20,6 +20,7 @@ import { readonly } from 'vue';
 import dayjs from 'dayjs';
 // dayjs 没有 exports 映射，原生 Node ESM 不会补扩展名，深路径必须写全 .js
 import customParseFormat from 'dayjs/plugin/customParseFormat.js';
+import { isEqual } from 'lodash-es';
 
 import { appendValidateSuggestion } from '@tmagic/design/headless';
 import { getValueByKeyPath, toLine } from '@tmagic/utils';
@@ -163,6 +164,14 @@ export const stringifyExampleValue = (value: any): string => {
     } catch {
       return String(value);
     }
+  }
+  return String(value);
+};
+
+/** 错误主文案里的非法取值：对象/数组用 JSON，避免变成 `[object Object]`。 */
+const formatErrorValue = (value: any): string => {
+  if (value !== null && typeof value === 'object') {
+    return stringifyExampleValue(value);
   }
   return String(value);
 };
@@ -363,7 +372,20 @@ const resolveOptions = (mForm: FormState | undefined, props: any): any[] => {
   return resolved;
 };
 
-const includesOptionValue = (optionValues: any[], value: any) => optionValues.some((item) => Object.is(item, value));
+/**
+ * option.value 可能是对象，表单取值又常被 Vue reactive 包成 Proxy。
+ * 引用比较会把内容相同的选项判成不在可选项中，因此按内容比较。
+ * 配置了 `valueKey` 时只比该字段（与 Select 的对象值比对一致）。
+ */
+const isSameOptionValue = (left: any, right: any, valueKey?: string) => {
+  if (valueKey && left !== null && right !== null && typeof left === 'object' && typeof right === 'object') {
+    return isEqual(left[valueKey], right[valueKey]);
+  }
+  return isEqual(left, right);
+};
+
+const includesOptionValue = (optionValues: any[], value: any, valueKey?: string) =>
+  optionValues.some((item) => isSameOptionValue(item, value, valueKey));
 
 const collectCascaderLeafValues = (options: CascaderOption[], result: any[] = []) => {
   options.forEach((option) => {
@@ -381,10 +403,11 @@ const isValidCascaderPath = (options: CascaderOption[], path: any[]): boolean =>
 
   let currentOptions = options;
   for (let i = 0; i < path.length; i++) {
-    const node = currentOptions.find((option) => Object.is(option.value, path[i]));
-    if (!node) return false;
+    // 同层可能有多份内容相同的 value，不能只走 find 到的第一项
+    const matches = currentOptions.filter((option) => isSameOptionValue(option.value, path[i]));
+    if (!matches.length) return false;
     if (i === path.length - 1) return true;
-    currentOptions = node.children || [];
+    currentOptions = matches.flatMap((option) => option.children || []);
   }
 
   return false;
@@ -450,7 +473,7 @@ const validateSelectValue = (
       if (!Array.isArray(value)) {
         return defaultMessage(
           message,
-          `${value} 类型应为数组`,
+          `${formatErrorValue(value)} 类型应为数组`,
           optionExampleSuggestion(optionValues, '["选项1", "选项2"]', true),
         );
       }
@@ -460,7 +483,7 @@ const validateSelectValue = (
     if (typeof value === 'object') {
       return defaultMessage(
         message,
-        `${value} 类型不合法`,
+        `${formatErrorValue(value)} 类型不合法`,
         optionExampleSuggestion(optionValues, '"文本内容" 或 123', false),
       );
     }
@@ -471,18 +494,18 @@ const validateSelectValue = (
     if (!Array.isArray(value)) {
       return defaultMessage(
         message,
-        `${value} 类型应为数组`,
+        `${formatErrorValue(value)} 类型应为数组`,
         optionExampleSuggestion(optionValues, '["选项1", "选项2"]', true),
       );
     }
-    if (value.some((item) => !includesOptionValue(optionValues, item))) {
-      return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(optionValues));
+    if (value.some((item) => !includesOptionValue(optionValues, item, config.valueKey))) {
+      return defaultMessage(message, `${formatErrorValue(value)} 不在可选项中`, optionSuggestion(optionValues));
     }
     return undefined;
   }
 
-  if (!includesOptionValue(optionValues, value)) {
-    return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(optionValues));
+  if (!includesOptionValue(optionValues, value, config.valueKey)) {
+    return defaultMessage(message, `${formatErrorValue(value)} 不在可选项中`, optionSuggestion(optionValues));
   }
   return undefined;
 };
@@ -514,16 +537,16 @@ const validateCascaderValue = (
     if (typeof value !== 'string' && !Array.isArray(value)) {
       return defaultMessage(
         message,
-        `${value} 类型应为字符串或数组`,
+        `${formatErrorValue(value)} 类型应为字符串或数组`,
         cascaderExample('"选项1,选项2" 或 ["选项1", "选项2"]'),
       );
     }
   } else if (multiple) {
     if (!Array.isArray(value)) {
-      return defaultMessage(message, `${value} 类型应为数组`, cascaderExample('["选项1", "选项2"]'));
+      return defaultMessage(message, `${formatErrorValue(value)} 类型应为数组`, cascaderExample('["选项1", "选项2"]'));
     }
   } else if (emitPath && !Array.isArray(value)) {
-    return defaultMessage(message, `${value} 类型应为数组`, cascaderExample('["选项1", "选项2"]'));
+    return defaultMessage(message, `${formatErrorValue(value)} 类型应为数组`, cascaderExample('["选项1", "选项2"]'));
   }
 
   if (config.remote) {
@@ -538,7 +561,7 @@ const validateCascaderValue = (
 
   if (multiple) {
     if (!Array.isArray(normalizedValue)) {
-      return defaultMessage(message, `${value} 类型应为数组`, cascaderExample('["选项1", "选项2"]'));
+      return defaultMessage(message, `${formatErrorValue(value)} 类型应为数组`, cascaderExample('["选项1", "选项2"]'));
     }
 
     const invalid = normalizedValue.some((item) => {
@@ -549,20 +572,32 @@ const validateCascaderValue = (
     });
 
     if (invalid) {
-      return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(collectCascaderLeafValues(options)));
+      return defaultMessage(
+        message,
+        `${formatErrorValue(value)} 不在可选项中`,
+        optionSuggestion(collectCascaderLeafValues(options)),
+      );
     }
     return undefined;
   }
 
   if (emitPath) {
     if (!Array.isArray(normalizedValue) || !isValidCascaderPath(options, normalizedValue)) {
-      return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(collectCascaderLeafValues(options)));
+      return defaultMessage(
+        message,
+        `${formatErrorValue(value)} 不在可选项中`,
+        optionSuggestion(collectCascaderLeafValues(options)),
+      );
     }
     return undefined;
   }
 
   if (!includesOptionValue(collectCascaderLeafValues(options), normalizedValue)) {
-    return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(collectCascaderLeafValues(options)));
+    return defaultMessage(
+      message,
+      `${formatErrorValue(value)} 不在可选项中`,
+      optionSuggestion(collectCascaderLeafValues(options)),
+    );
   }
   return undefined;
 };
@@ -585,7 +620,7 @@ const validateBuiltinTypeMatch = (
       if (typeof value !== 'number' || Number.isNaN(value)) {
         return defaultMessage(
           message,
-          `${value} 类型应为数字`,
+          `${formatErrorValue(value)} 类型应为数字`,
           typeExampleSuggestion(mForm, props, '123', isNumberValue),
         );
       }
@@ -605,7 +640,7 @@ const validateBuiltinTypeMatch = (
     if (typeof value !== 'string') {
       return defaultMessage(
         message,
-        `${value} 类型应为字符串`,
+        `${formatErrorValue(value)} 类型应为字符串`,
         typeExampleSuggestion(mForm, props, '"文本内容"', isStringValue),
       );
     }
@@ -624,7 +659,7 @@ const validateBuiltinTypeMatch = (
     if (typeof value !== 'number' || Number.isNaN(value)) {
       return defaultMessage(
         message,
-        `${value} 类型应为数字`,
+        `${formatErrorValue(value)} 类型应为数字`,
         typeExampleSuggestion(mForm, props, '123', isNumberValue),
       );
     }
@@ -639,7 +674,7 @@ const validateBuiltinTypeMatch = (
     ) {
       return defaultMessage(
         message,
-        `${value} 类型应为长度为 2 的数字数组`,
+        `${formatErrorValue(value)} 类型应为长度为 2 的数字数组`,
         typeExampleSuggestion(mForm, props, '[0, 100]', isNumberRangeValue),
       );
     }
@@ -649,7 +684,11 @@ const validateBuiltinTypeMatch = (
   if (fieldType === 'switch' || fieldType === 'checkbox') {
     const { activeValue, inactiveValue } = resolveToggleValues(config);
     if (!Object.is(value, activeValue) && !Object.is(value, inactiveValue)) {
-      return defaultMessage(message, `${value} 不在合法开关值中`, toggleSuggestion(activeValue, inactiveValue));
+      return defaultMessage(
+        message,
+        `${formatErrorValue(value)} 不在合法开关值中`,
+        toggleSuggestion(activeValue, inactiveValue),
+      );
     }
     return undefined;
   }
@@ -667,7 +706,7 @@ const validateBuiltinTypeMatch = (
     }
 
     if (!includesOptionValue(optionValues, value)) {
-      return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(optionValues));
+      return defaultMessage(message, `${formatErrorValue(value)} 不在可选项中`, optionSuggestion(optionValues));
     }
     return undefined;
   }
@@ -682,12 +721,12 @@ const validateBuiltinTypeMatch = (
     if (!Array.isArray(value)) {
       return defaultMessage(
         message,
-        `${value} 类型应为数组`,
+        `${formatErrorValue(value)} 类型应为数组`,
         optionExampleSuggestion(optionValues, '["选项1", "选项2"]', true),
       );
     }
     if (value.some((item) => !includesOptionValue(optionValues, item))) {
-      return defaultMessage(message, `${value} 不在可选项中`, optionSuggestion(optionValues));
+      return defaultMessage(message, `${formatErrorValue(value)} 不在可选项中`, optionSuggestion(optionValues));
     }
     return undefined;
   }
@@ -709,8 +748,8 @@ const validateBuiltinTypeMatch = (
       return defaultMessage(
         message,
         isTimestampValueFormat(valueFormat)
-          ? `${value} 类型应为长度为 2 的时间戳数字数组`
-          : `${value} 格式应为长度为 2 的 ${valueFormat} 数组`,
+          ? `${formatErrorValue(value)} 类型应为长度为 2 的时间戳数字数组`
+          : `${formatErrorValue(value)} 格式应为长度为 2 的 ${valueFormat} 数组`,
         dateRangeSuggestion(valueFormat),
       );
     }
@@ -721,7 +760,7 @@ const validateBuiltinTypeMatch = (
     if (!Array.isArray(value) || value.some((item) => !isObjectValue(item))) {
       return defaultMessage(
         message,
-        `${value} 类型应为对象数组`,
+        `${formatErrorValue(value)} 类型应为对象数组`,
         typeExampleSuggestion(mForm, props, '[{}]', isObjectArrayValue),
       );
     }
