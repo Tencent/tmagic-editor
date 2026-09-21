@@ -1,3 +1,9 @@
+# [1.8.0](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.29...v1.8.0) (2026-09-21)
+
+
+### Bug Fixes
+
+* **form:** typeMatch 按内容比较对象选项值，避免 Proxy 误判 ([6b9791a](https://github.com/Tencent/tmagic-editor/commit/6b9791a309df4b2b3137b3f99820a7fe063ea6e1))
 # [1.8.0-beta.29](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.28...v1.8.0-beta.29) (2026-09-20)
 
 
