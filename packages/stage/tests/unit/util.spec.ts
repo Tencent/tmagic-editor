@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { beforeEach, describe, expect, test } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import * as util from '../../src/util';
 
@@ -408,5 +408,77 @@ describe('scrollElementIntoView', () => {
         Object.defineProperty(docEl, 'scrollTop', originalDescriptor);
       }
     }
+  });
+});
+
+describe('isDocumentVisible', () => {
+  test('文档为空时视为可见', () => {
+    expect(util.isDocumentVisible(null)).toBe(true);
+    expect(util.isDocumentVisible(undefined)).toBe(true);
+  });
+
+  test('visibilityState 为 hidden 时不可见', () => {
+    const doc = { visibilityState: 'hidden' } as unknown as Document;
+    expect(util.isDocumentVisible(doc)).toBe(false);
+  });
+
+  test('visibilityState 为 visible / prerender 时可见', () => {
+    expect(util.isDocumentVisible({ visibilityState: 'visible' } as unknown as Document)).toBe(true);
+    expect(util.isDocumentVisible({ visibilityState: 'prerender' } as unknown as Document)).toBe(true);
+  });
+});
+
+describe('isElementVisible', () => {
+  beforeEach(() => {
+    globalThis.document.body.innerHTML = '';
+  });
+
+  test('未挂载到文档时不可见', () => {
+    const el = globalThis.document.createElement('div');
+    expect(util.isElementVisible(el)).toBe(false);
+  });
+
+  test('空值时不可见', () => {
+    expect(util.isElementVisible(null)).toBe(false);
+    expect(util.isElementVisible(undefined)).toBe(false);
+  });
+
+  test('挂载到文档时可见', () => {
+    const el = globalThis.document.createElement('div');
+    globalThis.document.body.appendChild(el);
+    expect(util.isElementVisible(el)).toBe(true);
+  });
+
+  test('自身 display: none 时不可见', () => {
+    const el = globalThis.document.createElement('div');
+    el.style.display = 'none';
+    globalThis.document.body.appendChild(el);
+    expect(util.isElementVisible(el)).toBe(false);
+  });
+
+  test('祖先 display: none 时不可见', () => {
+    const parent = globalThis.document.createElement('div');
+    const el = globalThis.document.createElement('div');
+    parent.appendChild(el);
+    globalThis.document.body.appendChild(parent);
+    parent.style.display = 'none';
+    expect(util.isElementVisible(el)).toBe(false);
+  });
+
+  test('visibility: hidden 时不可见', () => {
+    const el = globalThis.document.createElement('div');
+    el.style.visibility = 'hidden';
+    globalThis.document.body.appendChild(el);
+    expect(util.isElementVisible(el)).toBe(false);
+  });
+
+  test('支持 checkVisibility 时以浏览器结果为准', () => {
+    const el = globalThis.document.createElement('div');
+    globalThis.document.body.appendChild(el);
+    const checkVisibility = vi.fn(() => false);
+    Object.defineProperty(el, 'checkVisibility', { value: checkVisibility, configurable: true });
+
+    expect(util.isElementVisible(el)).toBe(false);
+    expect(checkVisibility).toHaveBeenCalledWith({ checkVisibilityCSS: true });
   });
 });

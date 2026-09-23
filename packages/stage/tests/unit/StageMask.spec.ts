@@ -505,6 +505,154 @@ describe('StageMask', () => {
     expect(mask.scrollTop).toBe(400);
   });
 
+  test('scrollIntoView：页面未挂载时不滚动', () => {
+    mask = new StageMask({ disabledRule: true });
+    const page = globalThis.document.createElement('div');
+    Object.defineProperty(page, 'scrollWidth', { value: 400, configurable: true });
+    mask.observe(page);
+
+    const el = globalThis.document.createElement('div');
+    page.appendChild(el);
+    el.getBoundingClientRect = () => makeDomRect({ left: 0, top: 500, right: 10, bottom: 600, width: 10, height: 100 });
+
+    mask.scrollIntoView(el);
+
+    expect(mask.scrollTop).toBe(0);
+  });
+
+  test('scrollIntoView：页面被隐藏时不滚动', () => {
+    mask = new StageMask({ disabledRule: true });
+    const { scrollParent, page } = setupScrollablePage(mask);
+    page.style.display = 'none';
+
+    const el = globalThis.document.createElement('div');
+    page.appendChild(el);
+    el.getBoundingClientRect = () => makeDomRect({ left: 0, top: 500, right: 10, bottom: 600, width: 10, height: 100 });
+
+    mask.scrollIntoView(el);
+
+    expect(scrollParent.scrollTop).toBe(0);
+    expect(mask.scrollTop).toBe(0);
+  });
+
+  test('scrollIntoView：画布容器被隐藏（蒙层不可见）时不滚动', () => {
+    mask = new StageMask({ disabledRule: true });
+    const host = globalThis.document.createElement('div');
+    host.style.display = 'none';
+    globalThis.document.body.appendChild(host);
+    mask.mount(host);
+
+    const { scrollParent, page } = setupScrollablePage(mask);
+
+    const el = globalThis.document.createElement('div');
+    page.appendChild(el);
+    el.getBoundingClientRect = () => makeDomRect({ left: 0, top: 500, right: 10, bottom: 600, width: 10, height: 100 });
+
+    mask.scrollIntoView(el);
+
+    expect(scrollParent.scrollTop).toBe(0);
+    expect(mask.scrollTop).toBe(0);
+  });
+
+  test('页面不可见时保留 IntersectionObserver 监听，恢复可见后回调仍会滚动', () => {
+    const originalIo = globalThis.IntersectionObserver;
+    const unobserve = vi.fn();
+    let trigger: ((target: Element, intersectionRatio: number) => void) | null = null;
+
+    const MockIntersectionObserver = vi.fn(function (
+      this: {
+        observe: ReturnType<typeof vi.fn>;
+        unobserve: ReturnType<typeof vi.fn>;
+        disconnect: ReturnType<typeof vi.fn>;
+      },
+      callback: IntersectionObserverCallback,
+    ) {
+      trigger = (target: Element, intersectionRatio: number) => {
+        const entry: IntersectionObserverEntry = {
+          target,
+          intersectionRatio,
+          isIntersecting: intersectionRatio > 0,
+          boundingClientRect: makeDomRect({}),
+          intersectionRect: makeDomRect({}),
+          rootBounds: null,
+          time: 0,
+        };
+        callback([entry], this as unknown as IntersectionObserver);
+      };
+      this.observe = vi.fn();
+      this.unobserve = unobserve;
+      this.disconnect = vi.fn();
+    });
+    globalThis.IntersectionObserver = MockIntersectionObserver as unknown as typeof IntersectionObserver;
+
+    try {
+      mask = new StageMask({ disabledRule: true });
+      const { scrollParent, page } = setupScrollablePage(mask);
+
+      const el = globalThis.document.createElement('div');
+      page.appendChild(el);
+      el.getBoundingClientRect = () =>
+        makeDomRect({ left: 0, top: 500, right: 10, bottom: 600, width: 10, height: 100 });
+
+      mask.observerIntersection(el);
+
+      Object.defineProperty(globalThis.document, 'visibilityState', { value: 'hidden', configurable: true });
+
+      try {
+        trigger?.(el, 0);
+
+        expect(scrollParent.scrollTop).toBe(0);
+        expect(mask.scrollTop).toBe(0);
+        // 不取消监听，等页面恢复可见后由 IntersectionObserver 重新回调
+        expect(unobserve).not.toHaveBeenCalled();
+      } finally {
+        delete (globalThis.document as unknown as Record<string, unknown>).visibilityState;
+      }
+
+      trigger?.(el, 0);
+
+      expect(scrollParent.scrollTop).toBe(300);
+      expect(mask.scrollTop).toBe(300);
+      expect(unobserve).toHaveBeenCalledWith(el);
+    } finally {
+      globalThis.IntersectionObserver = originalIo;
+    }
+  });
+
+  test('scrollIntoView：浏览器 tab 不可见时不滚动', () => {
+    mask = new StageMask({ disabledRule: true });
+    const { scrollParent, page } = setupScrollablePage(mask);
+
+    const el = globalThis.document.createElement('div');
+    page.appendChild(el);
+    el.getBoundingClientRect = () => makeDomRect({ left: 0, top: 500, right: 10, bottom: 600, width: 10, height: 100 });
+
+    Object.defineProperty(globalThis.document, 'visibilityState', { value: 'hidden', configurable: true });
+
+    try {
+      mask.scrollIntoView(el);
+    } finally {
+      delete (globalThis.document as unknown as Record<string, unknown>).visibilityState;
+    }
+
+    expect(scrollParent.scrollTop).toBe(0);
+    expect(mask.scrollTop).toBe(0);
+  });
+
+  test('scrollIntoView：浏览器 tab 可见时正常滚动', () => {
+    mask = new StageMask({ disabledRule: true });
+    const { scrollParent, page } = setupScrollablePage(mask);
+    expect(globalThis.document.visibilityState).toBe('visible');
+
+    const el = globalThis.document.createElement('div');
+    page.appendChild(el);
+    el.getBoundingClientRect = () => makeDomRect({ left: 0, top: 500, right: 10, bottom: 600, width: 10, height: 100 });
+
+    mask.scrollIntoView(el);
+
+    expect(scrollParent.scrollTop).toBe(300);
+  });
+
   test('scrollIntoView：pageScrollParent 不存在时不滚动', () => {
     mask = new StageMask({ disabledRule: true });
     const page = globalThis.document.createElement('div');

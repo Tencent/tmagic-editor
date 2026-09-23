@@ -142,6 +142,35 @@ export const getScrollParent = (element: HTMLElement, includeHidden = false): HT
 };
 
 /**
+ * 判断文档是否可见
+ * @description 浏览器 tab 切到后台、窗口最小化时文档 visibilityState 为 hidden；
+ * 只将 hidden 视为不可见，避免 prerender 等中间态被误判
+ * @param doc 目标文档
+ */
+export const isDocumentVisible = (doc: Document | null | undefined): boolean => doc?.visibilityState !== 'hidden';
+
+/**
+ * 判断元素是否可见
+ * @description 元素未挂载到文档、或其自身/祖先被 display:none、visibility:hidden 隐藏时视为不可见；
+ * 优先使用浏览器提供的 checkVisibility，不支持时退化为沿祖先链检查计算样式
+ * @param el 目标元素
+ */
+export const isElementVisible = (el: Element | null | undefined): boolean => {
+  if (!el?.isConnected) return false;
+
+  if (typeof el.checkVisibility === 'function') {
+    return el.checkVisibility({ checkVisibilityCSS: true });
+  }
+
+  for (let node: Element | null = el; node; node = node.parentElement) {
+    const { display, visibility } = getComputedStyle(node);
+    if (display === 'none' || visibility === 'hidden') return false;
+  }
+
+  return true;
+};
+
+/**
  * 将元素滚动到指定滚动容器的可视区域内（仅垂直方向，滚动最小距离）
  * @description 与原生 scrollIntoView 不同，只滚动指定的容器自身，不会连带滚动外层祖先滚动容器，
  * 避免编辑器画布外层容器（如 stage 外层使用 transform 模拟滚动的容器）被浏览器自动滚动导致整个画布位移

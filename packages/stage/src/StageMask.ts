@@ -21,7 +21,7 @@ import { createDiv, getDocument, injectStyle } from '@tmagic/core';
 import { Mode, ZIndex } from './const';
 import Rule from './Rule';
 import type { MaskEvents, RuleOptions } from './types';
-import { getScrollParent, isFixedParent, scrollElementIntoView } from './util';
+import { getScrollParent, isDocumentVisible, isElementVisible, isFixedParent, scrollElementIntoView } from './util';
 
 const wrapperClassName = 'editor-mask-wrapper';
 
@@ -176,7 +176,14 @@ export default class StageMask extends Rule {
     this.setMode(isFixedParent(el) ? Mode.FIXED : Mode.ABSOLUTE);
   }
 
+  /**
+   * 将元素滚动到画布可视区域内
+   * @description 页面不可见时不做滚动：此时滚动既无视觉效果，又会记录错误的滚动偏移
+   * @param el 目标元素
+   */
   public scrollIntoView(el: Element): void {
+    if (!this.isPageVisible()) return;
+
     // 不可以有横向滚动
     if (!this.page || el.getBoundingClientRect().left >= this.page.scrollWidth) return;
 
@@ -235,6 +242,10 @@ export default class StageMask extends Rule {
         (entries) => {
           entries.forEach((entry) => {
             const { target, intersectionRatio } = entry;
+
+            // 页面不可见时不滚动，同时保留监听，等页面恢复可见后由 IntersectionObserver 重新回调
+            if (!this.isPageVisible()) return;
+
             if (intersectionRatio <= 0) {
               this.scrollIntoView(target);
             }
@@ -308,6 +319,20 @@ export default class StageMask extends Rule {
       },
     });
     this.content.dispatchEvent(event);
+  }
+
+  /**
+   * 页面是否可见
+   * @description 页面未挂载、或画布容器被隐藏（如编辑器切到其他面板）时页面不可见；
+   * 蒙层与页面所在的 iframe 挂载在同一容器中，容器隐藏时页面内部元素仍可能是"可见"的，因此额外判断蒙层；
+   * 浏览器 tab 不可见（切到其他标签页、窗口最小化）时同样视为不可见
+   */
+  private isPageVisible(): boolean {
+    if (!isDocumentVisible(this.page?.ownerDocument) || !isDocumentVisible(this.wrapper.ownerDocument)) return false;
+
+    if (!isElementVisible(this.page)) return false;
+
+    return !this.wrapper.isConnected || isElementVisible(this.wrapper);
   }
 
   /**
