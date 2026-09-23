@@ -1,3 +1,9 @@
+## [1.8.2](https://github.com/Tencent/tmagic-editor/compare/v1.8.1...v1.8.2) (2026-09-23)
+
+
+### Features
+
+* **editor:** enablePropsFormValidate 改为响应式注入并接管 typeMatchValid / validateOnInit ([a100462](https://github.com/Tencent/tmagic-editor/commit/a100462a52dd57841f04e73f414f5041af838904))
 ## [1.8.1](https://github.com/Tencent/tmagic-editor/compare/v1.8.0...v1.8.1) (2026-09-23)
 
 
