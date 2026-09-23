@@ -1,3 +1,14 @@
+## [1.8.1](https://github.com/Tencent/tmagic-editor/compare/v1.8.0...v1.8.1) (2026-09-23)
+
+
+### Bug Fixes
+
+* **stage:** 页面不可见时不调用 scrollIntoView ([0b89e7e](https://github.com/Tencent/tmagic-editor/commit/0b89e7e32e68559d7e7887705c39ee3c9dcc7ed5))
+
+
+### Features
+
+* **editor:** 数据源字段路径支持数组下标，并细化 field-select 与展示条件的类型校验 ([a577d7c](https://github.com/Tencent/tmagic-editor/commit/a577d7cee369dd3f145751f1e396bc685fcaa488))
 # [1.8.0](https://github.com/Tencent/tmagic-editor/compare/v1.8.0-beta.29...v1.8.0) (2026-09-21)
 
 
