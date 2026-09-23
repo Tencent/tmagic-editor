@@ -1,4 +1,4 @@
-import type { InjectionKey } from 'vue';
+import type { ComputedRef, InjectionKey } from 'vue';
 
 import type { DataSourceSchema, EventOption, Id, MApp, MNode, MPage, MPageFragment } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
@@ -31,8 +31,11 @@ import type {
 /**
  * 「属性配置表单校验」联动能力的 provide/inject 注入键。
  * 使用 Symbol 避免与其它字符串键冲突，供 PropsPanel / FormPanel 注入判断校验失败时是否仍更新节点并记录错误。
+ *
+ * 注入值是 ComputedRef：Editor 用 `computed(() => props.enablePropsFormValidate ?? false)` 提供，
+ * 保证外部动态切换该 prop 时子孙组件能同步拿到最新值；子孙侧用 `.value` 读取。
  */
-export const ENABLE_PROPS_FORM_VALIDATE: InjectionKey<boolean> = Symbol('enablePropsFormValidate');
+export const ENABLE_PROPS_FORM_VALIDATE: InjectionKey<ComputedRef<boolean>> = Symbol('enablePropsFormValidate');
 
 export interface EditorProps {
   /** 是否是大屏模拟器容器，大屏容器时，左侧属性面板会扩展为两列（正常3列），颜色表单不扩展两列等 */

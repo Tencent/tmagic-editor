@@ -236,7 +236,12 @@ provide('services', services);
 provide('codeOptions', props.codeOptions);
 provide('stageOptions', stageOptions);
 /** 是否启用「属性配置表单校验」联动能力，供 PropsPanel / FormPanel 判断校验失败时是否仍更新节点并记录错误 */
-provide(ENABLE_PROPS_FORM_VALIDATE, props.enablePropsFormValidate ?? false);
+// 同 isLargeStageContainer：用 computed 包一层，否则传下去的是 provide 那一刻的值快照，
+// props.enablePropsFormValidate 后续变化不会同步到子孙。
+provide(
+  ENABLE_PROPS_FORM_VALIDATE,
+  computed(() => props.enablePropsFormValidate ?? false),
+);
 /**
  * 编辑器注入给整棵表单树的业务上下文（`services` / `stage`），属性面板、对比表单、
  * 侧边栏里的嵌套 MForm 都通过 inject 自动继承。

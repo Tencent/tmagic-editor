@@ -12,9 +12,9 @@
         :size="propsPanelSize"
         :init-values="values"
         :config="config"
-        :type-match-valid="true"
+        :type-match-valid="enablePropsFormValidate"
         :context="formContext"
-        :validate-on-init="true"
+        :validate-on-init="enablePropsFormValidate"
         @change="submit"
         @error="errorHandler"
       ></MForm>
@@ -86,7 +86,10 @@ const emit = defineEmits<{
   unmounted: [];
 }>();
 
-const enablePropsFormValidate = inject(ENABLE_PROPS_FORM_VALIDATE, false);
+const enablePropsFormValidate = inject(
+  ENABLE_PROPS_FORM_VALIDATE,
+  computed(() => false),
+);
 
 const services = useServices();
 const { uiService } = services;
@@ -116,7 +119,7 @@ const submit = async (v: FormValue, eventData: ContainerChangeEventData) => {
     // 校验成功：正常更新节点（第三个参数 error 为空，表示清除该来源的错误记录）
     emit('submit', values, eventData);
   } catch (e: any) {
-    if (enablePropsFormValidate) {
+    if (enablePropsFormValidate.value) {
       // 启用校验联动：校验失败时仍以当前表单值更新节点，并把错误信息一并抛给上层记录
       emit('submit', v, eventData, e);
     } else {
@@ -146,7 +149,7 @@ const formatValidateErrorHtml = (error: string): string =>
 const saveCode = async (values: any) => {
   const newValues = props.codeValueKey ? { [props.codeValueKey]: values } : values;
 
-  if (!enablePropsFormValidate) {
+  if (!enablePropsFormValidate.value) {
     // 未启用校验联动：保持原行为，直接提交源码保存的值
     emit('submit', newValues);
     return;

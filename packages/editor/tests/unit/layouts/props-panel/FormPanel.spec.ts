@@ -4,7 +4,7 @@
  * Copyright (C) 2025 Tencent.
  */
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { computed, defineComponent, h, nextTick } from 'vue';
+import { computed, defineComponent, h, nextTick, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import { FORM_CONTEXT_KEY } from '@tmagic/form';
@@ -78,7 +78,7 @@ vi.mock('@tmagic/form', async () => {
     validateForm: vi.fn((options?: any) => validateFormImpl(options)),
     MForm: defineComponent({
       name: 'MForm',
-      props: ['config', 'initValues', 'context'],
+      props: ['config', 'initValues', 'context', 'typeMatchValid', 'validateOnInit'],
       emits: ['change', 'error'],
       setup(_p, { expose, emit }) {
         const formState = { stage: null as any, services: null as any };
@@ -171,7 +171,7 @@ describe('FormPanel', () => {
     };
     const wrapper = mount(FormPanel, {
       props: { config: [], values: {} } as any,
-      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: computed(() => true) } },
     });
     await wrapper.find('.change-btn').trigger('click');
     await new Promise((r) => setTimeout(r, 0));
@@ -188,7 +188,7 @@ describe('FormPanel', () => {
   test('校验成功时 emit submit 且不携带 error', async () => {
     const wrapper = mount(FormPanel, {
       props: { config: [], values: {} } as any,
-      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: computed(() => true) } },
     });
     await wrapper.find('.change-btn').trigger('click');
     await new Promise((r) => setTimeout(r, 0));
@@ -245,7 +245,7 @@ describe('FormPanel', () => {
     validateFormImpl = validateSpy;
     const wrapper = mount(FormPanel, {
       props: { config: [], values: {}, codeValueKey: 'style' } as any,
-      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: computed(() => true) } },
     });
     await wrapper.find('.fake-btn').trigger('click');
     await wrapper.find('.fake-code-editor').trigger('click');
@@ -261,7 +261,7 @@ describe('FormPanel', () => {
     validateFormImpl = validateSpy;
     const wrapper = mount(FormPanel, {
       props: { config: [], values: {} } as any,
-      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: computed(() => true) } },
     });
     await wrapper.find('.fake-btn').trigger('click');
     await wrapper.find('.fake-code-editor').trigger('click');
@@ -276,7 +276,7 @@ describe('FormPanel', () => {
     validateFormImpl = async () => '';
     const wrapper = mount(FormPanel, {
       props: { config: [], values: {} } as any,
-      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: computed(() => true) } },
     });
     await wrapper.find('.fake-btn').trigger('click');
     await wrapper.find('.fake-code-editor').trigger('click');
@@ -293,7 +293,7 @@ describe('FormPanel', () => {
     validateFormImpl = async () => '字段A -> 必填';
     const wrapper = mount(FormPanel, {
       props: { config: [], values: {} } as any,
-      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: computed(() => true) } },
     });
     await wrapper.find('.fake-btn').trigger('click');
     await wrapper.find('.fake-code-editor').trigger('click');
@@ -314,7 +314,7 @@ describe('FormPanel', () => {
     };
     const wrapper = mount(FormPanel, {
       props: { config: [], values: {} } as any,
-      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: computed(() => true) } },
     });
     await wrapper.find('.fake-btn').trigger('click');
     await wrapper.find('.fake-code-editor').trigger('click');
@@ -328,5 +328,42 @@ describe('FormPanel', () => {
     expect(consoleError).toHaveBeenCalledWith('validateForm error', expect.any(Error));
     expect(tMagicMessage).not.toHaveBeenCalled();
     consoleError.mockRestore();
+  });
+
+  test('未启用 enablePropsFormValidate 时 MForm 不开启 typeMatchValid / validateOnInit', () => {
+    const wrapper = mount(FormPanel, { props: { config: [], values: {} } as any });
+
+    const mForm = wrapper.findComponent({ name: 'MForm' });
+    expect(mForm.props('typeMatchValid')).toBe(false);
+    expect(mForm.props('validateOnInit')).toBe(false);
+  });
+
+  test('启用 enablePropsFormValidate 时 MForm 开启 typeMatchValid / validateOnInit', () => {
+    const wrapper = mount(FormPanel, {
+      props: { config: [], values: {} } as any,
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: computed(() => true) } },
+    });
+
+    const mForm = wrapper.findComponent({ name: 'MForm' });
+    expect(mForm.props('typeMatchValid')).toBe(true);
+    expect(mForm.props('validateOnInit')).toBe(true);
+  });
+
+  test('enablePropsFormValidate 变化时 MForm 的 typeMatchValid / validateOnInit 同步更新', async () => {
+    const enabled = ref(false);
+    const wrapper = mount(FormPanel, {
+      props: { config: [], values: {} } as any,
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: computed(() => enabled.value) } },
+    });
+
+    const mForm = wrapper.findComponent({ name: 'MForm' });
+    expect(mForm.props('typeMatchValid')).toBe(false);
+    expect(mForm.props('validateOnInit')).toBe(false);
+
+    enabled.value = true;
+    await nextTick();
+
+    expect(mForm.props('typeMatchValid')).toBe(true);
+    expect(mForm.props('validateOnInit')).toBe(true);
   });
 });

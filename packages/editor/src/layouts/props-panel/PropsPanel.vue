@@ -93,7 +93,10 @@ const emit = defineEmits<{
 
 const { editorService, uiService, propsService, storageService } = useServices();
 
-const enablePropsFormValidate = inject(ENABLE_PROPS_FORM_VALIDATE, false);
+const enablePropsFormValidate = inject(
+  ENABLE_PROPS_FORM_VALIDATE,
+  computed(() => false),
+);
 
 const values = ref<FormValue>({});
 // ts类型应该是FormConfig， 但是打包时会出错，所以暂时用any
@@ -205,7 +208,9 @@ const submit = async (
       replace,
       // 启用校验联动时，仅校验失败（error 存在）才把错误信息随更新传入 editorService 记录；
       // 其余情况（含表单校验成功、CodeEditor 源码保存）不携带 invalidInfo，由 editorService 在执行 update 时统一清除该节点错误。
-      ...(enablePropsFormValidate && error ? { invalidInfo: { id: newValue.id, source, error: error?.message } } : {}),
+      ...(enablePropsFormValidate.value && error
+        ? { invalidInfo: { id: newValue.id, source, error: error?.message } }
+        : {}),
     });
   } catch (e: any) {
     emit('submit-error', e);

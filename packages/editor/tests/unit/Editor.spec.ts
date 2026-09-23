@@ -10,8 +10,10 @@ import { mount } from '@vue/test-utils';
 import { FORM_CONTEXT_KEY, type FormContext } from '@tmagic/form';
 
 import Editor from '@editor/Editor.vue';
+import { ENABLE_PROPS_FORM_VALIDATE } from '@editor/editorProps';
 
 let injectedFormContext: ComputedRef<FormContext> | undefined;
+let injectedEnablePropsFormValidate: ComputedRef<boolean> | undefined;
 
 const { initServiceEventsMock, initServiceStateMock } = vi.hoisted(() => ({
   initServiceEventsMock: vi.fn(),
@@ -107,6 +109,10 @@ vi.mock('@editor/layouts/props-panel/PropsPanel.vue', () => ({
     emits: ['mounted', 'unmounted', 'submit-error', 'form-error'],
     setup(_p, { emit }) {
       injectedFormContext = inject(FORM_CONTEXT_KEY, undefined);
+      injectedEnablePropsFormValidate = inject(
+        ENABLE_PROPS_FORM_VALIDATE,
+        computed(() => false),
+      );
       return () =>
         h('div', { class: 'fake-props-panel' }, [
           h('button', { class: 'mounted-btn', onClick: () => emit('mounted', { proxy: true }) }),
@@ -125,6 +131,7 @@ vi.mock('@editor/layouts/props-panel/FormPanel.vue', () => ({
 beforeEach(() => {
   vi.clearAllMocks();
   injectedFormContext = undefined;
+  injectedEnablePropsFormValidate = undefined;
 });
 
 describe('Editor', () => {
@@ -244,6 +251,24 @@ describe('Editor', () => {
     editorServiceMod.default.__setStage(nextStage);
     expect((injectedFormContext!.value as any).stage).toBe(nextStage);
     editorServiceMod.default.__setStage(stageStub);
+  });
+
+  test('ENABLE_PROPS_FORM_VALIDATE 默认注入 false', async () => {
+    mount(Editor, { props: {} as any });
+    await nextTick();
+    expect(injectedEnablePropsFormValidate?.value).toBe(false);
+  });
+
+  test('ENABLE_PROPS_FORM_VALIDATE 走 computed 读时求值，prop 变化后子孙能读到最新值', async () => {
+    const wrapper = mount(Editor, { props: { enablePropsFormValidate: false } as any });
+    await nextTick();
+    expect(injectedEnablePropsFormValidate?.value).toBe(false);
+
+    await wrapper.setProps({ enablePropsFormValidate: true });
+    expect(injectedEnablePropsFormValidate?.value).toBe(true);
+
+    await wrapper.setProps({ enablePropsFormValidate: false });
+    expect(injectedEnablePropsFormValidate?.value).toBe(false);
   });
 
   test('expose services', () => {

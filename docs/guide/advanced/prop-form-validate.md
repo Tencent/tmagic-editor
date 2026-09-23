@@ -10,6 +10,8 @@
 
 > 该能力默认关闭，需通过 `<m-editor :enable-props-form-validate="true">` 显式开启。
 
+开启后，属性 / 样式表单内部 `MForm` 的 `typeMatchValid`（按字段 type 校验值形态）与 `validateOnInit`（初始化后立即校验一次）也会一并开启；关闭时两者同样关闭。开关可动态变化，表单会同步生效。
+
 ## 工作原理
 
 ### 错误来源维度

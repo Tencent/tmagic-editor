@@ -4,7 +4,7 @@
  * Copyright (C) 2025 Tencent.
  */
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { defineComponent, h, nextTick, ref } from 'vue';
+import { computed, defineComponent, h, nextTick, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import { ENABLE_PROPS_FORM_VALIDATE } from '@editor/editorProps';
@@ -193,7 +193,7 @@ describe('PropsPanel', () => {
   test('启用 enablePropsFormValidate 时属性表单校验失败携带 invalidInfo(source=props)', async () => {
     const wrapper = mount(PropsPanel, {
       props: {} as any,
-      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: computed(() => true) } },
     });
     await new Promise((r) => setTimeout(r, 0));
     await wrapper.find('.submit-with-err-btn').trigger('click');
@@ -205,7 +205,7 @@ describe('PropsPanel', () => {
   test('启用 enablePropsFormValidate 且校验成功时不携带 invalidInfo（保持错误状态不变）', async () => {
     const wrapper = mount(PropsPanel, {
       props: {} as any,
-      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: computed(() => true) } },
     });
     await new Promise((r) => setTimeout(r, 0));
     await wrapper.find('.submit-btn').trigger('click');
@@ -218,7 +218,7 @@ describe('PropsPanel', () => {
     showStylePanel.value = true;
     const wrapper = mount(PropsPanel, {
       props: {} as any,
-      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: computed(() => true) } },
     });
     await new Promise((r) => setTimeout(r, 0));
     // 第二个 FormPanel 为样式面板
@@ -233,7 +233,7 @@ describe('PropsPanel', () => {
   test('CodeEditor 源码保存不携带 invalidInfo（未经表单校验，不应改动错误状态）', async () => {
     const wrapper = mount(PropsPanel, {
       props: {} as any,
-      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: true } },
+      global: { provide: { [ENABLE_PROPS_FORM_VALIDATE]: computed(() => true) } },
     });
     await new Promise((r) => setTimeout(r, 0));
     await wrapper.find('.code-save-btn').trigger('click');
