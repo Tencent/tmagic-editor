@@ -31,6 +31,7 @@ import {
   DATA_SOURCE_SET_DATA_METHOD_NAME,
   dataSourceTemplateRegExp,
   getKeysArray,
+  isArrayIndex,
   removeDataSourceFieldPrefix,
 } from '@tmagic/utils';
 
@@ -211,7 +212,7 @@ const displayCondSuggestion = (): string => {
 };
 
 const validateDataSourceFieldPath = (
-  path: string[],
+  path: Array<string | number>,
   options: {
     dataSourceId?: string;
     dataSourceFieldType?: DataSourceFieldType[];
@@ -239,8 +240,17 @@ const validateDataSourceFieldPath = (
     return undefined;
   }
 
-  const { field, ok, fields, failedName } = resolveFieldByPath(ds.fields, path);
+  const { field, ok, fields, failedName, invalidArrayIndex, arrayElement, untypedArrayElement } = resolveFieldByPath(
+    ds.fields,
+    path,
+    {
+      allowArrayIndex: true,
+    },
+  );
   if (!ok) {
+    if (invalidArrayIndex) {
+      return defaultMessage(options.message, `数组下标(${failedName})只能接在数组字段后面`);
+    }
     return defaultMessage(
       options.message,
       `数据源字段(${failedName})不存在`,
@@ -253,6 +263,13 @@ const validateDataSourceFieldPath = (
     return undefined;
   }
 
+  if (untypedArrayElement) {
+    return defaultMessage(
+      options.message,
+      `数组下标(${field?.name ?? path[path.length - 1]})的元素类型未定义，请选择具体字段`,
+    );
+  }
+
   const leafType = field?.type || 'any';
   if (leafType !== 'any' && !allowedTypes.includes(leafType)) {
     const fieldName = field?.name || path[path.length - 1];
@@ -260,7 +277,9 @@ const validateDataSourceFieldPath = (
     // 文案已点明当前字段类型与要求类型，无需再列同级可选字段
     return defaultMessage(
       options.message,
-      `请选择类型为${allowedTypes.join('或')}的字段，字段(${fieldName})的类型为${leafType}`,
+      arrayElement
+        ? `请选择类型为${allowedTypes.join('或')}的字段，数组元素的类型为${leafType}`
+        : `请选择类型为${allowedTypes.join('或')}的字段，字段(${fieldName})的类型为${leafType}`,
     );
   }
 };
@@ -437,8 +456,12 @@ const validateDataSourceInput: TypeMatchValidator = (value, { message }) => {
 const validateDataSourceMethodSelect: TypeMatchValidator = (value, { message }) =>
   validateDataSourceMethodTuple(value, message);
 
-const isDataSourceFieldPathValue = (value: any, config: any): value is string[] => {
-  if (!Array.isArray(value) || !value.length || value.some((item) => typeof item !== 'string')) {
+/** 字段名，或非负整数下标（number）。数字字符串本身是 string，走字段名分支。 */
+const isDataSourceFieldPathSegment = (item: unknown): item is string | number =>
+  typeof item === 'string' || (typeof item === 'number' && isArrayIndex(item));
+
+const isDataSourceFieldPathValue = (value: any, config: any): value is Array<string | number> => {
+  if (!Array.isArray(value) || !value.length || value.some((item) => !isDataSourceFieldPathSegment(item))) {
     return false;
   }
   if (config.dataSourceId) {
@@ -488,16 +511,29 @@ export const validateDataSourceFieldSelect = (
     }
   }
 
-  if (!Array.isArray(value) || value.some((item) => typeof item !== 'string')) {
-    return defaultMessage(message, `${value}类型应为字符串数组`, dataSourceFieldPathSuggestion());
+  if (!Array.isArray(value) || value.some((item) => !isDataSourceFieldPathSegment(item))) {
+    return defaultMessage(
+      message,
+      `${value}类型应为字符串数组，数组字段后可接数字下标`,
+      dataSourceFieldPathSuggestion(),
+    );
   }
 
   // 未指定 dataSourceId 时，路径首项为数据源 id，其余为字段名。
   // value 模式的首项带 ds-field:: 前缀、key 模式不带，removeDataSourceFieldPrefix 对后者是幂等的，无需分支。
+  // 数组下标只出现在字段段，数据源 id 仍必须是字符串。
   let dataSourceId = config.dataSourceId ? `${config.dataSourceId}` : undefined;
-  let fieldNames = value;
+  let fieldNames: Array<string | number> = value;
   if (!dataSourceId) {
-    dataSourceId = value.length ? removeDataSourceFieldPrefix(value[0]) : undefined;
+    const dsId = value[0];
+    if (value.length && typeof dsId !== 'string') {
+      return defaultMessage(
+        message,
+        `${value}类型应为字符串数组，数组字段后可接数字下标`,
+        dataSourceFieldPathSuggestion(),
+      );
+    }
+    dataSourceId = value.length ? removeDataSourceFieldPrefix(dsId) : undefined;
     fieldNames = value.slice(1);
   }
 

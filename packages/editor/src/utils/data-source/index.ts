@@ -1,6 +1,6 @@
 import type { DataSchema, DataSourceFieldType, DataSourceSchema } from '@tmagic/core';
 import { type CascaderOption, type FormConfig, type TabConfig } from '@tmagic/form';
-import { dataSourceTemplateRegExp, getKeysArray, isNumber } from '@tmagic/utils';
+import { dataSourceTemplateRegExp, getKeysArray, isArrayIndex, isNumber } from '@tmagic/utils';
 
 import BaseFormConfig from './formConfigs/base';
 import HttpFormConfig from './formConfigs/http';
@@ -239,34 +239,86 @@ export const getCascaderOptionsFromFields = (
 /**
  * 按字段名路径下钻 DataSchema。
  * @param skipNumberIndices 为 true 时跳过数字段（模板路径中的数组下标，如 arr[0].x）
+ * @param allowArrayIndex 为 true 时识别数组下标。`number` 只能是下标；数字字符串先按当前层字段名匹配，没有同名字段时才当中下标
  */
 export const resolveFieldByPath = (
   fields: DataSchema[] | undefined,
-  fieldNames: string[],
-  options: { skipNumberIndices?: boolean } = {},
-): { ok: boolean; field?: DataSchema; fields: DataSchema[]; failedName?: string } => {
+  fieldNames: Array<string | number>,
+  options: { skipNumberIndices?: boolean; allowArrayIndex?: boolean } = {},
+): {
+  ok: boolean;
+  field?: DataSchema;
+  fields: DataSchema[];
+  failedName?: string;
+  /** number 下标没有紧跟在数组字段后面 */
+  invalidArrayIndex?: boolean;
+  /** 路径停在数组下标上，当前值是数组元素 */
+  arrayElement?: boolean;
+  /** 数组没有子字段，元素类型未知 */
+  untypedArrayElement?: boolean;
+} => {
   let currentFields = fields || [];
   let field: DataSchema | undefined;
+  /** 刚消费了数组下标，路径若在此结束则当前值是数组元素 */
+  let atArrayElement = false;
+  let arrayIndexName = '';
 
   for (const name of fieldNames) {
     if (options.skipNumberIndices && isNumber(name)) {
       continue;
     }
-    if (!currentFields.length) {
-      return { ok: false, fields: currentFields, failedName: name };
+
+    const segment = `${name}`;
+    // number 不能当字段名。数字字符串仅在当前层没有同名字段时才当中下标，避免盖住名为 "0" 的子字段。
+    if (options.allowArrayIndex && isArrayIndex(name) && field?.type === 'array' && !atArrayElement) {
+      const namedField = typeof name === 'string' ? currentFields.find((item) => item.name === segment) : undefined;
+      if (!namedField) {
+        atArrayElement = true;
+        arrayIndexName = segment;
+        continue;
+      }
     }
-    field = currentFields.find((item) => item.name === name);
+
+    if (options.allowArrayIndex && typeof name === 'number') {
+      return { ok: false, fields: currentFields, failedName: segment, invalidArrayIndex: true };
+    }
+
+    atArrayElement = false;
+
+    if (!currentFields.length) {
+      return { ok: false, fields: currentFields, failedName: segment };
+    }
+    field = currentFields.find((item) => item.name === segment);
     if (!field) {
-      return { ok: false, fields: currentFields, failedName: name };
+      return { ok: false, fields: currentFields, failedName: segment };
     }
     currentFields = field.fields || [];
+  }
+
+  if (atArrayElement && field?.type === 'array') {
+    const elementFields = field.fields || [];
+    const untypedArrayElement = elementFields.length === 0;
+    return {
+      ok: true,
+      arrayElement: true,
+      untypedArrayElement,
+      field: {
+        name: arrayIndexName,
+        // 有子字段时元素是这些字段组成的对象；没有子字段时类型未知，不能当成显式 any
+        type: untypedArrayElement ? 'any' : 'object',
+        fields: elementFields,
+      },
+      fields: elementFields,
+    };
   }
 
   return { field, ok: true, fields: currentFields };
 };
 
-export const getFieldType = (ds: DataSourceSchema | undefined, fieldNames: string[]) => {
-  const { ok, field } = resolveFieldByPath(ds?.fields, fieldNames);
-  if (!ok) return '';
+export const getFieldType = (ds: DataSourceSchema | undefined, fieldNames: Array<string | number>) => {
+  const { ok, field, untypedArrayElement } = resolveFieldByPath(ds?.fields, fieldNames, {
+    allowArrayIndex: true,
+  });
+  if (!ok || untypedArrayElement) return '';
   return field?.type || '';
 };

@@ -211,7 +211,7 @@ describe('editorTypeMatchRules', () => {
   });
 
   test('data-source-field-select 校验路径与 fieldConfig 类型校验', () => {
-    expect(firstLine(run('data-source-field-select', 'x'))).toBe('x类型应为字符串数组');
+    expect(firstLine(run('data-source-field-select', 'x'))).toBe('x类型应为字符串数组，数组字段后可接数字下标');
 
     // 有 fieldConfig 且值不是数据源字段路径时，按 fieldConfig 的类型校验（text 允许数字）
     expect(run('data-source-field-select', 'text-value', { name: 'f', fieldConfig: { type: 'text' } })).toBeUndefined();
@@ -281,6 +281,95 @@ describe('editorTypeMatchRules', () => {
         dataSourceFieldType: ['string'],
       }),
     ).toBe('请选择类型为string的字段，字段(a)的类型为number');
+
+    dataSourcesState.value = [
+      {
+        id: 'ds1',
+        type: 'base',
+        fields: [
+          { name: 'title', type: 'string' },
+          { name: 'arr', type: 'array', fields: [{ name: 'item', type: 'string' }] },
+          {
+            name: 'matrix',
+            type: 'array',
+            fields: [{ name: 'row', type: 'array', fields: [{ name: 'cell', type: 'number' }] }],
+          },
+        ],
+        methods: [],
+      },
+    ];
+    // 数组字段后可接下标：number 与数字字符串都合法，并继续解析元素字段
+    expect(run('data-source-field-select', ['ds1', 'arr', 0, 'item'], { value: 'key' })).toBeUndefined();
+    expect(run('data-source-field-select', ['ds1', 'arr', '0', 'item'], { value: 'key' })).toBeUndefined();
+    expect(
+      run('data-source-field-select', [`${DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX}ds1`, 'arr', 0, 'item'], {
+        fieldConfig: { type: 'text' },
+        dataSourceFieldType: ['string'],
+      }),
+    ).toBeUndefined();
+    expect(run('data-source-field-select', ['arr', 0, 'item'], { dataSourceId: 'ds1' })).toBeUndefined();
+    expect(run('data-source-field-select', ['ds1', 'matrix', 0, 'row', 1, 'cell'], { value: 'key' })).toBeUndefined();
+    expect(
+      run('data-source-field-select', ['ds1', 'arr', 0], {
+        value: 'key',
+        dataSourceFieldType: ['object'],
+      }),
+    ).toBe(undefined);
+    expect(
+      firstLine(
+        run('data-source-field-select', ['ds1', 'arr', 0], {
+          value: 'key',
+          dataSourceFieldType: ['string'],
+        }),
+      ),
+    ).toBe('请选择类型为string的字段，数组元素的类型为object');
+    expect(firstLine(run('data-source-field-select', ['ds1', 'title', 0], { value: 'key' }))).toBe(
+      '数组下标(0)只能接在数组字段后面',
+    );
+    expect(firstLine(run('data-source-field-select', ['ds1', 'arr', 1.5], { value: 'key' }))).toBe(
+      'ds1,arr,1.5类型应为字符串数组，数组字段后可接数字下标',
+    );
+    expect(firstLine(run('data-source-field-select', [0, 'item'], { value: 'key' }))).toBe(
+      '0,item类型应为字符串数组，数组字段后可接数字下标',
+    );
+
+    dataSourcesState.value = [
+      {
+        id: 'ds1',
+        type: 'base',
+        fields: [
+          {
+            name: 'arr',
+            type: 'array',
+            fields: [
+              { name: '0', type: 'number' },
+              { name: 'item', type: 'string' },
+            ],
+          },
+          { name: 'ids', type: 'array' },
+        ],
+        methods: [],
+      },
+    ];
+    // 数字字符串与子字段同名时按字段名，number 下标再取元素上的字段
+    expect(
+      run('data-source-field-select', ['ds1', 'arr', '0'], {
+        value: 'key',
+        dataSourceFieldType: ['number'],
+      }),
+    ).toBeUndefined();
+    expect(run('data-source-field-select', ['ds1', 'arr', 0, 'item'], { value: 'key' })).toBeUndefined();
+    expect(firstLine(run('data-source-field-select', ['ds1', 'arr', '0', 'item'], { value: 'key' }))).toBe(
+      '数据源字段(item)不存在',
+    );
+    expect(
+      firstLine(
+        run('data-source-field-select', ['ds1', 'ids', 0], {
+          value: 'key',
+          dataSourceFieldType: ['string'],
+        }),
+      ),
+    ).toBe('数组下标(0)的元素类型未定义，请选择具体字段');
 
     // 有 fieldConfig、未声明 value/dataSourceId 时，仍按取值中的 ds-field:: 前缀解析数据源路径
     dataSourcesState.value = [
@@ -378,10 +467,20 @@ describe('editorTypeMatchRules', () => {
       'ds2不在可选项中',
     );
     expect(
-      run('data-source-select', { isBindDataSource: true, dataSourceId: 'ds1', dataSourceType: 'base' }),
+      run('data-source-select', {
+        isBindDataSource: true,
+        dataSourceId: 'ds1',
+        dataSourceType: 'base',
+      }),
     ).toBeUndefined();
     expect(
-      firstLine(run('data-source-select', { isBindDataSource: true, dataSourceId: 'ds1', dataSourceType: 'http' })),
+      firstLine(
+        run('data-source-select', {
+          isBindDataSource: true,
+          dataSourceId: 'ds1',
+          dataSourceType: 'http',
+        }),
+      ),
     ).toBe('[object Object]不在可选项中');
     expect(firstLine(run('data-source-select', { isBindDataSource: false, dataSourceId: 'ds1' }))).toBe(
       '[object Object]类型不合法',

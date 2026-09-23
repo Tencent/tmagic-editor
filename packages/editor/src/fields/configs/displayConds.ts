@@ -20,7 +20,7 @@ import type { DisplayCondsConfig, FormState, GroupListConfig } from '@tmagic/for
 import { removeDataSourceFieldPrefix } from '@tmagic/utils';
 
 import dataSourceService from '@editor/services/dataSource';
-import { getCascaderOptionsFromFields, getFieldType } from '@editor/utils/data-source';
+import { getCascaderOptionsFromFields, getFieldType, resolveFieldByPath } from '@editor/utils/data-source';
 
 import { stickyAddButton } from './stickyAddButton';
 
@@ -38,7 +38,7 @@ export const createDisplayCondsConfig = (
   name: string,
   parentFields: string[],
 ): GroupListConfig => {
-  const resolveFieldPath = (path: string[]) => {
+  const resolveFieldPath = (path: Array<string | number>) => {
     const [id, ...fieldNames] = path;
     const ds = id ? dataSourceService.getDataSourceById(removeDataSourceFieldPrefix(`${id}`)) : undefined;
     return { ds, fieldNames };
@@ -69,13 +69,13 @@ export const createDisplayCondsConfig = (
             return [];
           }
 
-          let fields = ds.fields || [];
-          fieldNames.forEach((key) => {
-            const field = fields.find((f) => f.name === key);
-            fields = field?.fields || [];
-          });
-
-          return getCascaderOptionsFromFields(fields, ['string', 'number', 'boolean', 'any']);
+          const resolved = resolveFieldByPath(ds.fields, fieldNames, { allowArrayIndex: true });
+          return getCascaderOptionsFromFields(resolved.ok ? resolved.fields : [], [
+            'string',
+            'number',
+            'boolean',
+            'any',
+          ]);
         },
         name: 'field',
         value: 'key',

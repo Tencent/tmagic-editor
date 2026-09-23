@@ -105,8 +105,16 @@ describe('data-source utils', () => {
       fields: [],
     });
     expect(resolveFieldByPath(fields, ['obj']).field?.name).toBe('obj');
-    expect(resolveFieldByPath(fields, ['unknown'])).toEqual({ ok: false, fields, failedName: 'unknown' });
-    expect(resolveFieldByPath(undefined, ['x'])).toEqual({ ok: false, fields: [], failedName: 'x' });
+    expect(resolveFieldByPath(fields, ['unknown'])).toEqual({
+      ok: false,
+      fields,
+      failedName: 'unknown',
+    });
+    expect(resolveFieldByPath(undefined, ['x'])).toEqual({
+      ok: false,
+      fields: [],
+      failedName: 'x',
+    });
     expect(resolveFieldByPath(fields, []).ok).toBe(true);
   });
 
@@ -129,14 +137,123 @@ describe('data-source utils', () => {
     expect(failed.failedName).toBe('missing');
   });
 
+  test('resolveFieldByPath 数组字段后可接下标，下标可以是 number', () => {
+    const fields: any = [
+      {
+        name: 'arr',
+        type: 'array',
+        fields: [{ name: 'item', type: 'string' }],
+      },
+      {
+        name: 'title',
+        type: 'string',
+      },
+      {
+        name: 'matrix',
+        type: 'array',
+        fields: [{ name: 'row', type: 'array', fields: [{ name: 'cell', type: 'number' }] }],
+      },
+    ];
+
+    const byNumber = resolveFieldByPath(fields, ['arr', 0, 'item'], { allowArrayIndex: true });
+    expect(byNumber.ok).toBe(true);
+    expect(byNumber.field).toMatchObject({ name: 'item', type: 'string' });
+
+    const byNumericString = resolveFieldByPath(fields, ['arr', '0', 'item'], {
+      allowArrayIndex: true,
+    });
+    expect(byNumericString.ok).toBe(true);
+    expect(byNumericString.field?.name).toBe('item');
+
+    const element = resolveFieldByPath(fields, ['arr', 0], { allowArrayIndex: true });
+    expect(element.ok).toBe(true);
+    expect(element.field).toMatchObject({ name: '0', type: 'object' });
+
+    const nested = resolveFieldByPath(fields, ['matrix', 0, 'row', 1, 'cell'], {
+      allowArrayIndex: true,
+    });
+    expect(nested.ok).toBe(true);
+    expect(nested.field).toMatchObject({ name: 'cell', type: 'number' });
+
+    const invalid = resolveFieldByPath(fields, ['title', 0], { allowArrayIndex: true });
+    expect(invalid).toMatchObject({ ok: false, invalidArrayIndex: true, failedName: '0' });
+
+    const untyped = resolveFieldByPath([{ name: 'ids', type: 'array' }] as any, ['ids', 0], {
+      allowArrayIndex: true,
+    });
+    expect(untyped.ok).toBe(true);
+    expect(untyped.untypedArrayElement).toBe(true);
+    expect(untyped.field).toMatchObject({ name: '0', type: 'any' });
+
+    // 数字字符串优先匹配同名字段；number 仍是下标，再继续找元素上的字段
+    const numericName = resolveFieldByPath(
+      [
+        {
+          name: 'arr',
+          type: 'array',
+          fields: [{ name: '0', type: 'object', fields: [{ name: 'x', type: 'string' }] }],
+        },
+      ] as any,
+      ['arr', '0', 'x'],
+      { allowArrayIndex: true },
+    );
+    expect(numericName.ok).toBe(true);
+    expect(numericName.field).toMatchObject({ name: 'x', type: 'string' });
+
+    const indexThenProp = resolveFieldByPath(
+      [
+        {
+          name: 'arr',
+          type: 'array',
+          fields: [
+            { name: '0', type: 'number' },
+            { name: 'item', type: 'string' },
+          ],
+        },
+      ] as any,
+      ['arr', 0, 'item'],
+      { allowArrayIndex: true },
+    );
+    expect(indexThenProp.ok).toBe(true);
+    expect(indexThenProp.field).toMatchObject({ name: 'item', type: 'string' });
+
+    const namedZero = resolveFieldByPath(
+      [
+        {
+          name: 'arr',
+          type: 'array',
+          fields: [
+            { name: '0', type: 'number' },
+            { name: 'item', type: 'string' },
+          ],
+        },
+      ] as any,
+      ['arr', '0'],
+      { allowArrayIndex: true },
+    );
+    expect(namedZero.arrayElement).toBeUndefined();
+    expect(namedZero.field).toMatchObject({ name: '0', type: 'number' });
+  });
+
   test('getFieldType 沿 path 取最终类型', () => {
     const ds: any = {
-      fields: [{ name: 'obj', type: 'object', fields: [{ name: 'name', type: 'string' }] }],
+      fields: [
+        { name: 'obj', type: 'object', fields: [{ name: 'name', type: 'string' }] },
+        { name: 'arr', type: 'array', fields: [{ name: 'item', type: 'string' }] },
+        { name: 'ids', type: 'array' },
+        { name: 'keyed', type: 'array', fields: [{ name: '0', type: 'number' }] },
+      ],
     };
     expect(getFieldType(ds, ['obj', 'name'])).toBe('string');
     expect(getFieldType(ds, ['obj'])).toBe('object');
     expect(getFieldType(ds, ['unknown'])).toBe('');
     expect(getFieldType(undefined, ['x'])).toBe('');
+    expect(getFieldType(ds, ['arr', 0, 'item'])).toBe('string');
+    expect(getFieldType(ds, ['arr', '0', 'item'])).toBe('string');
+    expect(getFieldType(ds, ['arr', 0])).toBe('object');
+    expect(getFieldType(ds, ['ids', 0])).toBe('');
+    expect(getFieldType(ds, ['keyed', '0'])).toBe('number');
+    expect(getFieldType(ds, ['keyed', 0, '0'])).toBe('number');
   });
 
   test('getFormConfig - 内部 tab 配置 defaultValue/display 函数行为', () => {

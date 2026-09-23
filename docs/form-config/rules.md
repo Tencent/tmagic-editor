@@ -165,7 +165,7 @@ app.use(MagicForm, {
 | `page-fragment-select` / `ui-select` | `string \| number`；有节点树时须为已有页面片 / 组件 id |
 | `data-source-input` | `string`；`${...}` 绑定须指向已有数据源/字段 |
 | `data-source-method-select` | `[dsId, methodName]`，方法须在该数据源可选方法集中 |
-| `data-source-field-select` | 数据源路径 `string[]`；有 `fieldConfig` 且非路径值时跳过 |
+| `data-source-field-select` | 数据源路径 `Array<string \| number>`。`number` 只能作数组下标；数字字符串先按字段名匹配，没有同名字段时才作下标。元素结构为空的下标，在限定了具体字段类型时不通过。有 `fieldConfig` 且非路径值时按 `fieldConfig` 校验 |
 | `data-source-select` | `value: 'id'` 为已有 ds id；否则为含 `isBindDataSource` + `dataSourceId` 的对象 |
 | `code-select` | `{ hookType: 'code', hookData }` 的浅层结构校验（`codeId` 存在性 / 数据源方法存在性由内部 `code-select-col`、`data-source-method-select` 单元格各自校验，只标红出错单元格） |
 | `data-source-fields` / `data-source-mocks` / `data-source-methods` | 数组 + 浅层结构（`name`/`type`、`title`/`enable`/`data`、`content`/`params` 等） |

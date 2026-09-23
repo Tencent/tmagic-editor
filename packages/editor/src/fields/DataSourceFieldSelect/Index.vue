@@ -51,7 +51,6 @@
 <script setup lang="ts">
 import { computed, inject, ref, resolveComponent, watch } from 'vue';
 
-import { DataSchema } from '@tmagic/core';
 import { TMagicButton, tMagicMessage, TMagicTooltip } from '@tmagic/design';
 import {
   type ContainerChangeEventData,
@@ -64,6 +63,7 @@ import { DATA_SOURCE_FIELDS_SELECT_VALUE_PREFIX, removeDataSourceFieldPrefix } f
 
 import MIcon from '@editor/components/Icon.vue';
 import { useServices } from '@editor/hooks/use-services';
+import { resolveFieldByPath } from '@editor/utils/data-source';
 
 import dataSourceIcon from '../../icons/DatasourceIcon.vue';
 
@@ -175,11 +175,8 @@ const onChangeHandler = (value: string[], eventData?: ContainerChangeEventData) 
     return;
   }
 
-  let fields = dataSource.fields || [];
-  let field: DataSchema | undefined;
-  (keys || []).forEach((key) => {
-    field = fields.find((f) => f.name === key);
-    fields = field?.fields || [];
+  const { field, ok, untypedArrayElement } = resolveFieldByPath(dataSource.fields, keys, {
+    allowArrayIndex: true,
   });
 
   const dataSourceFieldType = props.config.dataSourceFieldType || ['any'];
@@ -187,11 +184,14 @@ const onChangeHandler = (value: string[], eventData?: ContainerChangeEventData) 
     dataSourceFieldType.push('any');
   }
 
-  if (
-    !keys.length ||
-    (field?.type &&
-      (field.type === 'any' || dataSourceFieldType.includes('any') || dataSourceFieldType.includes(field.type)))
-  ) {
+  // 未声明元素结构的下标不是显式 any，限定了具体类型时不放行
+  const typeMatches =
+    ok &&
+    !!field?.type &&
+    (dataSourceFieldType.includes('any') ||
+      (!untypedArrayElement && (field.type === 'any' || dataSourceFieldType.includes(field.type))));
+
+  if (!keys.length || typeMatches) {
     emit('change', value, eventData);
   } else {
     tMagicMessage.error(`请选择类型为${dataSourceFieldType.join('或')}的字段`);
