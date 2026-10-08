@@ -8,7 +8,7 @@ import { reactive } from 'vue';
 
 import { createDataSourceTarget, DepTargetType, Target } from '@tmagic/core';
 
-import depService from '@editor/services/dep';
+import { depService } from '@editor/services/sdk-instance';
 
 // 全量收集（{ id, dsl }）与增量收集（{ id, payload }）共用一个常驻 worker
 vi.mock('@editor/utils/dep/worker.ts?worker&inline', () => ({

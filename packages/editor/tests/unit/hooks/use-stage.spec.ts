@@ -6,7 +6,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { useStage } from '@editor/hooks/use-stage';
-import editorService from '@editor/services/editor';
+import { editorService } from '@editor/services/sdk-instance';
 import uiService from '@editor/services/ui';
 
 const { stageInstance, StageCoreCtor, getIdFromElFn } = vi.hoisted(() => {
@@ -56,22 +56,29 @@ const editorState: Record<string, any> = {
   alwaysMultiSelect: false,
 };
 
-vi.mock('@editor/services/editor', () => ({
-  default: {
-    get: (k: string) => editorState[k],
-    set: vi.fn((k: string, v: any) => {
-      editorState[k] = v;
-    }),
-    select: vi.fn(),
-    multiSelect: vi.fn(),
-    highlight: vi.fn(),
-    moveToContainer: vi.fn(),
-    update: vi.fn(),
-    sort: vi.fn(),
-    remove: vi.fn(),
-    getNodeById: vi.fn((id: string) => ({ id })),
-  },
-}));
+vi.mock('@editor/services/sdk-instance', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  const modEditor = await (() => ({
+    default: {
+      get: (k: string) => editorState[k],
+      set: vi.fn((k: string, v: any) => {
+        editorState[k] = v;
+      }),
+      select: vi.fn(),
+      multiSelect: vi.fn(),
+      highlight: vi.fn(),
+      moveToContainer: vi.fn(),
+      update: vi.fn(),
+      sort: vi.fn(),
+      remove: vi.fn(),
+      getNodeById: vi.fn((id: string) => ({ id })),
+    },
+  }))();
+  return {
+    ...actual,
+    editorService: modEditor.default,
+  };
+});
 
 const uiState: Record<string, any> = { zoom: 1, uiSelectMode: false };
 vi.mock('@editor/services/ui', () => ({

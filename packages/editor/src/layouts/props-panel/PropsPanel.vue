@@ -66,7 +66,7 @@ import MIcon from '@editor/components/Icon.vue';
 import Resizer from '@editor/components/Resizer.vue';
 import { ENABLE_PROPS_FORM_VALIDATE } from '@editor/editorProps';
 import { useServices } from '@editor/hooks/use-services';
-import { Protocol } from '@editor/services/storage';
+import { Protocol } from '@editor/services/sdk-instance';
 import type { NodeInvalidSource, PropsPanelSlots } from '@editor/type';
 import { styleTabConfig } from '@editor/utils';
 import { PROPS_PANEL_WIDTH_STORAGE_KEY } from '@editor/utils/const';

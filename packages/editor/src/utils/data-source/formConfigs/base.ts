@@ -1,4 +1,4 @@
-import { defineFormConfig, type FormConfig } from '@tmagic/form';
+import { defineFormConfig, type FormConfig } from '@tmagic/form/headless';
 
 export default (): FormConfig =>
   defineFormConfig([

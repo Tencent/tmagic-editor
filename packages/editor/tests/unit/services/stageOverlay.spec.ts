@@ -28,26 +28,33 @@ vi.mock('@editor/hooks/use-stage', () => ({
 }));
 
 const editorEvents: Record<string, ((..._args: any[]) => any)[]> = {};
-vi.mock('@editor/services/editor', () => ({
-  default: {
-    on: vi.fn((evt: string, fn: any) => {
-      editorEvents[evt] ||= [];
-      editorEvents[evt].push(fn);
-    }),
-    off: vi.fn(),
-    get: vi.fn((k: string) => {
-      if (k === 'nodes') return [{ id: 'n1' }];
-      if (k === 'stage') {
-        return {
-          renderer: {
-            getDocument: () => ({ documentElement: document.createElement('html') }),
-          },
-        };
-      }
-      return null;
-    }),
-  },
-}));
+vi.mock('@editor/services/sdk-instance', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  const modEditor = await (() => ({
+    default: {
+      on: vi.fn((evt: string, fn: any) => {
+        editorEvents[evt] ||= [];
+        editorEvents[evt].push(fn);
+      }),
+      off: vi.fn(),
+      get: vi.fn((k: string) => {
+        if (k === 'nodes') return [{ id: 'n1' }];
+        if (k === 'stage') {
+          return {
+            renderer: {
+              getDocument: () => ({ documentElement: document.createElement('html') }),
+            },
+          };
+        }
+        return null;
+      }),
+    },
+  }))();
+  return {
+    ...actual,
+    editorService: modEditor.default,
+  };
+});
 
 vi.mock('@tmagic/utils', async () => {
   const actual = await vi.importActual<any>('@tmagic/utils');
@@ -192,8 +199,8 @@ describe('stageOverlay', () => {
   });
 
   test('updateSelectStatus 多节点调用 multiSelect', async () => {
-    const editorMod = (await import('@editor/services/editor')) as any;
-    editorMod.default.get.mockImplementation((k: string) => {
+    const editorMod = (await import('@editor/services/sdk-instance')) as any;
+    editorMod.editorService.get.mockImplementation((k: string) => {
       if (k === 'nodes') return [{ id: 'n1' }, { id: 'n2' }];
       return null;
     });

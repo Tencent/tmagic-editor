@@ -1,6 +1,6 @@
 import { computed, type Ref, watch } from 'vue';
 
-import { Protocol } from '@editor/services/storage';
+import { Protocol } from '@editor/services/sdk-instance';
 import { Services } from '@editor/type';
 import { RIGHT_COLUMN_WIDTH_STORAGE_KEY } from '@editor/utils/const';
 

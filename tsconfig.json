@@ -22,6 +22,7 @@
       "@tmagic/*": ["./packages/*/src"],
       "@tmagic/form/headless": ["./packages/form/src/headless.ts"],
       "@tmagic/editor/headless": ["./packages/editor/src/headless.ts"],
+      "@tmagic/editor/sdk": ["./packages/editor/src/sdk.ts"],
       "@tmagic/design/headless": ["./packages/design/src/headless.ts"],
       "@tmagic/tmagic-form-runtime": ["./runtime/tmagic-form/src"],
       "@tmagic/vue-runtime-help": ["./runtime/vue-runtime-help/src"],

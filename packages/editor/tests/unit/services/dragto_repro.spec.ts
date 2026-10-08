@@ -4,8 +4,7 @@ import { cloneDeep } from 'lodash-es';
 import type { MApp, MContainer } from '@tmagic/core';
 import { NodeType } from '@tmagic/core';
 
-import editorService from '@editor/services/editor';
-import historyService from '@editor/services/history';
+import { editorService, historyService } from '@editor/services/sdk-instance';
 import { setEditorConfig } from '@editor/utils';
 
 setEditorConfig({

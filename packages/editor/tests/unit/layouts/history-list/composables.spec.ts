@@ -18,7 +18,7 @@ import {
   opLabel,
 } from '@editor/layouts/history-list/composables';
 import { useHistoryList } from '@editor/layouts/history-list/useHistoryList';
-import historyService from '@editor/services/history';
+import { historyService } from '@editor/services/sdk-instance';
 import type { HistoryGroup, HistoryStepEntry, StepValue } from '@editor/type';
 import { createStackStep } from '@editor/utils/history';
 

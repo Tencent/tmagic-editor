@@ -17,13 +17,17 @@
  */
 
 import { reactive } from 'vue';
-import Schema from 'async-validator';
+import AsyncValidator from 'async-validator';
 
 import type { FormConfig, FormContext, FormState, FormValue } from '../schema';
 
 import { applyMountValueEffects, type CollectedField, collectValidatableFields } from './collectFields';
 import { createFormStateBase, createFormStateProxy, initValue } from './form';
 import { formatValidateError } from './validateError';
+
+// async-validator 是 CJS 包（`exports.default = Schema`）。原生 Node ESM 下默认导入拿到的是整个 `module.exports`，
+// 需要再取一层 `.default`；打包器 / vitest 会自动处理互操作，此时 `.default` 不存在，直接用默认导入。
+const Schema: typeof AsyncValidator = (AsyncValidator as any).default ?? AsyncValidator;
 
 // #region HeadlessFormStateOptions
 /** 构造无渲染 formState 所需的参数（与 MForm 的同名 props 对齐） */

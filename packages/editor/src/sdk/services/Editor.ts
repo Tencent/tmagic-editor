@@ -16,13 +16,11 @@
  * limitations under the License.
  */
 
-import { nextTick, reactive, toRaw } from 'vue';
 import { cloneDeep, isEmpty, isEqual, isObject, mergeWith, uniq } from 'lodash-es';
 
 import type { Id, MApp, MContainer, MNode, MPage, MPageFragment, TargetOptions } from '@tmagic/core';
 import { NodeType } from '@tmagic/core';
 import type { ChangeRecord } from '@tmagic/form';
-import { isFixed } from '@tmagic/stage';
 import {
   getNodeInfo,
   getNodePath,
@@ -35,14 +33,11 @@ import {
   traverseNode,
 } from '@tmagic/utils';
 
-import BaseService from '@editor/services//BaseService';
-import propsService from '@editor/services//props';
-import historyService from '@editor/services/history';
-import storageService, { Protocol } from '@editor/services/storage';
 import type {
   AddMNode,
   AsyncHookPlugin,
   AsyncMethodName,
+  CanDropInFunction,
   DslOpOptions,
   DslOpWithHistoryIdsResult,
   EditorEvents,
@@ -80,7 +75,13 @@ import {
   toggleFixedPosition,
 } from '@editor/utils/editor';
 import { getLastPushedHistoryIds } from '@editor/utils/history';
-import { beforePaste, getAddParent } from '@editor/utils/operator';
+
+import type { SdkContext } from '../type';
+import { beforePaste, getAddParent } from '../utils/operator';
+import { isFixed } from '../utils/position';
+
+import BaseService from './BaseService';
+import { Protocol } from './WebStorage';
 
 type MoveItem = { node: MNode; parent: MContainer; pageForOp: { name: string; id: Id } | null };
 
@@ -102,23 +103,13 @@ const buildUpdateDiff = (
     ...(changeRecords?.length ? { changeRecords } : {}),
   }));
 
+export interface EditorServiceConfig {
+  disabledPageFragment?: boolean;
+  canDropIn?: CanDropInFunction;
+}
+
 class Editor extends BaseService {
-  public state: StoreState = reactive({
-    root: null,
-    page: null,
-    parent: null,
-    node: null,
-    nodes: [],
-    stage: null,
-    stageLoading: true,
-    highlightNode: null,
-    modifiedNodeIds: new Map(),
-    invalidNodeIds: new Map(),
-    pageLength: 0,
-    pageFragmentLength: 0,
-    disabledMultiSelect: false,
-    alwaysMultiSelect: false,
-  });
+  public state: StoreState;
   private selectionBeforeOp: Id[] | null = null;
   /**
    * 操作前的节点校验错误快照，与 selectionBeforeOp 同时在 captureSelectionBeforeOp 中捕获，
@@ -137,12 +128,32 @@ class Editor extends BaseService {
    */
   private lastAdded: { selectedId: Id; nodeId: Id } | null = null;
 
-  constructor() {
+  /** 与编辑器 props 中 `disabledPageFragment` / `canDropIn` 对应，供结构合法性校验使用 */
+  private config: EditorServiceConfig = {};
+
+  constructor(private ctx: SdkContext) {
     super(
       canUsePluginMethods.async.map((methodName) => ({ name: methodName, isAsync: true })),
       // 需要注意循环依赖问题，如果函数间有相互调用的话，不能设置为串行调用
       ['select', 'update', 'moveLayer'],
     );
+
+    this.state = ctx.reactivity.reactive<StoreState>({
+      root: null,
+      page: null,
+      parent: null,
+      node: null,
+      nodes: [],
+      stage: null,
+      stageLoading: true,
+      highlightNode: null,
+      modifiedNodeIds: new Map(),
+      invalidNodeIds: new Map(),
+      pageLength: 0,
+      pageFragmentLength: 0,
+      disabledMultiSelect: false,
+      alwaysMultiSelect: false,
+    });
   }
 
   /**
@@ -185,8 +196,8 @@ class Editor extends BaseService {
           // 重复创建，set root 不额外产生记录，由恢复出的历史栈作为当前状态来源。
           // 标记不进入撤销/重做栈，仅作为该页历史列表底部的初始基线展示。
           app.items?.forEach((pageNode) => {
-            if (pageNode?.id !== undefined && !historyService.getMarker('page', pageNode.id)) {
-              historyService.setMarker('page', pageNode.id, {
+            if (pageNode?.id !== undefined && !this.ctx.history.getMarker('page', pageNode.id)) {
+              this.ctx.history.setMarker('page', pageNode.id, {
                 name: pageNode.name,
                 source: options.historySource,
               });
@@ -224,7 +235,7 @@ class Editor extends BaseService {
   public getNodeInfo(id: Id, raw = true): EditorNodeInfo {
     let root = this.get('root');
     if (raw) {
-      root = toRaw(root);
+      root = this.toRaw(root);
     }
 
     if (!root) {
@@ -340,11 +351,11 @@ class Editor extends BaseService {
   }
 
   public async selectNextNode(): Promise<MNode | null> | never {
-    const node = toRaw(this.get('node'));
+    const node = this.toRaw(this.get('node'));
 
     if (!node || isPage(node) || node.type === NodeType.ROOT) return node;
 
-    const parent = toRaw(this.getParentById(node.id));
+    const parent = this.toRaw(this.getParentById(node.id));
 
     if (!parent) return node;
 
@@ -359,8 +370,8 @@ class Editor extends BaseService {
   }
 
   public async selectNextPage(): Promise<MNode> | never {
-    const root = toRaw(this.get('root'));
-    const page = toRaw(this.get('page'));
+    const root = this.toRaw(this.get('root'));
+    const page = this.toRaw(this.get('page'));
 
     if (!page) throw new Error('page不能为空');
     if (!root) throw new Error('root不能为空');
@@ -414,6 +425,15 @@ class Editor extends BaseService {
     this.set('highlightNode', null);
   }
 
+  /** 设置结构合法性校验用到的配置，只覆盖传入的字段 */
+  public setConfig(config: Partial<EditorServiceConfig>): void {
+    this.config = { ...this.config, ...config };
+  }
+
+  public getConfig(): Readonly<EditorServiceConfig> {
+    return this.config;
+  }
+
   public async doAdd(node: MNode, parent: MContainer, _options: DslOpOptions = {}): Promise<MNode> {
     const root = this.get('root');
 
@@ -439,7 +459,7 @@ class Editor extends BaseService {
     parent.items.splice(insertIndex, 0, node);
     this.lastAdded = { selectedId: curNode.id, nodeId: node.id };
 
-    const layout = await this.getLayout(toRaw(parent), node as MNode);
+    const layout = await this.getLayout(this.toRaw(parent), node as MNode);
     node.style = getInitPositionStyle(node.style, layout);
 
     await stage?.add({
@@ -493,7 +513,7 @@ class Editor extends BaseService {
 
       if (!type) throw new Error('组件类型不能为空');
 
-      addNodes.push({ ...toRaw(await propsService.getPropsValue(type, config)) });
+      addNodes.push({ ...this.toRaw(await this.ctx.props.getPropsValue(type, config)) });
     } else {
       addNodes.push(...addNode);
     }
@@ -501,12 +521,23 @@ class Editor extends BaseService {
     // 必须串行：每个节点的插入位置依赖上一个已插入的节点，并行时插入顺序会受
     // doAdd 前置耗时（如异步 beforeDoAdd 插件钩子）影响而错乱
     const newNodes: MNode[] = [];
+    const targets: { node: MNode; parentNode: MContainer }[] = [];
     for (const node of addNodes) {
       const root = this.get('root');
-      const parentNode = isPageOrFragment(node) && root ? root : (parent ?? getAddParent(node));
+      const parentNode = isPageOrFragment(node) && root ? root : (parent ?? getAddParent(this.ctx, node));
       if (!parentNode) throw new Error('未找到父元素');
+      targets.push({ node, parentNode });
+    }
+
+    // 校验放在真正修改 DSL 之前，strict 模式下校验不通过则整批都不会被添加
+    const commitInvalid = await this.runGuard(() => this.ctx.validator.guardAdd(targets));
+
+    for (const { node, parentNode } of targets) {
       newNodes.push(await this.doAdd(node, parentNode, options));
     }
+
+    // record 模式：在写入历史记录之前落库，使历史快照包含本次的错误状态
+    commitInvalid?.();
 
     if (newNodes.length > 1) {
       // 多选时只要任一新增节点位于非当前页面，触发的 multiSelect 就会引起页面切换
@@ -544,7 +575,7 @@ class Editor extends BaseService {
             const p = this.getParentById(n.id, false) as MContainer;
             const idx = p ? getNodeIndex(n.id, p) : -1;
             return {
-              newSchema: cloneDeep(toRaw(n)),
+              newSchema: cloneDeep(this.toRaw(n)),
               parentId,
               index: typeof idx === 'number' ? idx : -1,
             };
@@ -569,7 +600,7 @@ class Editor extends BaseService {
     // 页面 / 页面片新增不入历史栈（见上方 isPageOrFragment 分支），这里合并补发一次结构变更通知
     const addedPages = newNodes.filter((node) => isPageOrFragment(node)) as (MPage | MPageFragment)[];
     if (addedPages.length) {
-      historyService.notifyPageStructureChange({ add: addedPages, remove: [] });
+      this.ctx.history.notifyPageStructureChange({ add: addedPages, remove: [] });
     }
 
     return Array.isArray(addNode) ? newNodes : newNodes[0];
@@ -626,7 +657,7 @@ class Editor extends BaseService {
         // nextTick 用于等 Stage 的 page watch 把新页面 id 同步给 runtime。
         await this.select(rootItems[0]);
         stage?.select(rootItems[0].id);
-        await nextTick();
+        await this.ctx.reactivity.nextTick();
         stage?.remove(removeData);
       } else {
         // page 置空会让 Workspace 卸载 Stage 并销毁 renderer，删除通知必须在卸载前发出，
@@ -653,7 +684,7 @@ class Editor extends BaseService {
 
     if (!rootItems.length) {
       this.resetModifiedNodeId();
-      historyService.reset();
+      this.ctx.history.reset();
     }
   }
 
@@ -685,7 +716,7 @@ class Editor extends BaseService {
           }
           const idx = getNodeIndex(curNode.id, parent);
           removedItems.push({
-            oldSchema: cloneDeep(toRaw(curNode)),
+            oldSchema: cloneDeep(this.toRaw(curNode)),
             parentId: parent.id,
             index: typeof idx === 'number' ? idx : -1,
           });
@@ -717,7 +748,7 @@ class Editor extends BaseService {
     // 页面 / 页面片删除不入历史栈（见上方 isPageOrFragment 分支），这里合并补发一次结构变更通知
     const removedPages = nodes.filter((node) => isPageOrFragment(node)) as (MPage | MPageFragment)[];
     if (removedPages.length) {
-      historyService.notifyPageStructureChange({ add: [], remove: removedPages });
+      this.ctx.history.notifyPageStructureChange({ add: [], remove: removedPages });
     }
   }
 
@@ -735,12 +766,12 @@ class Editor extends BaseService {
 
     if (!info.node) throw new Error(`获取不到id为${config.id}的节点`);
 
-    const node = toRaw(info.node);
+    const node = this.toRaw(info.node);
 
     // replace=true 时跳过 toggleFixedPosition / mergeWith / setChildrenLayout，直接用传入配置整节点替换
     let newConfig = replace
-      ? cloneDeep(toRaw(config))
-      : await toggleFixedPosition(toRaw(config), node, info.path, this.getLayout);
+      ? cloneDeep(this.toRaw(config))
+      : await toggleFixedPosition(this.toRaw(config), node, info.path, this.getLayout);
 
     if (!replace) {
       newConfig = mergeWith(cloneDeep(node), newConfig, editorNodeMergeCustomizer);
@@ -821,6 +852,8 @@ class Editor extends BaseService {
 
     const nodes = Array.isArray(config) ? config : [config];
 
+    const commitInvalid = await this.runGuard(() => this.ctx.validator.guardUpdate(nodes, { replace: data.replace }));
+
     // 多节点必须使用 changeRecordList 为每个节点提供独立的记录；
     // 否则同一份 changeRecords 会被复用到每个节点上，nodeUpdateHandler / 历史回放都会按错误的 propPath 处理。
     const updateData = await Promise.all(
@@ -832,6 +865,7 @@ class Editor extends BaseService {
 
     // 校验错误信息在 pushOpHistory 之前落库，保证历史快照包含本次变更对应的错误状态。
     this.applyInvalidInfo(config, invalidInfo);
+    commitInvalid?.();
 
     if (updateData[0].oldNode?.type !== NodeType.ROOT) {
       const curNodes = this.get('nodes');
@@ -891,7 +925,7 @@ class Editor extends BaseService {
     const node = this.get('node');
     if (!node) throw new Error('当前节点为空');
 
-    const parent = cloneDeep(toRaw(this.get('parent')));
+    const parent = cloneDeep(this.toRaw(this.get('parent')));
     if (!parent) throw new Error('父节点为空');
 
     const index2 = parent.items.findIndex((node: MNode) => `${node.id}` === `${id2}`);
@@ -919,7 +953,7 @@ class Editor extends BaseService {
    * @returns
    */
   public copy(config: MNode | MNode[]): void {
-    storageService.setItem(COPY_STORAGE_KEY, Array.isArray(config) ? config : [config], {
+    this.ctx.storage.setItem(COPY_STORAGE_KEY, Array.isArray(config) ? config : [config], {
       protocol: Protocol.OBJECT,
     });
   }
@@ -936,7 +970,7 @@ class Editor extends BaseService {
       collectRelatedNodes(copyNodes, collectorOptions, (id) => this.getNodeById(id));
     }
 
-    storageService.setItem(COPY_STORAGE_KEY, copyNodes, {
+    this.ctx.storage.setItem(COPY_STORAGE_KEY, copyNodes, {
       protocol: Protocol.OBJECT,
     });
   }
@@ -962,7 +996,7 @@ class Editor extends BaseService {
       historySource,
     }: DslOpOptions = {},
   ): Promise<MNode | MNode[] | void> {
-    const config: MNode[] = storageService.getItem(COPY_STORAGE_KEY);
+    const config: MNode[] = this.ctx.storage.getItem(COPY_STORAGE_KEY);
     if (!Array.isArray(config)) return;
 
     const node = this.get('node');
@@ -978,7 +1012,7 @@ class Editor extends BaseService {
     const pasteConfigs = await this.doPaste(config, position);
 
     if (collectorOptions && typeof collectorOptions.isTarget === 'function') {
-      propsService.replaceRelateId(config, pasteConfigs, collectorOptions);
+      this.ctx.props.replaceRelateId(config, pasteConfigs, collectorOptions);
     }
 
     return this.add(pasteConfigs, parent, {
@@ -991,9 +1025,9 @@ class Editor extends BaseService {
   }
 
   public async doPaste(config: MNode[], position: PastePosition = {}): Promise<MNode[]> {
-    propsService.clearRelateId();
+    this.ctx.props.clearRelateId();
     const doc = this.get('stage')?.renderer?.contentWindow?.document;
-    const pasteConfigs = beforePaste(position, cloneDeep(config), doc);
+    const pasteConfigs = beforePaste(this.ctx, position, cloneDeep(config), doc);
     return pasteConfigs;
   }
 
@@ -1001,7 +1035,7 @@ class Editor extends BaseService {
     const parent = this.getParentById(config.id);
     if (!parent) throw new Error('找不到父节点');
 
-    const node = cloneDeep(toRaw(config));
+    const node = cloneDeep(this.toRaw(config));
     const layout = await this.getLayout(parent, node);
     const doc = this.get('stage')?.renderer?.contentWindow?.document;
     const newStyle = calcAlignCenterStyle(node, parent, layout, doc);
@@ -1030,7 +1064,11 @@ class Editor extends BaseService {
 
     const newNodes = await Promise.all(nodes.map((node) => this.doAlignCenter(node)));
 
-    const newNode = await this.update(newNodes, { doNotPushHistory, historyDescription, historySource });
+    const newNode = await this.update(newNodes, {
+      doNotPushHistory,
+      historyDescription,
+      historySource,
+    });
 
     if (!doNotSelect) {
       if (newNodes.length > 1) {
@@ -1075,7 +1113,7 @@ class Editor extends BaseService {
       return;
     }
 
-    const oldParent = cloneDeep(toRaw(parent));
+    const oldParent = cloneDeep(this.toRaw(parent));
 
     brothers.splice(index, 1);
     brothers.splice(offsetIndex, 0, node);
@@ -1083,7 +1121,7 @@ class Editor extends BaseService {
     const grandparent = this.getParentById(parent.id);
 
     this.get('stage')?.update({
-      config: cloneDeep(toRaw(parent)),
+      config: cloneDeep(this.toRaw(parent)),
       parentId: grandparent?.id,
       root: cloneDeep(root),
     });
@@ -1095,7 +1133,7 @@ class Editor extends BaseService {
         'update',
 
         {
-          diff: buildUpdateDiff([{ oldNode: oldParent, newNode: cloneDeep(toRaw(parent)) }]),
+          diff: buildUpdateDiff([{ oldNode: oldParent, newNode: cloneDeep(this.toRaw(parent)) }]),
           pageData: { name: pageForOp?.name || '', id: pageForOp!.id },
           historyDescription,
           source: historySource,
@@ -1156,11 +1194,19 @@ class Editor extends BaseService {
     }
 
     const root = this.get('root');
-    const stage = this.get('stage');
 
-    if (!root || !stage) {
-      throw new Error('root 或 stage为空');
+    if (!root) {
+      throw new Error('root 为空');
     }
+
+    // 校验放在过滤之前：源节点不存在也要作为校验错误报出
+    await this.runGuard(() =>
+      this.ctx.validator.guardMove(
+        configs.map((item) => item.id),
+        target,
+        'stage-drag',
+      ),
+    );
 
     // 收集 (节点, 源父) 信息，过滤掉异常节点（找不到父或源父等于目标本身）
     const moves: MoveItem[] = [];
@@ -1176,10 +1222,10 @@ class Editor extends BaseService {
 
     // 记录所有涉及的源父容器（按 id 去重）+ 目标容器的前置快照；同一父容器只快照一次。
     const beforeSnapshots = new Map<Id, MNode>();
-    beforeSnapshots.set(target.id, cloneDeep(toRaw(target)));
+    beforeSnapshots.set(target.id, cloneDeep(this.toRaw(target)));
     for (const { parent } of moves) {
       if (!beforeSnapshots.has(parent.id)) {
-        beforeSnapshots.set(parent.id, cloneDeep(toRaw(parent)));
+        beforeSnapshots.set(parent.id, cloneDeep(this.toRaw(parent)));
       }
     }
 
@@ -1198,7 +1244,7 @@ class Editor extends BaseService {
       // 整批只入栈一条历史：updatedItems 包含所有源父容器 + 目标容器的前后快照（撤销/重做最小依赖）。
       const updatedItems = Array.from(beforeSnapshots.entries()).map(([id, oldNode]) => ({
         oldNode,
-        newNode: cloneDeep(toRaw(this.getNodeById(id, false))) as MNode,
+        newNode: cloneDeep(this.toRaw(this.getNodeById(id, false))) as MNode,
       }));
       const historyPage = moves[0].pageForOp ?? { name: '', id: target.id };
       this.pushOpHistory('update', {
@@ -1226,15 +1272,23 @@ class Editor extends BaseService {
 
     const configs = Array.isArray(config) ? config : [config];
 
+    await this.runGuard(() =>
+      this.ctx.validator.guardMove(
+        configs.map((item) => item.id),
+        targetParent,
+        'layer',
+      ),
+    );
+
     const beforeSnapshots = new Map<string, MNode>();
     for (const cfg of configs) {
       const { parent } = this.getNodeInfo(cfg.id, false);
       if (parent && !beforeSnapshots.has(`${parent.id}`)) {
-        beforeSnapshots.set(`${parent.id}`, cloneDeep(toRaw(parent)));
+        beforeSnapshots.set(`${parent.id}`, cloneDeep(this.toRaw(parent)));
       }
     }
     if (!beforeSnapshots.has(`${targetParent.id}`)) {
-      beforeSnapshots.set(`${targetParent.id}`, cloneDeep(toRaw(targetParent)));
+      beforeSnapshots.set(`${targetParent.id}`, cloneDeep(this.toRaw(targetParent)));
     }
 
     const newLayout = await this.getLayout(targetParent);
@@ -1276,7 +1330,7 @@ class Editor extends BaseService {
     for (const oldNode of beforeSnapshots.values()) {
       const newNode = this.getNodeById(oldNode.id, false);
       if (newNode) {
-        updatedItems.push({ oldNode, newNode: cloneDeep(toRaw(newNode)) });
+        updatedItems.push({ oldNode, newNode: cloneDeep(this.toRaw(newNode)) });
       }
     }
     if (!doNotPushHistory) {
@@ -1383,7 +1437,7 @@ class Editor extends BaseService {
   public async undo(): Promise<StepValue | null> {
     const pageId = this.get('page')?.id;
     if (pageId === undefined) return null;
-    const value = historyService.undo('page', pageId);
+    const value = this.ctx.history.undo('page', pageId);
     if (value) {
       await this.applyHistoryOp(value, true);
     }
@@ -1397,7 +1451,7 @@ class Editor extends BaseService {
   public async redo(): Promise<StepValue | null> {
     const pageId = this.get('page')?.id;
     if (pageId === undefined) return null;
-    const value = historyService.redo('page', pageId);
+    const value = this.ctx.history.redo('page', pageId);
     if (value) {
       await this.applyHistoryOp(value, false);
     }
@@ -1421,7 +1475,7 @@ class Editor extends BaseService {
    * @returns 反向后产生的新 step；目标不存在 / 未应用 / 反向失败时返回 null
    */
   public async revertPageStep(index: number): Promise<StepValue | null> {
-    const list = historyService.getStepList('page', this.get('page')?.id);
+    const list = this.ctx.history.getStepList('page', this.get('page')?.id);
     const entry = list[index];
     if (!entry?.applied) return null;
 
@@ -1443,11 +1497,16 @@ class Editor extends BaseService {
     const captureRevert = (_pageId: Id, s: StepValue) => {
       revertedStep = s;
     };
-    historyService.once('change', captureRevert);
+    this.ctx.history.once('change', captureRevert);
 
     const historyDescription = `回滚 #${index + 1}: ${describeStepForRevert(step)}`;
     // revert 走 public add/remove/update，让操作以一条普通新 step 入栈；不要切换选区与页面，避免打断用户。
-    const opts = { doNotSelect: true, doNotSwitchPage: true, historyDescription, historySource: 'rollback' } as const;
+    const opts = {
+      doNotSelect: true,
+      doNotSwitchPage: true,
+      historyDescription,
+      historySource: 'rollback',
+    } as const;
 
     try {
       switch (step.opType) {
@@ -1506,11 +1565,11 @@ class Editor extends BaseService {
         }
       }
     } finally {
-      historyService.off('change', captureRevert);
+      this.ctx.history.off('change', captureRevert);
     }
 
     // 通知一次 history-change，让上层（如属性面板）按当前最新 DSL 刷新
-    const page = toRaw(this.get('page'));
+    const page = this.toRaw(this.get('page'));
     if (page) {
       this.emit('history-change', page as MPage | MPageFragment);
     }
@@ -1529,7 +1588,7 @@ class Editor extends BaseService {
     const results: (StepValue | null)[] = [];
     const pageId = this.get('page')?.id;
     for (const uuid of uuids) {
-      const location = historyService.findStepLocationByUuid('page', uuid, pageId);
+      const location = this.ctx.history.findStepLocationByUuid('page', uuid, pageId);
       results.push(!location ? null : await this.revertPageStep(location.index));
     }
     return results;
@@ -1546,8 +1605,8 @@ class Editor extends BaseService {
    */
   public async gotoPageStep(targetCursor: number): Promise<number> {
     const pageId = this.get('page')?.id;
-    let cursor = historyService.getCursor('page', pageId);
-    const { length } = historyService.getStepList('page', pageId);
+    let cursor = this.ctx.history.getCursor('page', pageId);
+    const { length } = this.ctx.history.getStepList('page', pageId);
     const target = Math.max(0, Math.min(targetCursor, length));
     while (cursor > target) {
       const step = await this.undo();
@@ -1567,7 +1626,7 @@ class Editor extends BaseService {
     top: number,
     { doNotPushHistory = false, historyDescription, historySource }: DslOpOptions = {},
   ) {
-    const node = toRaw(this.get('node'));
+    const node = this.toRaw(this.get('node'));
     if (!node || isPage(node)) return;
 
     const newStyle = calcMoveStyle(node.style || {}, left, top);
@@ -1760,6 +1819,20 @@ class Editor extends BaseService {
     return null;
   }
 
+  /**
+   * 执行校验。校验不通过（strict 抛错）时操作不会继续，必须清掉 captureSelectionBeforeOp 留下的快照，
+   * 否则下一次成功的操作会沿用这份过期快照，写出错误的 selectedBefore / invalidNodeIdsBefore。
+   */
+  private async runGuard<T>(guard: () => Promise<T>): Promise<T> {
+    try {
+      return await guard();
+    } catch (e) {
+      this.selectionBeforeOp = null;
+      this.invalidNodeIdsBeforeOp = null;
+      throw e;
+    }
+  }
+
   private captureSelectionBeforeOp() {
     if (this.selectionBeforeOp) return;
     this.selectionBeforeOp = this.get('nodes').map((n) => n.id);
@@ -1794,15 +1867,22 @@ class Editor extends BaseService {
         this.pushPageDiffStep(
           'add',
           nextPage,
-          { newSchema: cloneDeep(toRaw(nextPage)), parentId: nextRoot.id, index: indexInItems(nextRoot, nextPage.id) },
+          {
+            newSchema: cloneDeep(this.toRaw(nextPage)),
+            parentId: nextRoot.id,
+            index: indexInItems(nextRoot, nextPage.id),
+          },
           source,
         );
         addedPages.push(nextPage);
-      } else if (!isEqual(toRaw(prevPage), toRaw(nextPage))) {
+      } else if (!isEqual(this.toRaw(prevPage), this.toRaw(nextPage))) {
         this.pushPageDiffStep(
           'update',
           nextPage,
-          { oldSchema: cloneDeep(toRaw(prevPage)), newSchema: cloneDeep(toRaw(nextPage)) },
+          {
+            oldSchema: cloneDeep(this.toRaw(prevPage)),
+            newSchema: cloneDeep(this.toRaw(nextPage)),
+          },
           source,
         );
       }
@@ -1813,7 +1893,11 @@ class Editor extends BaseService {
         this.pushPageDiffStep(
           'remove',
           prevPage,
-          { oldSchema: cloneDeep(toRaw(prevPage)), parentId: preRoot.id, index: indexInItems(preRoot, prevPage.id) },
+          {
+            oldSchema: cloneDeep(this.toRaw(prevPage)),
+            parentId: preRoot.id,
+            index: indexInItems(preRoot, prevPage.id),
+          },
           source,
         );
         removedPages.push(prevPage);
@@ -1821,7 +1905,7 @@ class Editor extends BaseService {
     });
 
     if (addedPages.length || removedPages.length) {
-      historyService.notifyPageStructureChange({ add: addedPages, remove: removedPages });
+      this.ctx.history.notifyPageStructureChange({ add: addedPages, remove: removedPages });
     }
   }
 
@@ -1852,11 +1936,11 @@ class Editor extends BaseService {
     };
     if (source) step.source = source;
 
-    const top = historyService.getCurrentPageStep(page.id);
+    const top = this.ctx.history.getCurrentPageStep(page.id);
     if (top?.rootStep && top.source === source) {
-      historyService.replaceCurrentStep('page', step, page.id);
+      this.ctx.history.replaceCurrentStep('page', step, page.id);
     } else {
-      historyService.push('page', step, page.id);
+      this.ctx.history.push('page', step, page.id);
     }
   }
 
@@ -1892,7 +1976,7 @@ class Editor extends BaseService {
     if (source) step.source = source;
     // 显式按 step.data.id 入栈：跨页操作（如 moveToContainer 从源页搬到目标页）
     // 必须落到正确的页面栈，否则会把记录错误地推到当前活动页 / 操作发起页。
-    const pushed = historyService.push('page', step, pageData.id);
+    const pushed = this.ctx.history.push('page', step, pageData.id);
     // push 返回 null 表示当前没有可写入的页面栈（未真正入栈），此时不应返回 uuid。
     const historyId = pushed ? step.uuid : null;
     this.lastPushedHistoryId = historyId;
@@ -2051,7 +2135,7 @@ class Editor extends BaseService {
     this.set('invalidNodeIds', new Map(invalidToRestore));
     this.emit('invalid-node-change', this.get('invalidNodeIds'));
 
-    const page = toRaw(this.get('page'));
+    const page = this.toRaw(this.get('page'));
     if (page) {
       const selectIds = (reverse ? step.extra?.selectedBefore : step.extra?.selectedAfter) ?? [];
       setTimeout(() => {
@@ -2089,8 +2173,13 @@ class Editor extends BaseService {
       doNotPushHistory: true,
     });
   }
+
+  /** 经由 reactivity 注入的 toRaw（默认是 Vue 的 toRaw） */
+  private toRaw<T>(value: T): T {
+    return this.ctx.reactivity.toRaw(value);
+  }
 }
 
 export type EditorService = Editor;
 
-export default new Editor();
+export default Editor;

@@ -5,17 +5,27 @@
  */
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import dataSource from '@editor/services/dataSource';
-import historyService from '@editor/services/history';
-import storageService, { Protocol } from '@editor/services/storage';
+import {
+  dataSourceService as dataSource,
+  historyService,
+  Protocol,
+  storageService,
+} from '@editor/services/sdk-instance';
 import { setEditorConfig } from '@editor/utils/config';
 import { COPY_DS_STORAGE_KEY } from '@editor/utils/editor';
 
-vi.mock('@editor/services/editor', () => ({
-  default: {
-    getNodeById: vi.fn((id: string) => ({ id, dsBinding: ['ds1'] })),
-  },
-}));
+vi.mock('@editor/services/sdk-instance', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  const modEditor = await (() => ({
+    default: {
+      getNodeById: vi.fn((id: string) => ({ id, dsBinding: ['ds1'] })),
+    },
+  }))();
+  return {
+    ...actual,
+    editorService: modEditor.default,
+  };
+});
 
 setEditorConfig({
   // eslint-disable-next-line no-new-func

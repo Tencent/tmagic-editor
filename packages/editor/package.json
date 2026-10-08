@@ -22,6 +22,11 @@
       "import": "./dist/es/headless.js",
       "require": "./dist/tmagic-editor-headless.umd.cjs"
     },
+    "./sdk": {
+      "types": "./types/sdk.d.ts",
+      "import": "./dist/es/sdk.js",
+      "require": "./dist/tmagic-editor-sdk.umd.cjs"
+    },
     "./dist/style.css": {
       "import": "./dist/style.css",
       "require": "./dist/style.css"

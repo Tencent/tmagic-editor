@@ -33,37 +33,44 @@ const componentEventsState = vi.hoisted((): { value: Record<string, { label: str
 const rootState = vi.hoisted(() => ({ value: null as any }));
 const nodesState = vi.hoisted((): { value: Record<string, any> } => ({ value: {} }));
 
-vi.mock('@editor/services/codeBlock', () => ({
-  default: {
-    getCodeDsl: () => codeDslState.value,
-  },
-}));
-
-vi.mock('@editor/services/dataSource', () => ({
-  default: {
-    get: (key: string) => {
-      if (key === 'dataSources') return dataSourcesState.value;
-      if (key === 'events') return {};
-      return undefined;
+vi.mock('@editor/services/sdk-instance', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  const modCodeBlock = await (() => ({
+    default: {
+      getCodeDsl: () => codeDslState.value,
     },
-    getFormMethod: () => formMethodsState.value,
-    getFormEvent: () => formEventsState.value,
-    getDataSourceById: (id: string) => dataSourcesState.value.find((ds) => `${ds.id}` === `${id}`),
-  },
-}));
-
-vi.mock('@editor/services/editor', () => ({
-  default: {
-    get: (key: string) => (key === 'root' ? rootState.value : undefined),
-    getNodeById: (id: string | number) => nodesState.value[`${id}`] || null,
-  },
-}));
-
-vi.mock('@editor/services/events', () => ({
-  default: {
-    getEvent: (type: string) => componentEventsState.value[type] || [],
-  },
-}));
+  }))();
+  const modDataSource = await (() => ({
+    default: {
+      get: (key: string) => {
+        if (key === 'dataSources') return dataSourcesState.value;
+        if (key === 'events') return {};
+        return undefined;
+      },
+      getFormMethod: () => formMethodsState.value,
+      getFormEvent: () => formEventsState.value,
+      getDataSourceById: (id: string) => dataSourcesState.value.find((ds) => `${ds.id}` === `${id}`),
+    },
+  }))();
+  const modEditor = await (() => ({
+    default: {
+      get: (key: string) => (key === 'root' ? rootState.value : undefined),
+      getNodeById: (id: string | number) => nodesState.value[`${id}`] || null,
+    },
+  }))();
+  const modEvents = await (() => ({
+    default: {
+      getEvent: (type: string) => componentEventsState.value[type] || [],
+    },
+  }))();
+  return {
+    ...actual,
+    codeBlockService: modCodeBlock.default,
+    dataSourceService: modDataSource.default,
+    editorService: modEditor.default,
+    eventsService: modEvents.default,
+  };
+});
 
 const ctx = (config: Record<string, any> = {}, model: Record<string, any> = {}, message?: string) => ({
   fieldType: config.type || '',

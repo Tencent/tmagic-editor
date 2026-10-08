@@ -5,7 +5,7 @@
  */
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
-import componentList from '@editor/services/componentList';
+import { componentListService as componentList } from '@editor/services/sdk-instance';
 
 afterEach(() => {
   componentList.resetState();

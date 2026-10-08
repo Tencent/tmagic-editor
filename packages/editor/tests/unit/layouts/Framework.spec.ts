@@ -76,8 +76,14 @@ vi.mock('@editor/layouts/page-bar/PageBar.vue', () => ({
   default: defineComponent({
     name: 'PageBar',
     props: ['disabledPageFragment'],
-    setup() {
-      return () => h('div', { class: 'fake-page-bar' });
+    setup(_p, { slots }) {
+      return () =>
+        h('div', { class: 'fake-page-bar' }, [
+          slots['page-bar-add-button']?.(),
+          slots['page-bar-title']?.({ page: { id: 'p1' } }),
+          slots['page-bar-popover']?.({ page: { id: 'p1' } }),
+          slots['page-list-popover']?.({ list: [] }),
+        ]);
     },
   }),
 }));
@@ -153,5 +159,25 @@ describe('Framework', () => {
     await wrapper.find('.change-btn').trigger('click');
     expect(uiService.set).toHaveBeenCalledWith('columnWidth', { left: 100, right: 200, center: 600 });
     expect(storageService.setItem).toHaveBeenCalled();
+  });
+
+  test('PageBar 插槽透传', () => {
+    const wrapper = mount(Framework, {
+      props: { disabledPageFragment: false } as any,
+      slots: {
+        'page-bar-add-button': '<i class="s-add"></i>',
+        'page-bar-title': '<i class="s-title"></i>',
+        'page-bar-popover': '<i class="s-popover"></i>',
+        'page-list-popover': '<i class="s-list"></i>',
+      },
+    });
+    for (const c of ['.s-add', '.s-title', '.s-popover', '.s-list']) {
+      expect(wrapper.find(c).exists()).toBe(true);
+    }
+  });
+
+  test('卸载时断开 ResizeObserver', () => {
+    const wrapper = mount(Framework, { props: { disabledPageFragment: false } as any });
+    expect(() => wrapper.unmount()).not.toThrow();
   });
 });

@@ -17,7 +17,7 @@
  */
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import history from '@editor/services/history';
+import { historyService as history } from '@editor/services/sdk-instance';
 import { setEditorConfig } from '@editor/utils/config';
 import { createStackStep } from '@editor/utils/history';
 import * as indexedDb from '@editor/utils/indexed-db';

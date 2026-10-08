@@ -19,6 +19,11 @@ import { error } from '../logger';
 
 export type DepsData = Record<string, Record<Id, DepData>>;
 
+export interface CollectWorkerResult {
+  deps: DepsData;
+  nodeIds: Id[];
+}
+
 /** 全量收集请求：worker 中根据 DSL 重建代码块/数据源 target */
 export interface DslCollectRequest {
   /** 请求 id，用于把结果与调用方对应起来 */

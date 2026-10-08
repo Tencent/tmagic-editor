@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue';
 import { cloneDeep, mergeWith } from 'lodash-es';
 import type { Writable } from 'type-fest';
 
@@ -25,7 +24,6 @@ import { Target, Watcher } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
 import { getNodePath, getValueByKeyPath, guid, setValueByKeyPath, toLine } from '@tmagic/utils';
 
-import editorService from '@editor/services/editor';
 import type {
   AsyncHookPlugin,
   PropsFormConfigFunction,
@@ -33,7 +31,9 @@ import type {
   PropsState,
   SyncHookPlugin,
 } from '@editor/type';
-import { fillConfig } from '@editor/utils/props';
+
+import type { SdkContext } from '../type';
+import { fillConfig } from '../utils/props';
 
 import BaseService from './BaseService';
 
@@ -53,21 +53,22 @@ type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
 type SyncMethodName = Writable<(typeof canUsePluginMethods)['sync']>;
 
 class Props extends BaseService {
-  private state = reactive<PropsState>({
-    propsConfigMap: {},
-    propsValueMap: {},
-    relateIdMap: {},
-    /** 禁用数据源 */
-    disabledDataSource: false,
-    /** 禁用代码块 */
-    disabledCodeBlock: false,
-  });
+  private state: PropsState;
 
-  constructor() {
+  constructor(private ctx: SdkContext) {
     super([
       ...canUsePluginMethods.async.map((methodName) => ({ name: methodName, isAsync: true })),
       ...canUsePluginMethods.sync.map((methodName) => ({ name: methodName, isAsync: false })),
     ]);
+    this.state = ctx.reactivity.reactive<PropsState>({
+      propsConfigMap: {},
+      propsValueMap: {},
+      relateIdMap: {},
+      /** 禁用数据源 */
+      disabledDataSource: false,
+      /** 禁用代码块 */
+      disabledCodeBlock: false,
+    });
   }
 
   public setDisabledDataSource(disabled: boolean) {
@@ -86,10 +87,9 @@ class Props extends BaseService {
     return this.state.disabledCodeBlock;
   }
 
-  public setPropsConfigs(configs: Record<string, FormConfig | PropsFormConfigFunction>) {
-    Object.keys(configs).forEach((type: string) => {
-      this.setPropsConfig(toLine(type), configs[type]);
-    });
+  /** 批量设置组件属性表单配置，返回的 Promise 在全部配置处理完（含异步的）后 resolve */
+  public async setPropsConfigs(configs: Record<string, FormConfig | PropsFormConfigFunction>) {
+    await Promise.all(Object.keys(configs).map((type: string) => this.setPropsConfig(toLine(type), configs[type])));
     this.emit('props-configs-change');
   }
 
@@ -102,13 +102,15 @@ class Props extends BaseService {
       labelWidth,
       disabledDataSource: this.getDisabledDataSource(),
       disabledCodeBlock: this.getDisabledCodeBlock(),
+      copyText: this.ctx.options.copyText,
+      notify: this.ctx.options.notify,
     });
   }
 
   public async setPropsConfig(type: string, config: FormConfig | PropsFormConfigFunction) {
     let c: FormConfig;
     if (typeof config === 'function') {
-      c = config({ editorService });
+      c = config({ editorService: this.ctx.editor });
     } else {
       c = config;
     }
@@ -134,9 +136,7 @@ class Props extends BaseService {
   }
 
   public setPropsValues(values: Record<string, Partial<MNode> | PropsFormValueFunction>) {
-    Object.keys(values).forEach((type: string) => {
-      this.setPropsValue(toLine(type), values[type]);
-    });
+    return Promise.all(Object.keys(values).map((type: string) => this.setPropsValue(toLine(type), values[type])));
   }
 
   public getPropsValues(): Record<string, Partial<MNode>> {
@@ -151,7 +151,7 @@ class Props extends BaseService {
   public async setPropsValue(type: string, value: Partial<MNode> | PropsFormValueFunction) {
     let v = value;
     if (typeof value === 'function') {
-      v = value({ editorService });
+      v = value({ editorService: this.ctx.editor });
     }
     this.state.propsValueMap[toLine(type)] = v;
   }
@@ -206,7 +206,7 @@ class Props extends BaseService {
    */
   /* eslint no-param-reassign: ["error", { "props": false }] */
   public setNewItemId(config: MNode, force = true) {
-    if (force || editorService.getNodeById(config.id)) {
+    if (force || this.ctx.editor.getNodeById(config.id)) {
       const newId = this.createId(config.type || 'component');
       this.setRelateId(config.id, newId);
       config.id = newId;
@@ -325,4 +325,4 @@ class Props extends BaseService {
 
 export type PropsService = Props;
 
-export default new Props();
+export default Props;

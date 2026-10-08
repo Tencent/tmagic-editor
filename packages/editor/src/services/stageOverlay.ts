@@ -5,8 +5,8 @@ import StageCore from '@tmagic/stage';
 import { getIdFromEl } from '@tmagic/utils';
 
 import { useStage } from '@editor/hooks/use-stage';
-import BaseService from '@editor/services//BaseService';
-import editorService from '@editor/services//editor';
+import BaseService from '@editor/sdk/services/BaseService';
+import { editorService } from '@editor/services/sdk-instance';
 import type { StageOptions, StageOverlayState, SyncHookPlugin } from '@editor/type';
 
 const canUsePluginMethods = {

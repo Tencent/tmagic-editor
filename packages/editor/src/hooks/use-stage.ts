@@ -4,7 +4,7 @@ import type { MNode } from '@tmagic/core';
 import StageCore, { GuidesType, RemoveEventData, SortEventData, UpdateEventData } from '@tmagic/stage';
 import { getIdFromEl } from '@tmagic/utils';
 
-import editorService from '@editor/services/editor';
+import { editorService } from '@editor/services/sdk-instance';
 import uiService from '@editor/services/ui';
 import type { StageOptions } from '@editor/type';
 import { H_GUIDE_LINE_STORAGE_KEY, UI_SELECT_MODE_EVENT_NAME, V_GUIDE_LINE_STORAGE_KEY } from '@editor/utils/const';

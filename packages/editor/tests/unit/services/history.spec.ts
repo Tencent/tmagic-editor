@@ -5,7 +5,7 @@
  */
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
-import history from '@editor/services/history';
+import { historyService as history } from '@editor/services/sdk-instance';
 import { createStackStep } from '@editor/utils/history';
 
 // pushCodeBlock / pushDataSource 已合入统一的 push(stepType, step, id)。

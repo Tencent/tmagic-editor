@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import { NodeType } from '@tmagic/core';
 
-import props from '@editor/services/props';
+import { propsService as props } from '@editor/services/sdk-instance';
 
 test('createId', async () => {
   const id = await props.createId('text');

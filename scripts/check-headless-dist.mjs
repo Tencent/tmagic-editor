@@ -21,6 +21,7 @@ const targets = [
   { specifier: '@tmagic/design/headless', expects: ['getDesignConfig', 'appendValidateSuggestion'] },
   { specifier: '@tmagic/form/headless', expects: ['validateForm', 'submitForm', 'registerField', 'builtInFields'] },
   { specifier: '@tmagic/editor/headless', expects: ['editorFields'] },
+  { specifier: '@tmagic/editor/sdk', expects: ['createDslSdk', 'DslValidationError'] },
 ];
 
 /**
@@ -85,6 +86,70 @@ for (const { specifier, expects } of targets) {
     }
   }
 }
+
+/**
+ * sdk 链路必须能在无 DOM 的 Node 里运行：沿着 `dist/es/sdk.js` 的相对 import 走一遍，
+ * 确认没有引入编辑器界面、画布、UI 库或 `.vue` 组件。
+ * vue 本身不在禁用之列：`@tmagic/form/headless` 只用到它的响应式 API。
+ */
+const SDK_FORBIDDEN = [
+  /^@tmagic\/stage/,
+  /^@tmagic\/design$/,
+  /^@tmagic\/form$/,
+  /^@tmagic\/table/,
+  /^monaco-editor/,
+  /\.vue/,
+];
+
+const checkSdkImports = () => {
+  const dir = findPackageDir('@tmagic/editor/sdk');
+  if (!dir) return;
+
+  const esDir = path.join(dir, 'dist/es');
+  const entry = path.join(esDir, 'sdk.js');
+  if (!existsSync(entry)) {
+    console.error(`✗ sdk 产物不存在：${entry}`);
+    failed += 1;
+    return;
+  }
+
+  const seen = new Set();
+  const queue = [entry];
+  const violations = [];
+  const importRe = /(?:import|export)\s[^'"]*?from\s*['"]([^'"]+)['"]|import\s*['"]([^'"]+)['"]/g;
+
+  while (queue.length) {
+    const file = queue.pop();
+    if (seen.has(file)) continue;
+    seen.add(file);
+
+    const code = readFileSync(file, 'utf-8');
+    for (const match of code.matchAll(importRe)) {
+      const specifier = match[1] || match[2];
+      if (specifier.startsWith('.')) {
+        const resolved = path.resolve(path.dirname(file), specifier);
+        if (/\.vue(\.js)?$/.test(resolved)) {
+          violations.push(`${path.relative(esDir, file)} -> ${specifier}`);
+        } else if (existsSync(resolved) && resolved.endsWith('.js')) {
+          queue.push(resolved);
+        }
+        continue;
+      }
+      if (SDK_FORBIDDEN.some((re) => re.test(specifier))) {
+        violations.push(`${path.relative(esDir, file)} -> ${specifier}`);
+      }
+    }
+  }
+
+  if (violations.length) {
+    failed += 1;
+    console.error(`✗ sdk 产物引入了禁用依赖：\n  ${violations.join('\n  ')}`);
+  } else {
+    console.log(`✓ sdk 依赖链干净（共 ${seen.size} 个模块）`);
+  }
+};
+
+checkSdkImports();
 
 if (failed) {
   console.error(`\n${failed} 个 headless 产物检查失败`);

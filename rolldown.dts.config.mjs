@@ -70,8 +70,10 @@ function rolldownConfig(pkg, base, entry = 'index') {
 
 function packageDtsConfigs(pkg, base) {
   const configs = [rolldownConfig(pkg, base, 'index')];
-  if (existsSync(`./temp/${base}/${pkg}/src/headless.d.ts`)) {
-    configs.push(rolldownConfig(pkg, base, 'headless'));
+  for (const entry of ['headless', 'sdk']) {
+    if (existsSync(`./temp/${base}/${pkg}/src/${entry}.d.ts`)) {
+      configs.push(rolldownConfig(pkg, base, entry));
+    }
   }
   return configs;
 }

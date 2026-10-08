@@ -15,7 +15,7 @@ const { dataSourceService } = vi.hoisted(() => ({
   dataSourceService: { getDataSourceById: vi.fn() },
 }));
 
-vi.mock('@editor/services/dataSource', () => ({ default: dataSourceService }));
+const mForm = { services: { dataSourceService } } as any;
 
 const { fieldTypeMock } = vi.hoisted(() => ({
   fieldTypeMock: vi.fn((_ds: any, names: string[]) => {
@@ -111,7 +111,7 @@ describe('DisplayConds', () => {
     });
     const item = capturedConfig.items[0].items[0];
     expect(item.type).toBe('cascader');
-    expect(item.options()).toEqual([{ label: 'f1', value: 'f1' }]);
+    expect(item.options(mForm)).toEqual([{ label: 'f1', value: 'f1' }]);
   });
 
   test('parentFields 为空时使用 data-source-field-select', () => {
@@ -160,10 +160,10 @@ describe('DisplayConds', () => {
       props: { config: { titlePrefix: 't', parentFields: ['ds1'] }, model: {}, name: 'conds' } as any,
     });
     const valueItem = capturedConfig.items[0].items[2];
-    expect(valueItem.type(undefined, { model: { field: ['numField'] } })).toBe('number');
-    expect(valueItem.type(undefined, { model: { field: ['boolField'] } })).toBe('select');
-    expect(valueItem.type(undefined, { model: { field: ['nullField'] } })).toBe('display');
-    expect(valueItem.type(undefined, { model: { field: ['anyField'] } })).toBe('text');
+    expect(valueItem.type(mForm, { model: { field: ['numField'] } })).toBe('number');
+    expect(valueItem.type(mForm, { model: { field: ['boolField'] } })).toBe('select');
+    expect(valueItem.type(mForm, { model: { field: ['nullField'] } })).toBe('display');
+    expect(valueItem.type(mForm, { model: { field: ['anyField'] } })).toBe('text');
   });
 
   test('value display 函数', () => {
@@ -218,7 +218,7 @@ describe('DisplayConds', () => {
       } as any,
     });
     const item = capturedConfig.items[0].items[0];
-    expect(item.options()).toEqual([]);
+    expect(item.options(mForm)).toEqual([]);
   });
 
   test('isCompare 但无 lastValues 时不进入对比', () => {

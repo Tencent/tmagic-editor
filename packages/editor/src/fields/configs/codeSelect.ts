@@ -19,10 +19,7 @@
 import { isEmpty } from 'lodash-es';
 
 import { HookCodeType, HookType } from '@tmagic/core';
-import type { CodeSelectConfig, FormValue, GroupListConfig } from '@tmagic/form/headless';
-
-import codeBlockService from '@editor/services/codeBlock';
-import dataSourceService from '@editor/services/dataSource';
+import type { CodeSelectConfig, FormState, FormValue, GroupListConfig } from '@tmagic/form/headless';
 
 import { stickyAddButton } from './stickyAddButton';
 
@@ -42,21 +39,21 @@ export const createCodeSelectConfig = (config: CodeSelectConfig): GroupListConfi
       codeId: '',
     }),
     ...stickyAddButton(`添加${config.text || ''}`),
-    title: (_mForm: any, { model, index }: any) => {
+    title: (mForm: FormState | undefined, { model, index }: any) => {
       if (model.codeType === HookCodeType.DATA_SOURCE_METHOD) {
         if (Array.isArray(model.codeId)) {
           if (model.codeId.length < 2) {
             return index;
           }
 
-          const ds = dataSourceService.getDataSourceById(model.codeId[0]);
+          const ds = mForm?.services?.dataSourceService.getDataSourceById(model.codeId[0]);
           return `${ds?.title} / ${model.codeId[1]}`;
         }
 
         return Array.isArray(model.codeId) ? model.codeId.join('/') : index;
       }
 
-      const codeContent = codeBlockService.getCodeContentById(model.codeId);
+      const codeContent = mForm?.services?.codeBlockService.getCodeContentById(model.codeId);
 
       if (codeContent) {
         return codeContent.name;
@@ -92,7 +89,7 @@ export const createCodeSelectConfig = (config: CodeSelectConfig): GroupListConfi
         rules: [{ typeMatch: true, trigger: 'change' }],
 
         display: (_mForm: any, { model }: any) => model.codeType !== HookCodeType.DATA_SOURCE_METHOD,
-        notEditable: () => !codeBlockService.getEditStatus(),
+        notEditable: (mForm: FormState | undefined) => !mForm?.services?.codeBlockService.getEditStatus(),
       },
       {
         type: 'data-source-method-select',
@@ -100,7 +97,7 @@ export const createCodeSelectConfig = (config: CodeSelectConfig): GroupListConfi
         text: '数据源字段',
         rules: [{ typeMatch: true, trigger: 'change' }],
         display: (_mForm: any, { model }: any) => model.codeType === HookCodeType.DATA_SOURCE_METHOD,
-        notEditable: () => !dataSourceService.get('editable'),
+        notEditable: (mForm: FormState | undefined) => !mForm?.services?.dataSourceService.get('editable'),
       },
     ],
   } as any as GroupListConfig;

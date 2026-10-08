@@ -2,7 +2,8 @@ import serialize from 'serialize-javascript';
 import type { Writable } from 'type-fest';
 
 import type { SyncHookPlugin } from '@editor/type';
-import { getEditorConfig } from '@editor/utils/config';
+
+import type { SdkContext, StorageLike } from '../type';
 
 import BaseService from './BaseService';
 
@@ -26,15 +27,48 @@ const canUsePluginMethods = {
 
 type SyncMethodName = Writable<(typeof canUsePluginMethods)['sync']>;
 
+/** 默认的内存存储，Node 下没有 localStorage 时使用 */
+export class MemoryStorage implements StorageLike {
+  private map = new Map<string, string>();
+
+  get length() {
+    return this.map.size;
+  }
+
+  clear() {
+    this.map.clear();
+  }
+
+  getItem(key: string) {
+    return this.map.has(key) ? (this.map.get(key) as string) : null;
+  }
+
+  key(index: number) {
+    return Array.from(this.map.keys())[index] ?? null;
+  }
+
+  removeItem(key: string) {
+    this.map.delete(key);
+  }
+
+  setItem(key: string, value: string) {
+    this.map.set(key, `${value}`);
+  }
+}
+
 /**
  * 数据存储服务
  */
 export class WebStorage extends BaseService {
-  private storage: Storage = globalThis.localStorage;
+  private storage: StorageLike;
   private namespace = 'tmagic';
 
-  constructor() {
+  constructor(
+    private ctx: SdkContext,
+    storage?: StorageLike,
+  ) {
     super(canUsePluginMethods.sync.map((methodName) => ({ name: methodName, isAsync: false })));
+    this.storage = storage ?? new MemoryStorage();
   }
 
   /**
@@ -42,12 +76,12 @@ export class WebStorage extends BaseService {
    * const storageService = new StorageService();
    * storageService.usePlugin({
    *    // 替换存储对象为 sessionStorage
-   *    async afterGetStorage(): Promise<Storage> {
+   *    async afterGetStorage(): Promise<StorageLike> {
    *      return window.sessionStorage;
    *    },
    * });
    */
-  public getStorage(): Storage {
+  public getStorage(): StorageLike {
     return this.storage;
   }
 
@@ -76,7 +110,7 @@ export class WebStorage extends BaseService {
 
     switch (protocol) {
       case Protocol.OBJECT:
-        return getEditorConfig('parseDSL')(`(${item})`);
+        return this.ctx.parseDSL(`(${item})`);
       case Protocol.JSON:
         return JSON.parse(item);
       case Protocol.NUMBER:
@@ -153,4 +187,4 @@ export class WebStorage extends BaseService {
 }
 
 export type StorageService = WebStorage;
-export default new WebStorage();
+export default WebStorage;

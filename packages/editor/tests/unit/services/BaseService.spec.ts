@@ -5,7 +5,7 @@
  */
 import { describe, expect, test, vi } from 'vitest';
 
-import BaseService from '@editor/services/BaseService';
+import BaseService from '@editor/sdk/services/BaseService';
 
 class SyncService extends BaseService {
   public count = 0;

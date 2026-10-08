@@ -25,7 +25,14 @@ const uiService = vi.hoisted(() => ({
   calcZoom: vi.fn(async () => 1.2),
 }));
 
-vi.mock('@editor/services/editor', () => ({ default: editorService }));
+vi.mock('@editor/services/sdk-instance', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  const modEditor = await (() => ({ default: editorService }))();
+  return {
+    ...actual,
+    editorService: modEditor.default,
+  };
+});
 vi.mock('@editor/services/ui', () => ({ default: uiService }));
 
 afterEach(() => {

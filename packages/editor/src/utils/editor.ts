@@ -23,7 +23,6 @@ import serialize from 'serialize-javascript';
 import type { Id, MApp, MContainer, MNode, MPage, MPageFragment, TargetOptions } from '@tmagic/core';
 import { NODE_CONDS_KEY, NodeType, Target, Watcher } from '@tmagic/core';
 import type StageCore from '@tmagic/stage';
-import { isFixed } from '@tmagic/stage';
 import {
   calcValueByFontsize,
   getElById,
@@ -37,6 +36,8 @@ import {
 
 import type { EditorNodeInfo, StepValue } from '@editor/type';
 import { LayerOffset, Layout } from '@editor/type';
+
+import { isFixed } from '../sdk/utils/position';
 
 export const COPY_STORAGE_KEY = '$MagicEditorCopyData';
 export const COPY_CODE_STORAGE_KEY = '$MagicEditorCopyCode';

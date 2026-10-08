@@ -21,7 +21,8 @@ import type { Writable } from 'type-fest';
 
 import { convertToNumber } from '@tmagic/utils';
 
-import editorService from '@editor/services/editor';
+import BaseService from '@editor/sdk/services/BaseService';
+import { editorService } from '@editor/services/sdk-instance';
 import type { AsyncHookPlugin, StageRect, UiState } from '@editor/type';
 import {
   DEFAULT_LEFT_COLUMN_WIDTH,
@@ -33,8 +34,7 @@ import {
   RIGHT_COLUMN_WIDTH_STORAGE_KEY,
 } from '@editor/utils/const';
 
-import BaseService from './BaseService';
-import storageService, { Protocol } from './storage';
+import { Protocol, storageService } from './sdk-instance';
 
 const state = shallowReactive<UiState>({
   uiSelectMode: false,

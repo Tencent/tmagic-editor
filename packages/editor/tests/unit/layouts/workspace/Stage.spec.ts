@@ -21,10 +21,9 @@ import { mount } from '@vue/test-utils';
 import { NodeType } from '@tmagic/core';
 
 import Stage from '@editor/layouts/workspace/viewer/Stage.vue';
-import editorService from '@editor/services/editor';
 import keybindingService from '@editor/services/keybinding';
+import { editorService, storageService } from '@editor/services/sdk-instance';
 import stageOverlayService from '@editor/services/stageOverlay';
-import storageService from '@editor/services/storage';
 import uiService from '@editor/services/ui';
 
 globalThis.ResizeObserver =

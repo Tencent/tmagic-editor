@@ -7,7 +7,7 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { defineComponent, h, nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 
-import historyService from '@editor/services/history';
+import { historyService } from '@editor/services/sdk-instance';
 import { createStackStep } from '@editor/utils/history';
 
 // pushCodeBlock / pushDataSource 已合入统一的 push(stepType, step, id)；用等价小工具沿用既有用例。

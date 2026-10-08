@@ -10,7 +10,7 @@ import { mount } from '@vue/test-utils';
 import CodeSelect from '@editor/fields/CodeSelect.vue';
 
 // 表单配置由 fields/configs/codeSelect.ts 产出（组件与无渲染校验的嵌套配置共用），
-// 那里直接用服务单例，因此这里 mock 服务模块本身
+// 那里通过 mForm.services 取服务，因此这里构造一个带 services 的 mForm
 const { dataSourceService, codeBlockService } = vi.hoisted(() => ({
   dataSourceService: {
     get: vi.fn(() => true),
@@ -22,8 +22,7 @@ const { dataSourceService, codeBlockService } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('@editor/services/dataSource', () => ({ default: dataSourceService }));
-vi.mock('@editor/services/codeBlock', () => ({ default: codeBlockService }));
+const mForm = { services: { dataSourceService, codeBlockService } } as any;
 
 vi.mock('@tmagic/form', async (importOriginal) => {
   const actual = await importOriginal<any>();
@@ -73,7 +72,7 @@ describe('CodeSelect', () => {
     const wrapper = mount(CodeSelect, { props: baseProps() as any });
     const container = wrapper.findComponent({ name: 'MContainer' });
     const config = container.props('config') as any;
-    const title = config.title(undefined, { model: { codeType: 'code', codeId: 'c1' }, index: 0 });
+    const title = config.title(mForm, { model: { codeType: 'code', codeId: 'c1' }, index: 0 });
     expect(title).toBe('code-name');
   });
 
@@ -81,7 +80,7 @@ describe('CodeSelect', () => {
     const wrapper = mount(CodeSelect, { props: baseProps() as any });
     const container = wrapper.findComponent({ name: 'MContainer' });
     const config = container.props('config') as any;
-    const title = config.title(undefined, {
+    const title = config.title(mForm, {
       model: { codeType: 'data-source-method', codeId: ['ds1', 'doFetch'] },
       index: 0,
     });
@@ -92,7 +91,7 @@ describe('CodeSelect', () => {
     const wrapper = mount(CodeSelect, { props: baseProps() as any });
     const container = wrapper.findComponent({ name: 'MContainer' });
     const config = container.props('config') as any;
-    const title = config.title(undefined, {
+    const title = config.title(mForm, {
       model: { codeType: 'data-source-method', codeId: ['ds1'] },
       index: 5,
     });
@@ -104,7 +103,7 @@ describe('CodeSelect', () => {
     const wrapper = mount(CodeSelect, { props: baseProps() as any });
     const container = wrapper.findComponent({ name: 'MContainer' });
     const config = container.props('config') as any;
-    const title = config.title(undefined, { model: { codeType: 'code', codeId: 'unknown' }, index: 0 });
+    const title = config.title(mForm, { model: { codeType: 'code', codeId: 'unknown' }, index: 0 });
     expect(title).toBe('unknown');
   });
 
@@ -165,8 +164,8 @@ describe('CodeSelect', () => {
     const wrapper = mount(CodeSelect, { props: baseProps() as any });
     const container = wrapper.findComponent({ name: 'MContainer' });
     const config = container.props('config') as any;
-    expect(config.items[1].notEditable()).toBe(true);
-    expect(config.items[2].notEditable()).toBe(true);
+    expect(config.items[1].notEditable(mForm)).toBe(true);
+    expect(config.items[2].notEditable(mForm)).toBe(true);
     codeBlockService.getEditStatus.mockReturnValue(true);
     dataSourceService.get.mockReturnValue(true);
   });

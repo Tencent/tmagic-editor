@@ -23,9 +23,7 @@ import type { MApp, MContainer, MNode } from '@tmagic/core';
 import { NodeType } from '@tmagic/core';
 import { getNodePath } from '@tmagic/utils';
 
-import editorService from '@editor/services/editor';
-import historyService from '@editor/services/history';
-import storageService from '@editor/services/storage';
+import { editorService, historyService, storageService } from '@editor/services/sdk-instance';
 import type { EditorChangeEvent } from '@editor/type';
 import { COPY_STORAGE_KEY, setEditorConfig } from '@editor/utils';
 

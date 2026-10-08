@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue';
 import { cloneDeep, get, keys, pick } from 'lodash-es';
 import type { Writable } from 'type-fest';
 
@@ -25,9 +24,6 @@ import { Target, Watcher } from '@tmagic/core';
 import type { TableColumnConfig } from '@tmagic/form';
 import { getValueByKeyPath, setValueByKeyPath } from '@tmagic/utils';
 
-import editorService from '@editor/services/editor';
-import historyService from '@editor/services/history';
-import storageService, { Protocol } from '@editor/services/storage';
 import type {
   AsyncHookPlugin,
   CodeBlockStepValue,
@@ -37,11 +33,13 @@ import type {
   HistoryOpOptionsWithChangeRecords,
 } from '@editor/type';
 import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
-import { getEditorConfig } from '@editor/utils/config';
 import { COPY_CODE_STORAGE_KEY } from '@editor/utils/editor';
 import { createStackStep, describeRevertStep, getLastPushedHistoryIds } from '@editor/utils/history';
 
+import type { SdkContext } from '../type';
+
 import BaseService from './BaseService';
+import { Protocol } from './WebStorage';
 
 const canUsePluginMethods = {
   async: ['setCodeDslById', 'setEditStatus', 'setCombineIds', 'setUndeleteableList', 'deleteCodeDslByIds'] as const,
@@ -51,13 +49,7 @@ const canUsePluginMethods = {
 type AsyncMethodName = Writable<(typeof canUsePluginMethods)['async']>;
 
 class CodeBlock extends BaseService {
-  private state = reactive<CodeState>({
-    codeDsl: null,
-    editable: true,
-    combineIds: [],
-    undeletableList: [],
-    paramsColConfig: undefined,
-  });
+  private state: CodeState;
 
   /**
    * 最近一次写入历史栈的代码块历史记录 uuid（单条写入场景：新增 / 更新）。
@@ -70,11 +62,18 @@ class CodeBlock extends BaseService {
    */
   private lastDeletedHistoryIds: string[] = [];
 
-  constructor() {
+  constructor(private ctx: SdkContext) {
     super([
       ...canUsePluginMethods.async.map((methodName) => ({ name: methodName, isAsync: true })),
       ...canUsePluginMethods.sync.map((methodName) => ({ name: methodName, isAsync: false })),
     ]);
+    this.state = ctx.reactivity.reactive<CodeState>({
+      codeDsl: null,
+      editable: true,
+      combineIds: [],
+      undeletableList: [],
+      paramsColConfig: undefined,
+    });
   }
 
   /**
@@ -170,9 +169,9 @@ class CodeBlock extends BaseService {
     const codeConfigProcessed = cloneDeep(codeConfig);
     if (codeConfigProcessed.content) {
       // 在保存的时候转换代码内容
-      const parseDSL = getEditorConfig('parseDSL');
-      if (typeof codeConfigProcessed.content === 'string') {
-        codeConfigProcessed.content = parseDSL<(...args: any[]) => any>(codeConfigProcessed.content);
+      // 没有注入 parseDSL（如 Node 默认）时保持源码字符串，不会执行代码，导出的 DSL 里仍是字符串
+      if (typeof codeConfigProcessed.content === 'string' && this.ctx.options.parseDSL) {
+        codeConfigProcessed.content = this.ctx.parseDSL(codeConfigProcessed.content) as (...args: any[]) => any;
       }
     }
 
@@ -196,7 +195,7 @@ class CodeBlock extends BaseService {
         historyDescription,
         source: historySource,
       });
-      this.lastPushedHistoryId = (step ? historyService.push('codeBlock', step, id) : null)?.uuid ?? null;
+      this.lastPushedHistoryId = (step ? this.ctx.history.push('codeBlock', step, id) : null)?.uuid ?? null;
     }
 
     this.emit('addOrUpdate', id, codeDsl[id]);
@@ -268,21 +267,21 @@ class CodeBlock extends BaseService {
    * 设置代码草稿
    */
   public setCodeDraft(codeId: Id, content: string): void {
-    globalThis.localStorage.setItem(`${CODE_DRAFT_STORAGE_KEY}_${codeId}`, content);
+    this.ctx.storage.getStorage().setItem(`${CODE_DRAFT_STORAGE_KEY}_${codeId}`, content);
   }
 
   /**
    * 获取代码草稿
    */
   public getCodeDraft(codeId: Id): string | null {
-    return globalThis.localStorage.getItem(`${CODE_DRAFT_STORAGE_KEY}_${codeId}`);
+    return this.ctx.storage.getStorage().getItem(`${CODE_DRAFT_STORAGE_KEY}_${codeId}`);
   }
 
   /**
    * 删除代码草稿
    */
   public removeCodeDraft(codeId: Id): void {
-    globalThis.localStorage.removeItem(`${CODE_DRAFT_STORAGE_KEY}_${codeId}`);
+    this.ctx.storage.getStorage().removeItem(`${CODE_DRAFT_STORAGE_KEY}_${codeId}`);
   }
 
   /**
@@ -314,7 +313,7 @@ class CodeBlock extends BaseService {
           historyDescription,
           source: historySource,
         });
-        const uuid = step ? historyService.push('codeBlock', step, id)?.uuid : undefined;
+        const uuid = step ? this.ctx.history.push('codeBlock', step, id)?.uuid : undefined;
         if (uuid) this.lastDeletedHistoryIds.push(uuid);
       }
 
@@ -390,7 +389,7 @@ class CodeBlock extends BaseService {
    * @returns 撤销的 step；栈不存在或已无可撤销时返回 null
    */
   public async undo(id: Id): Promise<CodeBlockStepValue | null> {
-    const step = historyService.undo('codeBlock', id);
+    const step = this.ctx.history.undo('codeBlock', id);
     if (!step) return null;
     await this.applyHistoryStep(step, true);
     return step;
@@ -402,7 +401,7 @@ class CodeBlock extends BaseService {
    * @returns 重做的 step；栈不存在或已无可重做时返回 null
    */
   public async redo(id: Id): Promise<CodeBlockStepValue | null> {
-    const step = historyService.redo('codeBlock', id);
+    const step = this.ctx.history.redo('codeBlock', id);
     if (!step) return null;
     await this.applyHistoryStep(step, false);
     return step;
@@ -410,12 +409,12 @@ class CodeBlock extends BaseService {
 
   /** 是否可对指定代码块撤销。 */
   public canUndo(id: Id): boolean {
-    return historyService.canUndo('codeBlock', id);
+    return this.ctx.history.canUndo('codeBlock', id);
   }
 
   /** 是否可对指定代码块重做。 */
   public canRedo(id: Id): boolean {
-    return historyService.canRedo('codeBlock', id);
+    return this.ctx.history.canRedo('codeBlock', id);
   }
 
   /**
@@ -426,7 +425,7 @@ class CodeBlock extends BaseService {
    * @returns 实际移动到的最终游标位置
    */
   public async goto(id: Id, targetCursor: number): Promise<number> {
-    let cursor = historyService.getCursor('codeBlock', id);
+    let cursor = this.ctx.history.getCursor('codeBlock', id);
     const target = Math.max(0, targetCursor);
     while (cursor > target) {
       const step = await this.undo(id);
@@ -452,7 +451,7 @@ class CodeBlock extends BaseService {
    * @returns 反向后产生的新 step；目标不存在 / 未应用时返回 null
    */
   public async revert(id: Id, index: number): Promise<CodeBlockStepValue | null> {
-    const list = historyService.getStepList('codeBlock', id);
+    const list = this.ctx.history.getStepList('codeBlock', id);
     const entry = list[index];
     if (!entry?.applied) return null;
     // 更新类步骤（前后 content 都存在）必须带 changeRecords 才支持回滚，否则只能整内容替换，会冲掉后续无关变更。
@@ -473,7 +472,7 @@ class CodeBlock extends BaseService {
   public async revertById(uuids: string[]): Promise<(CodeBlockStepValue | null)[]> {
     const results: (CodeBlockStepValue | null)[] = [];
     for (const uuid of uuids) {
-      const location = historyService.findStepLocationByUuid('codeBlock', uuid);
+      const location = this.ctx.history.findStepLocationByUuid('codeBlock', uuid);
       results.push(location ? await this.revert(location.id, location.index) : null);
     }
     return results;
@@ -513,7 +512,7 @@ class CodeBlock extends BaseService {
       coperWatcher.collect(copyNodes, {}, true, collectorOptions.type);
 
       Object.keys(customTarget.deps).forEach((nodeId: Id) => {
-        const node = editorService.getNodeById(nodeId);
+        const node = this.ctx.editor.getNodeById(nodeId);
         if (!node) return;
         customTarget!.deps[nodeId].keys.forEach((key) => {
           const relateCodeId = get(node, key);
@@ -527,7 +526,7 @@ class CodeBlock extends BaseService {
         });
       });
     }
-    storageService.setItem(COPY_CODE_STORAGE_KEY, copyData, {
+    this.ctx.storage.setItem(COPY_CODE_STORAGE_KEY, copyData, {
       protocol: Protocol.OBJECT,
     });
   }
@@ -537,7 +536,7 @@ class CodeBlock extends BaseService {
    * @returns
    */
   public paste() {
-    const codeDsl: CodeBlockDSL = storageService.getItem(COPY_CODE_STORAGE_KEY);
+    const codeDsl: CodeBlockDSL = this.ctx.storage.getItem(COPY_CODE_STORAGE_KEY);
     Object.keys(codeDsl).forEach((codeId: Id) => {
       // 不覆盖同样id的代码块
       this.setCodeDslByIdSync(codeId, codeDsl[codeId], false);
@@ -575,13 +574,16 @@ class CodeBlock extends BaseService {
     // 原本是新增 → revert 即删除
     if (!oldSchema && newSchema) {
       await this.deleteCodeDslByIds([id], { historyDescription, historySource: 'rollback' });
-      return historyService.getStepList('codeBlock', id).slice(-1)[0]?.step ?? null;
+      return this.ctx.history.getStepList('codeBlock', id).slice(-1)[0]?.step ?? null;
     }
 
     // 原本是删除 → revert 即写回
     if (oldSchema && !newSchema) {
-      this.setCodeDslByIdSync(id, cloneDeep(oldSchema), true, { historyDescription, historySource: 'rollback' });
-      return historyService.getStepList('codeBlock', id).slice(-1)[0]?.step ?? null;
+      this.setCodeDslByIdSync(id, cloneDeep(oldSchema), true, {
+        historyDescription,
+        historySource: 'rollback',
+      });
+      return this.ctx.history.getStepList('codeBlock', id).slice(-1)[0]?.step ?? null;
     }
 
     if (!oldSchema || !newSchema) return null;
@@ -605,11 +607,14 @@ class CodeBlock extends BaseService {
         historyDescription,
         historySource: 'rollback',
       });
-      return historyService.getStepList('codeBlock', id).slice(-1)[0]?.step ?? null;
+      return this.ctx.history.getStepList('codeBlock', id).slice(-1)[0]?.step ?? null;
     }
 
-    this.setCodeDslByIdSync(id, cloneDeep(oldSchema), true, { historyDescription, historySource: 'rollback' });
-    return historyService.getStepList('codeBlock', id).slice(-1)[0]?.step ?? null;
+    this.setCodeDslByIdSync(id, cloneDeep(oldSchema), true, {
+      historyDescription,
+      historySource: 'rollback',
+    });
+    return this.ctx.history.getStepList('codeBlock', id).slice(-1)[0]?.step ?? null;
   }
 
   /**
@@ -680,4 +685,4 @@ class CodeBlock extends BaseService {
 
 export type CodeBlockService = CodeBlock;
 
-export default new CodeBlock();
+export default CodeBlock;

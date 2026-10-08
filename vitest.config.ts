@@ -12,6 +12,7 @@ const alias = {
   '@tmagic/form/headless': r('./packages/form/src/headless.ts'),
   '@tmagic/form': r('./packages/form/src'),
   '@tmagic/editor/headless': r('./packages/editor/src/headless.ts'),
+  '@tmagic/editor/sdk': r('./packages/editor/src/sdk.ts'),
   '@data-source': r('./packages/data-source/src'),
 };
 
@@ -45,6 +46,7 @@ export default defineConfig({
           include: ['./packages/*/tests/**', './runtime/*/tests/**'],
           exclude: [
             './packages/cli/tests/**',
+            './packages/editor/tests/unit/sdk/**',
             './packages/editor/tests/unit/hooks/use-stage.spec.ts',
             // 多份用例共用的脚手架模块，本身不含用例
             './packages/*/tests/**/helpers/**',
@@ -74,7 +76,9 @@ export default defineConfig({
         resolve: { alias },
         test: {
           name: 'node',
-          include: ['./packages/cli/tests/**', './packages/form/tests/node/**'],
+          include: ['./packages/cli/tests/**', './packages/form/tests/node/**', './packages/editor/tests/unit/sdk/**'],
+          // 多份用例共用的脚手架模块，本身不含用例
+          exclude: ['./packages/*/tests/**/helpers/**'],
           environment: 'node',
           pool: 'forks',
           isolate: false,

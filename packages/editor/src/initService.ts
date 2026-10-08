@@ -12,23 +12,22 @@ import type {
   MPage,
   MPageFragment,
 } from '@tmagic/core';
-import {
-  createCodeBlockTarget,
-  createDataSourceCondTarget,
-  createDataSourceMethodTarget,
-  createDataSourceTarget,
-  DepTargetType,
-  NODE_CONDS_KEY,
-  NodeType,
-  Target,
-  updateNode,
-} from '@tmagic/core';
+import { createCodeBlockTarget, DepTargetType, NodeType, Target, updateNode } from '@tmagic/core';
 import { ChangeRecord } from '@tmagic/form';
 import StageCore from '@tmagic/stage';
-import { getDepNodeIds, getNodes, isPage, isValueIncludeDataSource } from '@tmagic/utils';
+import { getDepNodeIds, getNodes, isPage } from '@tmagic/utils';
 
 import PropsPanel from './layouts/PropsPanel.vue';
-import { isIncludeDataSource } from './utils/editor';
+import type { Reactivity } from './sdk/type';
+import {
+  addDataSourceTargets,
+  classifyUpdatedNodes,
+  getDataSourceRecollectTypes,
+  removeDataSourceTargets,
+  removeTargetDeps,
+  resetDepTargets,
+  writeTargetDeps,
+} from './sdk/utils/dep';
 import { error as logError } from './utils/logger';
 import { EditorProps } from './editorProps';
 import { Services } from './type';
@@ -242,6 +241,16 @@ export const initServiceState = (
   watch(
     () => props.disabledDataSource,
     (disabledDataSource) => propsService.setDisabledDataSource(disabledDataSource ?? false),
+    {
+      immediate: true,
+    },
+  );
+
+  // 同步给 SDK 的结构合法性校验（浏览器端默认 validateMode 为 off，主动调用 `validate` 时才会用到）
+  watch(
+    () => [props.disabledPageFragment, props.canDropIn] as const,
+    ([disabledPageFragment, canDropIn]) =>
+      editorService.setConfig({ disabledPageFragment: disabledPageFragment ?? false, canDropIn }),
     {
       immediate: true,
     },
@@ -476,12 +485,6 @@ export const initServiceEvents = (
     }
   };
 
-  const initDataSourceDepTarget = (ds: DataSourceSchema) => {
-    depService.addTarget(createDataSourceTarget(ds, reactive({})));
-    depService.addTarget(createDataSourceMethodTarget(ds, reactive({})));
-    depService.addTarget(createDataSourceCondTarget(ds, reactive({})));
-  };
-
   const rootChangeHandler = (value: MApp | null) => {
     if (!value) return;
 
@@ -491,15 +494,12 @@ export const initServiceEvents = (
     codeBlockService.setCodeDsl(value.codeBlocks);
     dataSourceService.set('dataSources', value.dataSources);
 
-    depService.clearTargets();
-
-    for (const [id, code] of Object.entries(value.codeBlocks)) {
-      depService.addTarget(createCodeBlockTarget(id, code));
-    }
-
-    for (const ds of dataSourceService.get('dataSources')) {
-      initDataSourceDepTarget(ds);
-    }
+    resetDepTargets(
+      depService,
+      value.codeBlocks,
+      dataSourceService.get('dataSources'),
+      reactive as Reactivity['reactive'],
+    );
 
     if (Array.isArray(value.items)) {
       updateStageDsl(value);
@@ -549,49 +549,7 @@ export const initServiceEvents = (
   // 节点更新，收集依赖
   // 仅当修改到数据源相关的才收集
   const nodeUpdateHandler = (data: { newNode: MComponent; oldNode: MComponent; changeRecords?: ChangeRecord[] }[]) => {
-    const needRecollectNodes: MComponent[] = [];
-    const normalNodes: MComponent[] = [];
-    for (const { newNode, oldNode, changeRecords } of data) {
-      if (newNode.type === NodeType.ROOT) {
-        normalNodes.push(newNode);
-      } else if (changeRecords?.length) {
-        // eslint-disable-next-line no-restricted-syntax
-        forChangeRecords: for (const record of changeRecords) {
-          if (!record.propPath) {
-            needRecollectNodes.push(newNode);
-            break forChangeRecords;
-          }
-
-          // NODE_CONDS_KEY为显示条件key
-          if (
-            new RegExp(`${NODE_CONDS_KEY}.(\\d)+.cond`).test(record.propPath) ||
-            new RegExp(`${NODE_CONDS_KEY}.(\\d)+.cond.(\\d)+.value`).test(record.propPath) ||
-            record.propPath === NODE_CONDS_KEY ||
-            isValueIncludeDataSource(record.value)
-          ) {
-            needRecollectNodes.push(newNode);
-            break forChangeRecords;
-          }
-
-          // 修改的key在收集的依赖中，则需要触发重新收集
-          for (const target of Object.values(depService.getTargets(DepTargetType.DATA_SOURCE))) {
-            if (!target.deps[newNode.id]) {
-              continue;
-            }
-            if (target.deps[newNode.id].keys.includes(record.propPath)) {
-              needRecollectNodes.push(newNode);
-              break forChangeRecords;
-            }
-          }
-
-          normalNodes.push(newNode);
-        }
-      } else if (isIncludeDataSource(newNode, oldNode)) {
-        needRecollectNodes.push(newNode);
-      } else {
-        normalNodes.push(newNode);
-      }
-    }
+    const { needRecollectNodes, normalNodes } = classifyUpdatedNodes({ dep: depService }, data);
 
     if (needRecollectNodes.length) {
       // 有数据源依赖，需要等依赖重新收集完才更新stage
@@ -603,13 +561,14 @@ export const initServiceEvents = (
       handler();
     } else {
       updateStageNodes(normalNodes);
-
-      // 在上面判断是否需要收集数据源依赖中已经更新stage
-      Promise.all([
-        collectIdle(normalNodes, true, DepTargetType.CODE_BLOCK),
-        collectIdle(normalNodes, true, DepTargetType.DATA_SOURCE_METHOD),
-      ]);
     }
+
+    // 代码块、数据源方法依赖对所有被更新的节点都要收集：同一批里既改了数据源引用又改了方法时不能漏掉
+    const updatedNodes = [...needRecollectNodes, ...normalNodes];
+    Promise.all([
+      collectIdle(updatedNodes, true, DepTargetType.CODE_BLOCK),
+      collectIdle(updatedNodes, true, DepTargetType.DATA_SOURCE_METHOD),
+    ]);
   };
 
   // 节点删除，清除对齐的依赖收集
@@ -634,7 +593,7 @@ export const initServiceEvents = (
 
   const dataSourceAddHandler = (config: DataSourceSchema) => {
     const handler = async () => {
-      initDataSourceDepTarget(config);
+      addDataSourceTargets(depService, config, reactive as Reactivity['reactive']);
       const app = await getTMagicApp();
 
       if (!app?.dataSourceManager) {
@@ -669,84 +628,31 @@ export const initServiceEvents = (
       ds.setData(config.mocks?.find((mock) => mock.useInEditor)?.data || ds.getDefaultData());
     };
 
-    let needRecollectDep = false;
-    let isModifyField = false;
-    let isModifyMock = false;
-    let isModifyMethod = false;
-    for (const changeRecord of changeRecords) {
-      if (!changeRecord.propPath) {
-        continue;
-      }
-
-      isModifyField =
-        changeRecord.propPath === 'fields' ||
-        /fields.(\d)+.name/.test(changeRecord.propPath) ||
-        /fields.(\d)+.defaultValue/.test(changeRecord.propPath) ||
-        /fields.(\d)+$/.test(changeRecord.propPath);
-
-      isModifyMock = changeRecord.propPath === 'mocks';
-
-      isModifyMethod =
-        changeRecord.propPath === 'methods' ||
-        /methods.(\d)+.name/.test(changeRecord.propPath) ||
-        /methods.(\d)+$/.test(changeRecord.propPath);
-
-      needRecollectDep = isModifyField || isModifyMock || isModifyMethod;
-
-      if (needRecollectDep) {
-        break;
-      }
-    }
-
+    const types = getDataSourceRecollectTypes(changeRecords);
     const root = editorService.get('root');
-    if (needRecollectDep) {
-      if (Array.isArray(root?.items)) {
-        depService.clearIdleTasks();
 
-        let collectIdlePromises: Promise<boolean>[] = [];
-        if (isModifyField) {
-          depService.removeTarget(config.id, DepTargetType.DATA_SOURCE);
-          depService.removeTarget(config.id, DepTargetType.DATA_SOURCE_COND);
-
-          depService.addTarget(createDataSourceTarget(config, reactive({})));
-          depService.addTarget(createDataSourceCondTarget(config, reactive({})));
-
-          collectIdlePromises = [
-            collectIdle(root.items, true, DepTargetType.DATA_SOURCE),
-            collectIdle(root.items, true, DepTargetType.DATA_SOURCE_COND),
-          ];
-        } else if (isModifyMock) {
-          depService.removeTarget(config.id, DepTargetType.DATA_SOURCE);
-
-          depService.addTarget(createDataSourceTarget(config, reactive({})));
-
-          collectIdlePromises = [collectIdle(root.items, true, DepTargetType.DATA_SOURCE)];
-        } else if (isModifyMethod) {
-          depService.removeTarget(config.id, DepTargetType.DATA_SOURCE_METHOD);
-
-          depService.addTarget(createDataSourceMethodTarget(config, reactive({})));
-
-          collectIdlePromises = [collectIdle(root.items, true, DepTargetType.DATA_SOURCE_METHOD)];
-        }
-        const handler = async () => {
-          const results = await Promise.all(collectIdlePromises);
-          if (!results.every(Boolean)) return;
-
-          updateDataSourceSchema();
-          await updateDsData();
-          updateStageNodes(root.items);
-        };
-        handler();
-      }
-    } else if (root?.dataSources) {
-      updateDsData();
+    if (!types) {
+      if (root?.dataSources) updateDsData();
+      return;
     }
-  };
 
-  const removeDataSourceTarget = (id: string) => {
-    depService.removeTarget(id, DepTargetType.DATA_SOURCE);
-    depService.removeTarget(id, DepTargetType.DATA_SOURCE_COND);
-    depService.removeTarget(id, DepTargetType.DATA_SOURCE_METHOD);
+    if (!Array.isArray(root?.items)) return;
+
+    depService.clearIdleTasks();
+    removeDataSourceTargets(depService, config.id, types);
+    addDataSourceTargets(depService, config, reactive as Reactivity['reactive'], types);
+
+    const collectIdlePromises = types.map((type) => collectIdle(root.items, true, type));
+
+    const handler = async () => {
+      const results = await Promise.all(collectIdlePromises);
+      if (!results.every(Boolean)) return;
+
+      updateDataSourceSchema();
+      await updateDsData();
+      updateStageNodes(root.items);
+    };
+    handler();
   };
 
   const dataSourceRemoveHandler = (id: string) => {
@@ -773,7 +679,7 @@ export const initServiceEvents = (
       app?.dataSourceManager?.removeDataSource(id);
 
       updateStageNodes(nodes);
-      removeDataSourceTarget(id);
+      removeDataSourceTargets(depService, id);
     };
 
     handler();
@@ -799,45 +705,10 @@ export const initServiceEvents = (
   codeBlockService.on('addOrUpdate', codeBlockAddOrUpdateHandler);
   codeBlockService.on('remove', codeBlockRemoveHandler);
 
-  const targetAddHandler = (target: Target) => {
-    const root = editorService.get('root');
-    if (!root) return;
+  const targetAddHandler = (target: Target) => writeTargetDeps(editorService.get('root'), target);
 
-    if (target.type === DepTargetType.DATA_SOURCE) {
-      if (!root.dataSourceDeps) {
-        root.dataSourceDeps = {};
-      }
-      root.dataSourceDeps[target.id] = target.deps;
-    } else if (target.type === DepTargetType.DATA_SOURCE_COND) {
-      if (!root.dataSourceCondDeps) {
-        root.dataSourceCondDeps = {};
-      }
-      root.dataSourceCondDeps[target.id] = target.deps;
-    } else if (target.type === DepTargetType.DATA_SOURCE_METHOD) {
-      if (!root.dataSourceMethodDeps) {
-        root.dataSourceMethodDeps = {};
-      }
-      root.dataSourceMethodDeps[target.id] = target.deps;
-    }
-  };
-
-  const targetRemoveHandler = (id: string | number, type: DepTargetType) => {
-    const root = editorService.get('root');
-
-    if (!root) return;
-
-    if (root.dataSourceDeps && type === DepTargetType.DATA_SOURCE) {
-      delete root.dataSourceDeps[id];
-    }
-
-    if (root.dataSourceCondDeps && type === DepTargetType.DATA_SOURCE_COND) {
-      delete root.dataSourceCondDeps[id];
-    }
-
-    if (root.dataSourceMethodDeps && type === DepTargetType.DATA_SOURCE_METHOD) {
-      delete root.dataSourceMethodDeps[id];
-    }
-  };
+  const targetRemoveHandler = (id: string | number, type: DepTargetType) =>
+    removeTargetDeps(editorService.get('root'), id, type);
 
   depService.on('add-target', targetAddHandler);
   depService.on('remove-target', targetRemoveHandler);

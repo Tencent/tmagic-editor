@@ -16,7 +16,6 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue';
 import type { Writable } from 'type-fest';
 
 import type { Id, MPage, MPageFragment } from '@tmagic/core';
@@ -37,7 +36,6 @@ import type {
   StepValue,
   SyncHookPlugin,
 } from '@editor/type';
-import { getEditorConfig } from '@editor/utils/config';
 import {
   deserializeStacks,
   getOrCreateStack,
@@ -46,11 +44,11 @@ import {
   serializeStacks,
   undoFloor,
 } from '@editor/utils/history';
-import { idbGet, idbSet } from '@editor/utils/indexed-db';
 import { UndoRedo } from '@editor/utils/undo-redo';
 
+import type { SdkContext } from '../type';
+
 import BaseService from './BaseService';
-import editorService from './editor';
 
 const canUsePluginMethods = {
   sync: ['push', 'undo', 'redo'] as const,
@@ -80,18 +78,57 @@ const DEFAULT_KEY: IDBValidKey = 'default';
 // 全部历史栈统一收敛到 steps 字段（见 HistorySteps）。
 const PERSIST_VERSION = 3;
 
-class History extends BaseService {
-  public state = reactive<HistoryState>({
-    steps: {
-      page: {},
-      codeBlock: {},
-      dataSource: {},
-    },
-    stepNames: { ...DEFAULT_STEP_NAMES },
-  });
+const EXTRA_MAP_KEYS = ['modifiedNodeIds', 'invalidNodeIdsBefore', 'invalidNodeIdsAfter'] as const;
 
-  constructor() {
+/**
+ * 转换各栈 step.extra 中的 Map 字段，返回新对象（不修改入参，避免污染运行中的历史状态）。
+ * - 导出：Map -> entries 数组，使快照可以直接 `JSON.stringify`
+ * - 还原：entries 数组 -> Map
+ */
+const convertExtraMaps = (
+  stacks: Record<string, any> | undefined,
+  restoring: boolean,
+): Record<string, any> | undefined => {
+  if (!stacks) return stacks;
+
+  const convertValue = (value: any) => {
+    if (restoring) return Array.isArray(value) ? new Map(value) : value;
+    return value instanceof Map ? [...value.entries()] : value;
+  };
+
+  const result: Record<string, any> = {};
+  Object.entries(stacks).forEach(([id, stack]: [string, any]) => {
+    result[id] = !stack?.elementList
+      ? stack
+      : {
+          ...stack,
+          elementList: stack.elementList.map((step: any) => {
+            if (!step?.extra) return step;
+            const extra = { ...step.extra };
+            // 导出与还原使用同一份 key 清单，保证往返对称
+            EXTRA_MAP_KEYS.forEach((key) => {
+              if (extra[key]) extra[key] = convertValue(extra[key]);
+            });
+            return { ...step, extra };
+          }),
+        };
+  });
+  return result;
+};
+
+class History extends BaseService {
+  public state: HistoryState;
+
+  constructor(private ctx: SdkContext) {
     super([...canUsePluginMethods.sync.map((methodName) => ({ name: methodName, isAsync: false }))]);
+    this.state = ctx.reactivity.reactive<HistoryState>({
+      steps: {
+        page: {},
+        codeBlock: {},
+        dataSource: {},
+      },
+      stepNames: { ...DEFAULT_STEP_NAMES },
+    });
   }
 
   /**
@@ -148,7 +185,12 @@ class History extends BaseService {
   public setMarker(
     stepType: HistoryStepType,
     id: Id,
-    options: { name?: string; description?: string; source?: HistoryOpSource; extra?: Record<string, any> } = {},
+    options: {
+      name?: string;
+      description?: string;
+      source?: HistoryOpSource;
+      extra?: Record<string, any>;
+    } = {},
   ): StepValue | null {
     if (!this.isValidStackId(id)) return null;
 
@@ -385,21 +427,46 @@ class History extends BaseService {
   public async saveToIndexedDB(options: HistoryPersistOptions = {}): Promise<PersistedHistoryState> {
     const { dbName = DEFAULT_DB_NAME, storeName = DEFAULT_STORE_NAME, key = DEFAULT_KEY, appId } = options;
 
+    const persistence = this.getPersistence();
+    const snapshot = this.serialize();
+
+    await persistence.set(this.resolveDbName(dbName, appId), storeName, key, snapshot);
+    this.emit('save-to-indexed-db', snapshot);
+    return snapshot;
+  }
+
+  /**
+   * 把当前内存中的全部历史栈导出成可持久化的快照（纯同步，不依赖 IndexedDB），
+   * 可用于无状态调用：下次通过 {@link restore} 或 `createDslSdk({ history })` 还原。
+   */
+  public serialize({ jsonSafe = false }: { jsonSafe?: boolean } = {}): PersistedHistoryState {
     // serializeStacks 会在序列化各栈时只把每条 step 的 diff（可能含函数）序列化成字符串，其余字段原样保留，
     // 因此整份快照可直接按对象写入 IndexedDB（结构化克隆），避免序列化整份快照的开销；读取时再用 parseDSL 还原 diff。
     const steps: PersistedHistoryState['steps'] = { page: {}, codeBlock: {}, dataSource: {} };
     Object.entries(this.state.steps).forEach(([stepType, bucket]) => {
       steps[stepType] = serializeStacks(bucket);
+      // `extra` 里的校验错误记录是 Map，JSON 无法表示；jsonSafe 时转成 entries 数组，restore 时会还原
+      if (jsonSafe) steps[stepType] = convertExtraMaps(steps[stepType], false) as any;
     });
 
-    const snapshot: PersistedHistoryState = {
+    return {
       version: PERSIST_VERSION,
       steps,
       savedAt: Date.now(),
     };
+  }
 
-    await idbSet(this.resolveDbName(dbName, appId), storeName, key, snapshot);
-    this.emit('save-to-indexed-db', snapshot);
+  /**
+   * 用 {@link serialize} 导出的快照重建全部撤销/重做栈，会整体覆盖当前内存中的历史状态。
+   */
+  public restore(snapshot: PersistedHistoryState): PersistedHistoryState {
+    // 各 step 的 diff 以序列化字符串存储（含函数），由 deserializeStacks 逐条用 parseDSL 还原。
+    const steps: HistoryState['steps'] = { page: {}, codeBlock: {}, dataSource: {} };
+    Object.entries(snapshot.steps).forEach(([stepType, bucket]) => {
+      // 兼容 jsonSafe 导出的快照（Map 被转成了 entries 数组）
+      steps[stepType] = deserializeStacks(convertExtraMaps(bucket, true) as any, this.ctx.parseDSL);
+    });
+    this.state.steps = steps;
     return snapshot;
   }
 
@@ -414,17 +481,14 @@ class History extends BaseService {
   public async restoreFromIndexedDB(options: HistoryPersistOptions = {}): Promise<PersistedHistoryState | null> {
     const { dbName = DEFAULT_DB_NAME, storeName = DEFAULT_STORE_NAME, key = DEFAULT_KEY, appId } = options;
 
-    const snapshot = await idbGet<PersistedHistoryState>(this.resolveDbName(dbName, appId), storeName, key);
+    const snapshot = await this.getPersistence().get<PersistedHistoryState>(
+      this.resolveDbName(dbName, appId),
+      storeName,
+      key,
+    );
     if (!snapshot) return null;
 
-    // 各 step 的 diff 以序列化字符串存储（含函数），由 deserializeStacks 逐条用 parseDSL 还原。
-    const parseDSL = getEditorConfig('parseDSL');
-
-    const steps: HistoryState['steps'] = { page: {}, codeBlock: {}, dataSource: {} };
-    Object.entries(snapshot.steps).forEach(([stepType, bucket]) => {
-      steps[stepType] = deserializeStacks(bucket, parseDSL);
-    });
-    this.state.steps = steps;
+    this.restore(snapshot);
     // initial 基线作为各栈 index 0 的 step 随 steps 一并还原，无需单独恢复；活动页由 editorService 维护。
     this.emit('restore-from-indexed-db', snapshot);
     return snapshot;
@@ -583,17 +647,25 @@ class History extends BaseService {
     });
   }
 
+  private getPersistence() {
+    const persistence = this.ctx.options.historyPersistence;
+    if (!persistence) {
+      throw new Error('未提供 historyPersistence，无法读写历史快照；请改用 serialize() / restore()');
+    }
+    return persistence;
+  }
+
   /**
    * 把基础 dbName 与当前 DSL（root app）的 id 拼成最终库名，实现不同应用历史隔离。
    * 取不到 app id（如尚未加载 DSL）时退回基础 dbName。
    */
   private resolveDbName(dbName: string, appId?: Id): string {
     // 优先用显式传入的 appId（「先恢复再 set root」时 root 尚未就绪）；否则回退到当前 root.id。
-    const resolvedAppId = appId ?? editorService.get('root')?.id;
+    const resolvedAppId = appId ?? this.ctx.editor.get('root')?.id;
     return resolvedAppId ? `${dbName}-${resolvedAppId}` : dbName;
   }
 }
 
 export type HistoryService = History;
 
-export default new History();
+export default History;

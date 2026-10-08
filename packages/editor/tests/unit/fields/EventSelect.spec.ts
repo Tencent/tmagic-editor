@@ -37,11 +37,9 @@ vi.mock('@editor/hooks/use-services', () => ({
   useServices: () => ({ editorService, dataSourceService, eventsService, codeBlockService, propsService }),
 }));
 
-vi.mock('@editor/services/editor', () => ({ default: editorService }));
-vi.mock('@editor/services/dataSource', () => ({ default: dataSourceService }));
-vi.mock('@editor/services/events', () => ({ default: eventsService }));
-vi.mock('@editor/services/codeBlock', () => ({ default: codeBlockService }));
-vi.mock('@editor/services/props', () => ({ default: propsService }));
+const mForm = {
+  services: { editorService, dataSourceService, eventsService, codeBlockService, propsService },
+} as any;
 
 vi.mock('@editor/utils/data-source', async () => {
   const actual = await vi.importActual<any>('@editor/utils/data-source');
@@ -188,8 +186,8 @@ describe('EventSelect', () => {
       model: { events: [{ name: 'a', actions: [] }] },
     });
     const cfg = eventNameCfg();
-    expect(cfg.type(undefined, { formValue: { type: 'btn' } })).toBe('select');
-    const opts = cfg.options(undefined, { formValue: { type: 'btn' } });
+    expect(cfg.type(mForm, { formValue: { type: 'btn' } })).toBe('select');
+    const opts = cfg.options(mForm, { formValue: { type: 'btn' } });
     expect(Array.isArray(opts)).toBe(true);
     expect(opts[0]).toMatchObject({ text: 'click', value: 'click' });
   });
@@ -202,16 +200,16 @@ describe('EventSelect', () => {
     const [rule] = cfg.rules;
 
     const okCb = vi.fn();
-    rule.validator({ value: 'click', callback: okCb }, { formValue: { type: 'btn' } });
+    rule.validator({ value: 'click', callback: okCb }, { formValue: { type: 'btn' } }, mForm);
     expect(okCb).toHaveBeenCalledWith();
 
     const errCb = vi.fn();
-    rule.validator({ value: 'unknown', callback: errCb }, { formValue: { type: 'btn' } });
+    rule.validator({ value: 'unknown', callback: errCb }, { formValue: { type: 'btn' } }, mForm);
     expect(errCb).toHaveBeenCalledWith('事件名(unknown)不存在');
 
     // 空值不做枚举校验
     const emptyCb = vi.fn();
-    rule.validator({ value: '', callback: emptyCb }, { formValue: { type: 'btn' } });
+    rule.validator({ value: '', callback: emptyCb }, { formValue: { type: 'btn' } }, mForm);
     expect(emptyCb).toHaveBeenCalledWith();
   });
 
@@ -224,7 +222,7 @@ describe('EventSelect', () => {
     const [rule] = cfg.rules;
 
     const cb = vi.fn();
-    rule.validator({ value: 'whatever', callback: cb }, { formValue: { type: 'btn' } });
+    rule.validator({ value: 'whatever', callback: cb }, { formValue: { type: 'btn' } }, mForm);
     expect(cb).toHaveBeenCalledWith();
   });
 
@@ -234,10 +232,8 @@ describe('EventSelect', () => {
       model: { events: [{ name: 'a', actions: [] }] },
     });
     const cfg = eventNameCfg();
-    expect(cfg.type(undefined, { formValue: { type: 'page-fragment-container', pageFragmentId: 'pf1' } })).toBe(
-      'cascader',
-    );
-    const opts = cfg.options(undefined, { formValue: { type: 'page-fragment-container', pageFragmentId: 'pf1' } });
+    expect(cfg.type(mForm, { formValue: { type: 'page-fragment-container', pageFragmentId: 'pf1' } })).toBe('cascader');
+    const opts = cfg.options(mForm, { formValue: { type: 'page-fragment-container', pageFragmentId: 'pf1' } });
     expect(Array.isArray(opts)).toBe(true);
   });
 
@@ -248,7 +244,7 @@ describe('EventSelect', () => {
       model: { events: [{ name: 'a', actions: [] }] },
     });
     const cfg = eventNameCfg();
-    const opts = cfg.options(undefined, { formValue: { type: 'ds', id: 'd1' } });
+    const opts = cfg.options(mForm, { formValue: { type: 'ds', id: 'd1' } });
     expect(opts).toEqual([{ label: '数据变化', value: 'ds_change_', children: [] }]);
   });
 
@@ -259,8 +255,32 @@ describe('EventSelect', () => {
       model: { events: [{ name: 'a', actions: [] }] },
     });
     const cfg = eventNameCfg();
-    const opts = cfg.options(undefined, { formValue: { type: 'ds', id: 'd1' } });
+    const opts = cfg.options(mForm, { formValue: { type: 'ds', id: 'd1' } });
     expect(opts).toEqual([]);
+  });
+
+  test('表单上下文没有 services 时安全降级，字段不抛错', () => {
+    mountEvent({
+      model: { events: [{ name: 'a', actions: [] }] },
+    });
+    const nameCfg = eventNameCfg();
+    // 没有 services 时选项为空，回调不会抛错
+    expect(nameCfg.options(undefined, { formValue: { type: 'btn' } })).toEqual([]);
+    const cb = vi.fn();
+    nameCfg.rules[0].validator({ value: 'x', callback: cb }, { formValue: { type: 'btn' } }, undefined);
+    expect(cb).toHaveBeenCalledWith();
+
+    const [actionType, , compAction, codeAction, dsAction] = actionsCfg().items;
+    // 没有 services 时只保留组件联动
+    expect(actionType.options(undefined).map((o: any) => o.value)).toEqual(['comp']);
+    expect(compAction.type(undefined, { model: { to: '1' } })).toBe('select');
+    expect(compAction.options(undefined, { model: { to: '1' } })).toEqual([]);
+    const cb2 = vi.fn();
+    compAction.rules[0].validator({ value: 'x', callback: cb2 }, { model: { to: '1' } }, undefined);
+    expect(cb2).toHaveBeenCalledWith();
+    // 没有 services 时代码块 / 数据源联动只读
+    expect(codeAction.notEditable(undefined)).toBe(true);
+    expect(dsAction.notEditable(undefined)).toBe(true);
   });
 
   test('actionTypeConfig 含 组件/代码/数据源', () => {
@@ -270,7 +290,7 @@ describe('EventSelect', () => {
       model: { events: [{ name: 'a', actions: [] }] },
     });
     const actionType = actionsCfg().items[0];
-    const opts = typeof actionType.options === 'function' ? actionType.options() : actionType.options;
+    const opts = typeof actionType.options === 'function' ? actionType.options(mForm) : actionType.options;
     expect(opts.map((o: any) => o.value).sort()).toEqual(['code', 'comp', 'data-source'].sort());
   });
 
@@ -281,7 +301,7 @@ describe('EventSelect', () => {
       model: { events: [{ name: 'a', actions: [] }] },
     });
     const actionType = actionsCfg().items[0];
-    const opts = typeof actionType.options === 'function' ? actionType.options() : actionType.options;
+    const opts = typeof actionType.options === 'function' ? actionType.options(mForm) : actionType.options;
     expect(opts.map((o: any) => o.value)).toEqual(['comp']);
     propsService.getDisabledCodeBlock.mockReturnValue(false);
     propsService.getDisabledDataSource.mockReturnValue(false);
@@ -304,8 +324,8 @@ describe('EventSelect', () => {
       model: { events: [{ name: 'a', actions: [] }] },
     });
     const compAction = actionsCfg().items[2];
-    expect(compAction.type(undefined, { model: { to: '1' } })).toBe('select');
-    expect(Array.isArray(compAction.options(undefined, { model: { to: '1' } }))).toBe(true);
+    expect(compAction.type(mForm, { model: { to: '1' } })).toBe('select');
+    expect(Array.isArray(compAction.options(mForm, { model: { to: '1' } }))).toBe(true);
   });
 
   test('compActionConfig type cascader 当 page-fragment-container', () => {
@@ -315,8 +335,8 @@ describe('EventSelect', () => {
       model: { events: [{ name: 'a', actions: [] }] },
     });
     const compAction = actionsCfg().items[2];
-    expect(compAction.type(undefined, { model: { to: '1' } })).toBe('cascader');
-    const opts = compAction.options(undefined, { model: { to: '1' } });
+    expect(compAction.type(mForm, { model: { to: '1' } })).toBe('cascader');
+    const opts = compAction.options(mForm, { model: { to: '1' } });
     expect(Array.isArray(opts)).toBe(true);
   });
 
@@ -326,7 +346,7 @@ describe('EventSelect', () => {
       model: { events: [{ name: 'a', actions: [] }] },
     });
     const compAction = actionsCfg().items[2];
-    expect(compAction.options(undefined, { model: { to: 'unknown' } })).toEqual([]);
+    expect(compAction.options(mForm, { model: { to: 'unknown' } })).toEqual([]);
   });
 
   test('compActionConfig.rules 仅校验动作名是否在可选项中', () => {
@@ -339,15 +359,15 @@ describe('EventSelect', () => {
     const [rule] = compAction.rules;
 
     const okCb = vi.fn();
-    rule.validator({ value: 'open', callback: okCb }, { model: { to: '1' } });
+    rule.validator({ value: 'open', callback: okCb }, { model: { to: '1' } }, mForm);
     expect(okCb).toHaveBeenCalledWith();
 
     const errCb = vi.fn();
-    rule.validator({ value: 'unknown', callback: errCb }, { model: { to: '1' } });
+    rule.validator({ value: 'unknown', callback: errCb }, { model: { to: '1' } }, mForm);
     expect(errCb).toHaveBeenCalledWith('动作名(unknown)不存在');
 
     const emptyCb = vi.fn();
-    rule.validator({ value: '', callback: emptyCb }, { model: { to: '1' } });
+    rule.validator({ value: '', callback: emptyCb }, { model: { to: '1' } }, mForm);
     expect(emptyCb).toHaveBeenCalledWith();
   });
 
@@ -365,7 +385,7 @@ describe('EventSelect', () => {
     const [rule] = compAction.rules;
 
     const cb = vi.fn();
-    rule.validator({ value: 'whatever', callback: cb }, { model: { to: '1' } });
+    rule.validator({ value: 'whatever', callback: cb }, { model: { to: '1' } }, mForm);
     expect(cb).toHaveBeenCalledWith();
   });
 
@@ -380,11 +400,11 @@ describe('EventSelect', () => {
     const [rule] = compAction.rules;
 
     const okCb = vi.fn();
-    rule.validator({ value: ['c1', 'open'], callback: okCb }, { model: { to: '1' } });
+    rule.validator({ value: ['c1', 'open'], callback: okCb }, { model: { to: '1' } }, mForm);
     expect(okCb).toHaveBeenCalledWith();
 
     const errCb = vi.fn();
-    rule.validator({ value: ['c1', 'missing'], callback: errCb }, { model: { to: '1' } });
+    rule.validator({ value: ['c1', 'missing'], callback: errCb }, { model: { to: '1' } }, mForm);
     expect(errCb).toHaveBeenCalledWith('动作名(c1.missing)不存在');
   });
 
@@ -395,7 +415,7 @@ describe('EventSelect', () => {
     });
     const codeAction = actionsCfg().items[3];
     expect(codeAction.display(undefined, { model: { actionType: 'code' } })).toBe(true);
-    expect(codeAction.notEditable()).toBe(true);
+    expect(codeAction.notEditable(mForm)).toBe(true);
     codeBlockService.getEditStatus.mockReturnValue(true);
   });
 
@@ -406,7 +426,7 @@ describe('EventSelect', () => {
     });
     const dsAction = actionsCfg().items[4];
     expect(dsAction.display(undefined, { model: { actionType: 'data-source' } })).toBe(true);
-    expect(dsAction.notEditable()).toBe(true);
+    expect(dsAction.notEditable(mForm)).toBe(true);
   });
 
   test('table 配置中 method options', () => {
@@ -418,10 +438,10 @@ describe('EventSelect', () => {
     });
     const tableCfg = wrapper.findComponent({ name: 'MTable' }).props('config') as any;
     const methodCol = tableCfg.items.find((it: any) => it.name === 'method');
-    const opts = methodCol.options(undefined, { model: { to: '1' } });
+    const opts = methodCol.options(mForm, { model: { to: '1' } });
     expect(opts).toEqual([{ text: 'open', value: 'open' }]);
     editorService.getNodeById.mockReturnValue(null);
-    expect(methodCol.options(undefined, { model: { to: '1' } })).toEqual([]);
+    expect(methodCol.options(mForm, { model: { to: '1' } })).toEqual([]);
   });
 
   describe('对比模式', () => {

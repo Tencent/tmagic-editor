@@ -1,4 +1,3 @@
-import { reactive } from 'vue';
 import { cloneDeep, get } from 'lodash-es';
 import type { Writable } from 'type-fest';
 
@@ -7,9 +6,6 @@ import { Target, Watcher } from '@tmagic/core';
 import type { FormConfig } from '@tmagic/form';
 import { getValueByKeyPath, guid, setValueByKeyPath, toLine } from '@tmagic/utils';
 
-import editorService from '@editor/services/editor';
-import historyService from '@editor/services/history';
-import storageService, { Protocol } from '@editor/services/storage';
 import type {
   DataSourceStepValue,
   DatasourceTypeOption,
@@ -22,7 +18,10 @@ import { getFormConfig, getFormValue } from '@editor/utils/data-source';
 import { COPY_DS_STORAGE_KEY } from '@editor/utils/editor';
 import { createStackStep, describeRevertStep, getLastPushedHistoryIds } from '@editor/utils/history';
 
+import type { SdkContext } from '../type';
+
 import BaseService from './BaseService';
+import { Protocol } from './WebStorage';
 
 interface State {
   datasourceTypeList: DatasourceTypeOption[];
@@ -57,15 +56,7 @@ const canUsePluginMethods = {
 type SyncMethodName = Writable<(typeof canUsePluginMethods)['sync']>;
 
 class DataSource extends BaseService {
-  private state = reactive<State>({
-    datasourceTypeList: [],
-    dataSources: [],
-    editable: true,
-    configs: {},
-    values: {},
-    events: {},
-    methods: {},
-  });
+  private state: State;
 
   /**
    * 最近一次写入历史栈的数据源历史记录 uuid。
@@ -74,8 +65,17 @@ class DataSource extends BaseService {
    */
   private lastPushedHistoryId: string | null = null;
 
-  constructor() {
+  constructor(private ctx: SdkContext) {
     super(canUsePluginMethods.sync.map((methodName) => ({ name: methodName, isAsync: false })));
+    this.state = ctx.reactivity.reactive<State>({
+      datasourceTypeList: [],
+      dataSources: [],
+      editable: true,
+      configs: {},
+      values: {},
+      events: {},
+      methods: {},
+    });
   }
 
   public set<K extends StateKey, T extends State[K]>(name: K, value: T) {
@@ -129,6 +129,10 @@ class DataSource extends BaseService {
     config: DataSourceSchema,
     { doNotPushHistory = false, historyDescription, historySource }: HistoryOpOptions = {},
   ) {
+    // 数据源的新增 / 更新是同步方法，这里只能做同步的结构校验（类型是否可用）；
+    // 属性表单校验见 `sdk.validate.dataSource(id)`
+    this.ctx.validator.guardDataSource(config, true);
+
     const newConfig = {
       ...config,
       id: config.id && !this.getDataSourceById(config.id) ? config.id : this.createId(),
@@ -143,7 +147,7 @@ class DataSource extends BaseService {
         historyDescription,
         source: historySource,
       });
-      this.lastPushedHistoryId = (step ? historyService.push('dataSource', step, newConfig.id) : null)?.uuid ?? null;
+      this.lastPushedHistoryId = (step ? this.ctx.history.push('dataSource', step, newConfig.id) : null)?.uuid ?? null;
     }
 
     this.emit('add', newConfig);
@@ -169,6 +173,8 @@ class DataSource extends BaseService {
       historySource,
     }: HistoryOpOptionsWithChangeRecords = {},
   ) {
+    this.ctx.validator.guardDataSource(config, false);
+
     const dataSources = this.get('dataSources');
 
     const index = dataSources.findIndex((ds) => ds.id === config.id);
@@ -186,7 +192,7 @@ class DataSource extends BaseService {
         historyDescription,
         source: historySource,
       });
-      this.lastPushedHistoryId = (step ? historyService.push('dataSource', step, newConfig.id) : null)?.uuid ?? null;
+      this.lastPushedHistoryId = (step ? this.ctx.history.push('dataSource', step, newConfig.id) : null)?.uuid ?? null;
     }
 
     this.emit('update', newConfig, {
@@ -218,7 +224,7 @@ class DataSource extends BaseService {
         historyDescription,
         source: historySource,
       });
-      this.lastPushedHistoryId = (step ? historyService.push('dataSource', step, id) : null)?.uuid ?? null;
+      this.lastPushedHistoryId = (step ? this.ctx.history.push('dataSource', step, id) : null)?.uuid ?? null;
     }
 
     this.emit('remove', id);
@@ -273,7 +279,7 @@ class DataSource extends BaseService {
    * @returns 撤销的 step；栈不存在或已无可撤销时返回 null
    */
   public undo(id: Id) {
-    const step = historyService.undo('dataSource', id);
+    const step = this.ctx.history.undo('dataSource', id);
     if (!step) return null;
     this.applyHistoryStep(step, true);
     return step;
@@ -285,7 +291,7 @@ class DataSource extends BaseService {
    * @returns 重做的 step；栈不存在或已无可重做时返回 null
    */
   public redo(id: Id) {
-    const step = historyService.redo('dataSource', id);
+    const step = this.ctx.history.redo('dataSource', id);
     if (!step) return null;
     this.applyHistoryStep(step, false);
     return step;
@@ -293,12 +299,12 @@ class DataSource extends BaseService {
 
   /** 是否可对指定数据源撤销。 */
   public canUndo(id: Id): boolean {
-    return historyService.canUndo('dataSource', id);
+    return this.ctx.history.canUndo('dataSource', id);
   }
 
   /** 是否可对指定数据源重做。 */
   public canRedo(id: Id): boolean {
-    return historyService.canRedo('dataSource', id);
+    return this.ctx.history.canRedo('dataSource', id);
   }
 
   /**
@@ -309,7 +315,7 @@ class DataSource extends BaseService {
    * @returns 实际移动到的最终游标位置
    */
   public goto(id: Id, targetCursor: number): number {
-    let cursor = historyService.getCursor('dataSource', id);
+    let cursor = this.ctx.history.getCursor('dataSource', id);
     const target = Math.max(0, targetCursor);
     while (cursor > target) {
       if (!this.undo(id)) break;
@@ -333,7 +339,7 @@ class DataSource extends BaseService {
    * @returns 反向后产生的新 step；目标不存在 / 未应用时返回 null
    */
   public revert(id: Id, index: number): DataSourceStepValue | null {
-    const list = historyService.getStepList('dataSource', id);
+    const list = this.ctx.history.getStepList('dataSource', id);
     const entry = list[index];
     if (!entry?.applied) return null;
     // 更新类步骤（前后 schema 都存在）必须带 changeRecords 才支持回滚，否则只能整 schema 替换，会冲掉后续无关变更。
@@ -352,7 +358,7 @@ class DataSource extends BaseService {
    */
   public revertById(uuids: string[]): (DataSourceStepValue | null)[] {
     return uuids.map((uuid) => {
-      const location = historyService.findStepLocationByUuid('dataSource', uuid);
+      const location = this.ctx.history.findStepLocationByUuid('dataSource', uuid);
       if (!location) return null;
       return this.revert(location.id, location.index);
     });
@@ -401,7 +407,7 @@ class DataSource extends BaseService {
       coperWatcher.collect(copyNodes, {}, true, collectorOptions.type);
 
       Object.keys(customTarget.deps).forEach((nodeId: Id) => {
-        const node = editorService.getNodeById(nodeId);
+        const node = this.ctx.editor.getNodeById(nodeId);
         if (!node) return;
         customTarget!.deps[nodeId].keys.forEach((key) => {
           const [relateDsId] = get(node, key);
@@ -415,7 +421,7 @@ class DataSource extends BaseService {
         });
       });
     }
-    storageService.setItem(COPY_DS_STORAGE_KEY, copyData, {
+    this.ctx.storage.setItem(COPY_DS_STORAGE_KEY, copyData, {
       protocol: Protocol.OBJECT,
     });
   }
@@ -424,7 +430,7 @@ class DataSource extends BaseService {
    * @returns
    */
   public paste() {
-    const dataSource: DataSourceSchema[] = storageService.getItem(COPY_DS_STORAGE_KEY);
+    const dataSource: DataSourceSchema[] = this.ctx.storage.getItem(COPY_DS_STORAGE_KEY);
     dataSource.forEach((item: DataSourceSchema) => {
       // 不覆盖同样id的数据源
       if (!this.getDataSourceById(item.id)) {
@@ -444,13 +450,13 @@ class DataSource extends BaseService {
     // 原本是新增 → revert 即删除
     if (!oldSchema && newSchema) {
       this.remove(`${id}`, { historyDescription, historySource: 'rollback' });
-      return historyService.getStepList('dataSource', id).slice(-1)[0]?.step ?? null;
+      return this.ctx.history.getStepList('dataSource', id).slice(-1)[0]?.step ?? null;
     }
 
     // 原本是删除 → revert 即重新加回
     if (oldSchema && !newSchema) {
       this.add(cloneDeep(oldSchema), { historyDescription, historySource: 'rollback' });
-      return historyService.getStepList('dataSource', id).slice(-1)[0]?.step ?? null;
+      return this.ctx.history.getStepList('dataSource', id).slice(-1)[0]?.step ?? null;
     }
 
     if (!oldSchema || !newSchema) return null;
@@ -474,11 +480,11 @@ class DataSource extends BaseService {
         historyDescription,
         historySource: 'rollback',
       });
-      return historyService.getStepList('dataSource', id).slice(-1)[0]?.step ?? null;
+      return this.ctx.history.getStepList('dataSource', id).slice(-1)[0]?.step ?? null;
     }
 
     this.update(cloneDeep(oldSchema), { historyDescription, historySource: 'rollback' });
-    return historyService.getStepList('dataSource', id).slice(-1)[0]?.step ?? null;
+    return this.ctx.history.getStepList('dataSource', id).slice(-1)[0]?.step ?? null;
   }
 
   /**
@@ -549,4 +555,4 @@ class DataSource extends BaseService {
 
 export type DataSourceService = DataSource;
 
-export default new DataSource();
+export default DataSource;

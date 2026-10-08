@@ -5,18 +5,23 @@
  */
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import codeBlockService from '@editor/services/codeBlock';
-import historyService from '@editor/services/history';
-import storageService, { Protocol } from '@editor/services/storage';
+import { codeBlockService, historyService, Protocol, storageService } from '@editor/services/sdk-instance';
 import { CODE_DRAFT_STORAGE_KEY } from '@editor/type';
 import { setEditorConfig } from '@editor/utils/config';
 import { COPY_CODE_STORAGE_KEY } from '@editor/utils/editor';
 
-vi.mock('@editor/services/editor', () => ({
-  default: {
-    getNodeById: vi.fn((id: string) => ({ id, code: 'code1' })),
-  },
-}));
+vi.mock('@editor/services/sdk-instance', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  const modEditor = await (() => ({
+    default: {
+      getNodeById: vi.fn((id: string) => ({ id, code: 'code1' })),
+    },
+  }))();
+  return {
+    ...actual,
+    editorService: modEditor.default,
+  };
+});
 
 beforeAll(() => {
   setEditorConfig({

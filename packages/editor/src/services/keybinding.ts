@@ -2,10 +2,10 @@ import KeyController, { KeyControllerEvent } from 'keycon';
 
 import { isPageOrFragment } from '@tmagic/utils';
 
+import BaseService from '@editor/sdk/services/BaseService';
 import { KeyBindingCacheItem, KeyBindingCommand, KeyBindingItem } from '@editor/type';
 
-import BaseService from './BaseService';
-import editorService from './editor';
+import { editorService } from './sdk-instance';
 import uiService from './ui';
 
 class Keybinding extends BaseService {

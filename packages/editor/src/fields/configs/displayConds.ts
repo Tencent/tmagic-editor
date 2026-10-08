@@ -19,7 +19,6 @@
 import type { DisplayCondsConfig, FormState, GroupListConfig } from '@tmagic/form/headless';
 import { removeDataSourceFieldPrefix } from '@tmagic/utils';
 
-import dataSourceService from '@editor/services/dataSource';
 import { getCascaderOptionsFromFields, getFieldType, resolveFieldByPath } from '@editor/utils/data-source';
 
 import { stickyAddButton } from './stickyAddButton';
@@ -38,15 +37,17 @@ export const createDisplayCondsConfig = (
   name: string,
   parentFields: string[],
 ): GroupListConfig => {
-  const resolveFieldPath = (path: Array<string | number>) => {
+  const resolveFieldPath = (formState: FormState | undefined, path: Array<string | number>) => {
     const [id, ...fieldNames] = path;
-    const ds = id ? dataSourceService.getDataSourceById(removeDataSourceFieldPrefix(`${id}`)) : undefined;
+    const ds = id
+      ? formState?.services?.dataSourceService.getDataSourceById(removeDataSourceFieldPrefix(`${id}`))
+      : undefined;
     return { ds, fieldNames };
   };
 
   // 字段变更后按新字段的类型把已填的值转成对应类型，避免类型校验与运行期取值不一致
-  const fieldOnChange = (_formState: FormState | undefined, v: string[], { model }: { model: Record<string, any> }) => {
-    const { ds, fieldNames } = resolveFieldPath([...parentFields, ...v]);
+  const fieldOnChange = (formState: FormState | undefined, v: string[], { model }: { model: Record<string, any> }) => {
+    const { ds, fieldNames } = resolveFieldPath(formState, [...parentFields, ...v]);
     const type = getFieldType(ds, fieldNames);
     if (type === 'number') {
       model.value = Number(model.value);
@@ -63,8 +64,8 @@ export const createDisplayCondsConfig = (
   const fieldItem = parentFields.length
     ? {
         type: 'cascader',
-        options: () => {
-          const { ds, fieldNames } = resolveFieldPath(parentFields);
+        options: (formState: FormState | undefined) => {
+          const { ds, fieldNames } = resolveFieldPath(formState, parentFields);
           if (!ds) {
             return [];
           }
@@ -141,8 +142,8 @@ export const createDisplayCondsConfig = (
           {
             name: 'value',
             text: '值',
-            type: (_mForm: FormState | undefined, { model }: any) => {
-              const { ds, fieldNames } = resolveFieldPath([...parentFields, ...(model.field || [])]);
+            type: (mForm: FormState | undefined, { model }: any) => {
+              const { ds, fieldNames } = resolveFieldPath(mForm, [...parentFields, ...(model.field || [])]);
               const type = getFieldType(ds, fieldNames);
 
               if (type === 'number') {

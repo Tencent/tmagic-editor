@@ -11,6 +11,9 @@ import * as sass from 'sass-embedded';
 
 const args = minimist(process.argv.slice(2));
 
+/** 除 index 外的子路径入口（`src/<name>.ts`），存在才构建 */
+const subEntries = ['headless', 'sdk'];
+
 const toPascalCase = (str) => str.replace(/(^\w|-\w)/g, (text) => text.replace(/-/, '').toUpperCase());
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -30,7 +33,9 @@ async function buildPackage({ packageName, packagesDir, requirePath }) {
 
   await build({ packageName, format: 'es', pkg, packagesDir });
   await build({ packageName, format: 'umd', pkg, packagesDir });
-  await buildHeadlessUmd({ packageName, pkg, packagesDir });
+  for (const subEntry of subEntries) {
+    await buildSubEntryUmd({ packageName, pkg, packagesDir, subEntry });
+  }
   buildThemes({ packageName, packagesDir });
 }
 
@@ -82,25 +87,32 @@ function fixUmdSymbolShadow() {
   };
 }
 
-function buildHeadlessUmd({ packageName, pkg, packagesDir }) {
+function buildSubEntryUmd({ packageName, pkg, packagesDir, subEntry }) {
   const pkgRoot = path.resolve(packagesDir, `./${packageName}`);
-  if (!fs.existsSync(path.join(pkgRoot, 'src/headless.ts'))) return;
+  if (!fs.existsSync(path.join(pkgRoot, `src/${subEntry}.ts`))) return;
 
   return build({
     packageName,
     format: 'umd',
     pkg,
     packagesDir,
-    entry: 'src/headless.ts',
-    name: `TMagic${toPascalCase(packageName)}Headless`,
-    fileName: `tmagic-${packageName}-headless`,
-    cssFileName: 'style-headless',
+    entry: `src/${subEntry}.ts`,
+    name: `TMagic${toPascalCase(packageName)}${toPascalCase(subEntry)}`,
+    fileName: `tmagic-${packageName}-${subEntry}`,
+    cssFileName: `style-${subEntry}`,
   });
 }
 
 async function build({ packageName, format, pkg, packagesDir, entry, name, fileName, cssFileName = 'style' }) {
   const pkgRoot = path.resolve(packagesDir, `./${packageName}`);
-  const hasHeadless = !entry && format === 'es' && fs.existsSync(path.join(pkgRoot, 'src/headless.ts'));
+  const esEntries =
+    !entry && format === 'es'
+      ? Object.fromEntries(
+          subEntries
+            .filter((name) => fs.existsSync(path.join(pkgRoot, `src/${name}.ts`)))
+            .map((name) => [name, `src/${name}.ts`]),
+        )
+      : {};
 
   await buildVite({
     root: pkgRoot,
@@ -117,7 +129,7 @@ async function build({ packageName, format, pkg, packagesDir, entry, name, fileN
       target: 'esnext',
 
       lib: {
-        entry: entry ?? (hasHeadless ? { index: 'src/index.ts', headless: 'src/headless.ts' } : 'src/index.ts'),
+        entry: entry ?? (Object.keys(esEntries).length ? { index: 'src/index.ts', ...esEntries } : 'src/index.ts'),
         name: name ?? `TMagic${toPascalCase(packageName)}`,
         fileName: fileName ?? `tmagic-${packageName}`,
         formats: [format],

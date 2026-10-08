@@ -31,18 +31,14 @@ import type {
 } from '@tmagic/form/headless';
 import { defineFormItem } from '@tmagic/form/headless';
 
-import codeBlockService from '@editor/services/codeBlock';
-import dataSourceService from '@editor/services/dataSource';
-import editorService from '@editor/services/editor';
-import eventsService from '@editor/services/events';
-import propsService from '@editor/services/props';
+import type { Services } from '@editor/type';
 import {
   getCompActionAllowedValues,
   getCompActionOptions,
   getEventNameAllowedValues,
   getEventNameOptions,
   normalizeCompActionValue,
-} from '@editor/utils';
+} from '@editor/utils/event';
 
 import { stickyAddButton } from './stickyAddButton';
 
@@ -67,11 +63,14 @@ export const createEventNameConfig = (config: EventSelectConfig) => {
     labelWidth: '70px',
     checkStrictly: () => config.src !== 'component',
     valueSeparator: '.',
-    options: (_mForm: FormState, { formValue }: any) => getEventNameOptions(config.src, formValue),
+    options: (mForm: FormState, { formValue }: any) =>
+      mForm?.services ? getEventNameOptions(config.src, formValue, mForm.services) : [],
     rules: [
       {
-        validator: ({ value, callback }: any, { formValue }: any) => {
-          const allowedNames = getEventNameAllowedValues(config as any, formValue);
+        validator: ({ value, callback }: any, { formValue }: any, mForm?: FormState) => {
+          const allowedNames = mForm?.services
+            ? getEventNameAllowedValues(config as any, formValue, mForm.services)
+            : null;
           if (allowedNames && allowedNames.size > 0 && value && !allowedNames.has(value)) {
             return callback(`事件名(${value})不存在`);
           }
@@ -84,7 +83,7 @@ export const createEventNameConfig = (config: EventSelectConfig) => {
   return { ...defaultEventNameConfig, ...config.eventNameConfig };
 };
 
-const createActionTypeOptions = () => {
+const createActionTypeOptions = (services?: Services) => {
   const o: {
     text: string;
     label: string;
@@ -97,6 +96,12 @@ const createActionTypeOptions = () => {
       value: ActionType.COMP,
     },
   ];
+
+  if (!services) {
+    return o;
+  }
+
+  const { propsService, codeBlockService } = services;
 
   if (!propsService.getDisabledCodeBlock()) {
     o.push({
@@ -125,7 +130,7 @@ const createActionTypeConfig = (config: EventSelectConfig) => {
     text: '联动类型',
     type: 'select',
     defaultValue: ActionType.COMP,
-    options: createActionTypeOptions(),
+    options: (mForm: FormState | undefined) => createActionTypeOptions(mForm?.services),
     rules: [
       {
         required: true,
@@ -171,8 +176,8 @@ const createCompActionConfig = (config: EventSelectConfig) => {
   const defaultCompActionConfig: DynamicTypeConfig = {
     name: 'method',
     text: '动作',
-    type: (_mForm: FormState | undefined, { model }: any) => {
-      const to = editorService.getNodeById(model.to);
+    type: (mForm: FormState | undefined, { model }: any) => {
+      const to = mForm?.services?.editorService.getNodeById(model.to);
 
       if (to?.type === 'page-fragment-container' && to.pageFragmentId) {
         return 'cascader';
@@ -182,12 +187,15 @@ const createCompActionConfig = (config: EventSelectConfig) => {
     },
     checkStrictly: () => config.src !== 'component',
     display: (_mForm: FormState | undefined, { model }: any) => model.actionType === ActionType.COMP,
-    options: (_mForm: FormState, { model }: any) => getCompActionOptions(model.to),
+    options: (mForm: FormState, { model }: any) =>
+      mForm?.services ? getCompActionOptions(model.to, mForm.services) : [],
     rules: [
       {
         trigger: 'blur',
-        validator: ({ value, callback }: any, { model }: any) => {
-          const allowedMethods = getCompActionAllowedValues(config as any, model);
+        validator: ({ value, callback }: any, { model }: any, mForm?: FormState) => {
+          const allowedMethods = mForm?.services
+            ? getCompActionAllowedValues(config as any, model, mForm.services)
+            : null;
           const normalized = normalizeCompActionValue(value);
           if (allowedMethods && allowedMethods.size > 0 && normalized && !allowedMethods.has(normalized)) {
             return callback(`动作名(${normalized})不存在`);
@@ -206,7 +214,7 @@ const createCodeActionConfig = (config: EventSelectConfig) => {
     type: 'code-select-col',
     text: '代码块',
     name: 'codeId',
-    notEditable: () => !codeBlockService.getEditStatus(),
+    notEditable: (mForm: FormState | undefined) => !mForm?.services?.codeBlockService.getEditStatus(),
     display: (_mForm, { model }) => model.actionType === ActionType.CODE,
   };
   return { ...defaultCodeActionConfig, ...config.codeActionConfig };
@@ -218,7 +226,7 @@ const createDataSourceActionConfig = (config: EventSelectConfig) => {
     type: 'data-source-method-select',
     text: '数据源方法',
     name: 'dataSourceMethod',
-    notEditable: () => !dataSourceService.get('editable'),
+    notEditable: (mForm: FormState | undefined) => !mForm?.services?.dataSourceService.get('editable'),
     display: (_mForm, { model }) => model.actionType === ActionType.DATA_SOURCE,
   };
   return { ...defaultDataSourceActionConfig, ...config.dataSourceActionConfig };
@@ -272,13 +280,17 @@ export const createLegacyTableConfig = (config: EventSelectConfig): TableConfig 
         name: 'name',
         label: '事件名',
         type: createEventNameConfig(config).type,
-        options: (_mForm: FormState, { formValue }: any) =>
-          eventsService
-            .getEvent(formValue.type, { node: editorService.getNodeById(formValue.id) })
+        options: (mForm: FormState, { formValue }: any) => {
+          const services = mForm?.services;
+          if (!services) return [];
+
+          return services.eventsService
+            .getEvent(formValue.type, { node: services.editorService.getNodeById(formValue.id) })
             .map((option: any) => ({
               text: option.label,
               value: option.value,
-            })),
+            }));
+        },
       },
       {
         name: 'to',
@@ -289,11 +301,14 @@ export const createLegacyTableConfig = (config: EventSelectConfig): TableConfig 
         name: 'method',
         label: '动作',
         type: createCompActionConfig(config).type,
-        options: (_mForm: FormState, { model, formValue }: any) => {
-          const node = editorService.getNodeById(model.to) || (formValue as MNode);
+        options: (mForm: FormState, { model, formValue }: any) => {
+          const services = mForm?.services;
+          if (!services) return [];
+
+          const node = services.editorService.getNodeById(model.to) || (formValue as MNode);
           if (!node?.type) return [];
 
-          return eventsService.getMethod(node.type, { targetId: model.to, node }).map((option: any) => ({
+          return services.eventsService.getMethod(node.type, { targetId: model.to, node }).map((option: any) => ({
             text: option.label,
             value: option.value,
           }));

@@ -5,7 +5,7 @@
  */
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
-import storage, { Protocol } from '@editor/services/storage';
+import { Protocol, storageService as storage } from '@editor/services/sdk-instance';
 import { setEditorConfig } from '@editor/utils/config';
 
 describe('storage service', () => {

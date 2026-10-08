@@ -7,8 +7,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { NodeType } from '@tmagic/core';
 
-import editorService from '@editor/services/editor';
-import propsService from '@editor/services/props';
+import { editorService, propsService } from '@editor/services/sdk-instance';
 import { beforePaste, getAddParent, getDefaultConfig, getPositionInContainer } from '@editor/utils/operator';
 
 const { editorState } = vi.hoisted(() => {
@@ -16,20 +15,27 @@ const { editorState } = vi.hoisted(() => {
   return { editorState: state };
 });
 
-vi.mock('@editor/services/editor', () => ({
-  default: {
-    get: (k: string) => editorState[k],
-    getParentById: vi.fn((id: string) => ({ id: `parent-of-${id}`, items: [] })),
-    getLayout: vi.fn(async () => 'absolute'),
-  },
-}));
-
-vi.mock('@editor/services/props', () => ({
-  default: {
-    setNewItemId: vi.fn((node: any) => ({ ...node, id: `new-${node.id}` })),
-    getPropsValue: vi.fn(async (type: string, cfg: any) => ({ type, ...cfg })),
-  },
-}));
+vi.mock('@editor/services/sdk-instance', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  const modEditor = await (() => ({
+    default: {
+      get: (k: string) => editorState[k],
+      getParentById: vi.fn((id: string) => ({ id: `parent-of-${id}`, items: [] })),
+      getLayout: vi.fn(async () => 'absolute'),
+    },
+  }))();
+  const modProps = await (() => ({
+    default: {
+      setNewItemId: vi.fn((node: any) => ({ ...node, id: `new-${node.id}` })),
+      getPropsValue: vi.fn(async (type: string, cfg: any) => ({ type, ...cfg })),
+    },
+  }))();
+  return {
+    ...actual,
+    editorService: modEditor.default,
+    propsService: modProps.default,
+  };
+});
 
 vi.mock('@tmagic/utils', async () => {
   const actual = (await vi.importActual('@tmagic/utils')) as Record<string, unknown>;

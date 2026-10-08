@@ -25,35 +25,55 @@ vi.mock('@editor/initService', () => ({
   initServiceState: initServiceStateMock,
 }));
 
-vi.mock('@editor/services/codeBlock', () => ({ default: {} }));
-vi.mock('@editor/services/componentList', () => ({ default: {} }));
-vi.mock('@editor/services/dataSource', () => ({ default: {} }));
-vi.mock('@editor/services/dep', () => ({ default: {} }));
+vi.mock('@editor/services/sdk-instance', async (importOriginal) => {
+  const actual = await importOriginal<any>();
+  const modCodeBlock = await (() => ({ default: {} }))();
+  const modComponentList = await (() => ({ default: {} }))();
+  const modDataSource = await (() => ({ default: {} }))();
+  const modDep = await (() => ({ default: {} }))();
+  const modEditor = await (async () => {
+    const { shallowRef } = await import('vue');
+    const stage = shallowRef<any>(stageStub);
+    return {
+      default: {
+        get: vi.fn((key: string) => (key === 'stage' ? stage.value : undefined)),
+        __setStage: (value: any) => {
+          stage.value = value;
+        },
+      },
+    };
+  })();
+  const modEvents = await (() => ({ default: {} }))();
+  const modHistory = await (() => ({ default: {} }))();
+  const modProps = await (() => ({ default: {} }))();
+  const modStorage = await (() => ({ default: {}, Protocol: {} }))();
+  return {
+    ...actual,
+    codeBlockService: modCodeBlock.default,
+    componentListService: modComponentList.default,
+    dataSourceService: modDataSource.default,
+    depService: modDep.default,
+    editorService: modEditor.default,
+    eventsService: modEvents.default,
+    historyService: modHistory.default,
+    propsService: modProps.default,
+    storageService: modStorage.default,
+    Protocol: modStorage.Protocol,
+  };
+});
+
 const { stageStub } = vi.hoisted(() => ({ stageStub: { name: 'stage-instance' } }));
 // 用响应式 ref 承载 stage，模拟真实 editorService 的 reactive state，
 // 这样 formContext 的 computed 才会在 stage 变化时失效重算
-vi.mock('@editor/services/editor', async () => {
-  const { shallowRef } = await import('vue');
-  const stage = shallowRef<any>(stageStub);
-  return {
-    default: {
-      get: vi.fn((key: string) => (key === 'stage' ? stage.value : undefined)),
-      __setStage: (value: any) => {
-        stage.value = value;
-      },
-    },
-  };
-});
-vi.mock('@editor/services/events', () => ({ default: {} }));
-vi.mock('@editor/services/history', () => ({ default: {} }));
+
 vi.mock('@editor/services/keybinding', () => ({
   default: { register: vi.fn(), registerEl: vi.fn() },
 }));
-vi.mock('@editor/services/props', () => ({ default: {} }));
+
 vi.mock('@editor/services/stageOverlay', () => ({
   default: { set: vi.fn() },
 }));
-vi.mock('@editor/services/storage', () => ({ default: {}, Protocol: {} }));
+
 vi.mock('@editor/services/ui', () => ({ default: {} }));
 vi.mock('@editor/utils/keybinding-config', () => ({ default: {}, KeyBindingContainerKey: { STAGE: 'stage' } }));
 
@@ -64,6 +84,15 @@ vi.mock('@editor/layouts/Framework.vue', () => ({
     setup(_p, { slots }) {
       return () =>
         h('div', { class: 'fake-framework' }, [
+          slots['content-before']?.(),
+          slots['src-code']?.(),
+          slots.empty?.(),
+          slots['content-after']?.(),
+          slots['page-bar']?.(),
+          slots['page-bar-add-button']?.(),
+          slots['page-bar-title']?.({ page: { id: 'p' } }),
+          slots['page-bar-popover']?.({ page: { id: 'p' } }),
+          slots['page-list-popover']?.({ list: [] }),
           slots.header?.(),
           slots.nav?.({ editorService: {} }),
           slots.sidebar?.({ editorService: {} }),
@@ -89,25 +118,52 @@ vi.mock('@editor/layouts/sidebar/Sidebar.vue', () => ({
   default: defineComponent({
     name: 'FakeSidebar',
     emits: ['layer-node-dblclick'],
-    setup(_p, { emit }) {
+    setup(_p, { emit, slots }) {
       return () =>
-        h('div', {
-          class: 'fake-sidebar',
-          onClick: () => emit('layer-node-dblclick', new MouseEvent('dblclick'), { id: 'a' }),
-        });
+        h(
+          'div',
+          {
+            class: 'fake-sidebar',
+            onClick: () => emit('layer-node-dblclick', new MouseEvent('dblclick'), { id: 'a' }),
+          },
+          [
+            slots['layer-panel-header']?.(),
+            slots['layer-node-content']?.({ data: { id: 'a' } }),
+            slots['layer-node-label']?.({ data: { id: 'a' } }),
+            slots['layer-node-tool']?.({ data: { id: 'a' } }),
+            slots['component-list-panel-header']?.(),
+            slots['component-list']?.({ componentGroupList: [] }),
+            slots['component-list-item']?.({ component: { type: 'x' } }),
+            slots['code-block-panel-header']?.(),
+            slots['code-block-panel-tool']?.({ id: 'c', data: {} }),
+            slots['code-block-panel-search']?.(),
+            slots['data-source-panel-tool']?.({ data: {} }),
+            slots['data-source-panel-search']?.(),
+          ],
+        );
     },
   }),
 }));
 
 vi.mock('@editor/layouts/workspace/Workspace.vue', () => ({
-  default: defineComponent({ name: 'FakeWorkspace', setup: () => () => h('div', { class: 'fake-workspace' }) }),
+  default: defineComponent({
+    name: 'FakeWorkspace',
+    setup:
+      (_p, { slots }) =>
+      () =>
+        h('div', { class: 'fake-workspace' }, [
+          slots['stage-top']?.(),
+          slots.stage?.(),
+          slots['workspace-content']?.(),
+        ]),
+  }),
 }));
 
 vi.mock('@editor/layouts/props-panel/PropsPanel.vue', () => ({
   default: defineComponent({
     name: 'PropsPanel',
     emits: ['mounted', 'unmounted', 'submit-error', 'form-error'],
-    setup(_p, { emit }) {
+    setup(_p, { emit, slots }) {
       injectedFormContext = inject(FORM_CONTEXT_KEY, undefined);
       injectedEnablePropsFormValidate = inject(
         ENABLE_PROPS_FORM_VALIDATE,
@@ -115,6 +171,7 @@ vi.mock('@editor/layouts/props-panel/PropsPanel.vue', () => ({
       );
       return () =>
         h('div', { class: 'fake-props-panel' }, [
+          slots['props-panel-header']?.(),
           h('button', { class: 'mounted-btn', onClick: () => emit('mounted', { proxy: true }) }),
           h('button', { class: 'unmounted-btn', onClick: () => emit('unmounted') }),
           h('button', { class: 'submit-err', onClick: () => emit('submit-error', new Error('e')) }),
@@ -241,16 +298,16 @@ describe('Editor', () => {
   });
 
   test('stage 走 computed 读时求值，切换画布后能读到新实例', async () => {
-    const editorServiceMod = (await import('@editor/services/editor')) as any;
+    const editorServiceMod = (await import('@editor/services/sdk-instance')) as any;
     mount(Editor, { props: {} as any });
     await nextTick();
 
     expect((injectedFormContext!.value as any).stage).toBe(stageStub);
 
     const nextStage = { name: 'next-stage' };
-    editorServiceMod.default.__setStage(nextStage);
+    editorServiceMod.editorService.__setStage(nextStage);
     expect((injectedFormContext!.value as any).stage).toBe(nextStage);
-    editorServiceMod.default.__setStage(stageStub);
+    editorServiceMod.editorService.__setStage(stageStub);
   });
 
   test('ENABLE_PROPS_FORM_VALIDATE 默认注入 false', async () => {
@@ -275,5 +332,45 @@ describe('Editor', () => {
     const wrapper = mount(Editor, { props: {} as any });
     expect((wrapper.vm as any).editorService).toBeDefined();
     expect((wrapper.vm as any).propsService).toBeDefined();
+  });
+
+  test('所有插槽透传到子布局', () => {
+    const names = [
+      'content-before',
+      'src-code',
+      'empty',
+      'content-after',
+      'page-bar',
+      'page-bar-add-button',
+      'page-bar-title',
+      'page-bar-popover',
+      'page-list-popover',
+      'layer-panel-header',
+      'layer-node-content',
+      'layer-node-label',
+      'layer-node-tool',
+      'component-list-panel-header',
+      'component-list',
+      'component-list-item',
+      'code-block-panel-header',
+      'code-block-panel-tool',
+      'code-block-panel-search',
+      'data-source-panel-tool',
+      'data-source-panel-search',
+      'stage-top',
+      'stage',
+      'workspace-content',
+      'props-panel-header',
+    ];
+    const slots = Object.fromEntries(names.map((n) => [n, `<i class="slot-${n}"></i>`]));
+    const wrapper = mount(Editor, { props: {} as any, slots });
+    for (const n of names) {
+      expect(wrapper.find(`.slot-${n}`).exists(), n).toBe(true);
+    }
+  });
+
+  test('传入 isLargeStageContainer 与 theme', () => {
+    const wrapper = mount(Editor, { props: { isLargeStageContainer: true, theme: 'dark' } as any });
+    expect(wrapper.exists()).toBe(true);
   });
 });

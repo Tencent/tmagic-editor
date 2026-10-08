@@ -1,16 +1,19 @@
 import serialize from 'serialize-javascript';
 
-import type { Id, MApp } from '@tmagic/core';
+import type { MApp } from '@tmagic/core';
 
 import { error } from '../logger';
 
-import type { CollectWorkerPayload, CollectWorkerRequest, CollectWorkerResponse, DepsData } from './worker';
+import type {
+  CollectWorkerPayload,
+  CollectWorkerRequest,
+  CollectWorkerResponse,
+  CollectWorkerResult,
+  DepsData,
+} from './worker';
 import CollectWorker from './worker.ts?worker&inline';
 
-export interface CollectWorkerResult {
-  deps: DepsData;
-  nodeIds: Id[];
-}
+export type { CollectWorkerResult };
 
 interface CollectTask {
   id: number;

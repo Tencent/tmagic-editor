@@ -16,19 +16,20 @@
  * limitations under the License.
  */
 
-import { shallowReactive } from 'vue';
-
 import type { ComponentGroup, ComponentGroupState } from '@editor/type';
+
+import type { SdkContext } from '../type';
 
 import BaseService from './BaseService';
 
 class ComponentList extends BaseService {
-  private state = shallowReactive<ComponentGroupState>({
-    list: [],
-  });
+  private state: ComponentGroupState;
 
-  constructor() {
+  constructor(ctx: SdkContext) {
     super([]);
+    this.state = ctx.reactivity.shallowReactive<ComponentGroupState>({
+      list: [],
+    });
   }
 
   /**
@@ -55,4 +56,4 @@ class ComponentList extends BaseService {
 
 export type ComponentListService = ComponentList;
 
-export default new ComponentList();
+export default ComponentList;

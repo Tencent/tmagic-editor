@@ -228,6 +228,10 @@ export default defineConfig({
               text: 'storageService',
               link: '/api/editor/storageServiceMethods.md',
             },
+            {
+              text: 'DSL SDK（Node）',
+              link: '/api/editor/sdk.md',
+            },
           ]
         },
         {

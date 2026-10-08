@@ -45,17 +45,17 @@ import type {
   UpdateDragEl,
 } from '@tmagic/stage';
 
-import type { CodeBlockService } from './services/codeBlock';
-import type { ComponentListService } from './services/componentList';
-import type { DataSourceService } from './services/dataSource';
-import type { DepService } from './services/dep';
-import type { EditorService } from './services/editor';
-import type { EventsService } from './services/events';
-import type { HistoryService } from './services/history';
+import type { CodeBlockService } from './sdk/services/CodeBlock';
+import type { ComponentListService } from './sdk/services/ComponentList';
+import type { DataSourceService } from './sdk/services/DataSource';
+import type { DepService } from './sdk/services/Dep';
+import type { EditorService } from './sdk/services/Editor';
+import type { EventsService } from './sdk/services/Events';
+import type { HistoryService } from './sdk/services/History';
+import type { PropsService } from './sdk/services/Props';
+import type { StorageService } from './sdk/services/WebStorage';
 import type { KeybindingService } from './services/keybinding';
-import type { PropsService } from './services/props';
 import type { StageOverlayService } from './services/stageOverlay';
-import type { StorageService } from './services/storage';
 import type { UiService } from './services/ui';
 import type { SerializedUndoRedo, UndoRedo } from './utils/undo-redo';
 

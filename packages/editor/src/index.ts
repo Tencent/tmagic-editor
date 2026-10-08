@@ -37,17 +37,19 @@ export * from './utils';
 export { isGlobalFlat } from './utils/config';
 export { default as TMagicEditor } from './Editor.vue';
 export { default as TMagicCodeEditor } from './layouts/CodeEditor.vue';
-export { default as editorService } from './services/editor';
-export { default as propsService } from './services/props';
-export { default as historyService } from './services/history';
-export { default as storageService } from './services/storage';
-export { default as eventsService } from './services/events';
-export { default as dataSourceService } from './services/dataSource';
+export {
+  codeBlockService,
+  componentListService,
+  dataSourceService,
+  depService,
+  editorService,
+  eventsService,
+  historyService,
+  propsService,
+  storageService,
+} from './services/sdk-instance';
 export { default as stageOverlayService } from './services/stageOverlay';
 export { default as uiService } from './services/ui';
-export { default as codeBlockService } from './services/codeBlock';
-export { default as depService } from './services/dep';
-export { default as componentListService } from './services/componentList';
 export { default as keybindingService } from './services/keybinding';
 export { default as ComponentListPanel } from './layouts/sidebar/ComponentListPanel.vue';
 export { default as LayerPanel } from './layouts/sidebar/layer/LayerPanel.vue';

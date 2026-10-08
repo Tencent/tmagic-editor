@@ -19,7 +19,7 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { computed } from 'vue';
 
-import events from '@editor/services/events';
+import { eventsService as events } from '@editor/services/sdk-instance';
 
 describe('events', () => {
   beforeEach(() => {

@@ -1,4 +1,4 @@
-import { defineFormConfig } from '@tmagic/form';
+import { defineFormConfig } from '@tmagic/form/headless';
 
 export default defineFormConfig([
   {

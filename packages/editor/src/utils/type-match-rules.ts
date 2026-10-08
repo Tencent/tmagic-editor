@@ -35,9 +35,7 @@ import {
   removeDataSourceFieldPrefix,
 } from '@tmagic/utils';
 
-import codeBlockService from '@editor/services/codeBlock';
-import dataSourceService from '@editor/services/dataSource';
-import editorService from '@editor/services/editor';
+import { codeBlockService, dataSourceService, editorService } from '@editor/services/sdk-instance';
 import { getFieldType, resolveFieldByPath } from '@editor/utils/data-source';
 import {
   arrayOptions,

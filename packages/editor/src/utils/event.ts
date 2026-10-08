@@ -20,10 +20,15 @@ import type { EventOption, Id, MComponent, MContainer, MNode } from '@tmagic/cor
 import type { CascaderOption } from '@tmagic/form';
 import { DATA_SOURCE_FIELDS_CHANGE_EVENT_PREFIX, traverseNode } from '@tmagic/utils';
 
-import dataSourceService from '@editor/services/dataSource';
-import editorService from '@editor/services/editor';
-import eventsService from '@editor/services/events';
+import { dataSourceService, editorService, eventsService } from '@editor/services/sdk-instance';
+import type { Services } from '@editor/type';
 import { getCascaderOptionsFromFields } from '@editor/utils/data-source';
+
+/** 事件相关工具函数依赖的服务，可由表单上下文（`mForm.services`）注入 */
+export type EventUtilServices = Pick<Services, 'editorService' | 'eventsService' | 'dataSourceService'>;
+
+/** 未显式传入 services 时使用浏览器端默认实例 */
+const getDefaultServices = (): EventUtilServices => ({ editorService, eventsService, dataSourceService });
 
 export const EVENT_NAME_VALUE_SEPARATOR = '.';
 
@@ -50,17 +55,21 @@ export const normalizeCompActionValue = (value: unknown): string => {
 export const getEventNameOptions = (
   src: string | undefined,
   formValue: Record<string, any> = {},
+  services: EventUtilServices = getDefaultServices(),
 ): EventNameOption[] => {
   if (!formValue.type) {
     return [];
   }
 
   if (src === 'component') {
-    const sourceNode = editorService.getNodeById(formValue.id) || (formValue as MNode);
-    let events: EventOption[] | CascaderOption[] = eventsService.getEvent(formValue.type, { node: sourceNode }) || [];
+    const sourceNode = services.editorService.getNodeById(formValue.id) || (formValue as MNode);
+    let events: EventOption[] | CascaderOption[] =
+      services.eventsService.getEvent(formValue.type, { node: sourceNode }) || [];
 
     if (formValue.type === 'page-fragment-container' && formValue.pageFragmentId) {
-      const pageFragment = editorService.get('root')?.items?.find((page) => page.id === formValue.pageFragmentId);
+      const pageFragment = services.editorService
+        .get('root')
+        ?.items?.find((page) => page.id === formValue.pageFragmentId);
       if (!pageFragment) {
         return [];
       }
@@ -79,8 +88,8 @@ export const getEventNameOptions = (
             return;
           }
 
-          const node = editorService.getNodeById(current.id) || current;
-          const nodeEvents = eventsService.getEvent(current.type, { node }) || [];
+          const node = services.editorService.getNodeById(current.id) || current;
+          const nodeEvents = services.eventsService.getEvent(current.type, { node }) || [];
           (events as CascaderOption[]).push({
             label: `${current.name}_${current.id}`,
             value: `${current.id}`,
@@ -99,8 +108,8 @@ export const getEventNameOptions = (
   }
 
   if (src === 'datasource') {
-    const events: EventNameOption[] = dataSourceService.getFormEvent(formValue.type) || [];
-    const dataSource = dataSourceService.getDataSourceById(formValue.id);
+    const events: EventNameOption[] = services.dataSourceService.getFormEvent(formValue.type) || [];
+    const dataSource = services.dataSourceService.getDataSourceById(formValue.id);
     const fields = dataSource?.fields || [];
 
     if (fields.length > 0) {
@@ -157,6 +166,7 @@ export const collectEventNameOptionValues = (
 export const getEventNameAllowedValues = (
   config: { src?: string; eventNameConfig?: { options?: unknown } } = {},
   formValue: Record<string, any> = {},
+  services: EventUtilServices = getDefaultServices(),
 ): Set<string> | null => {
   if (typeof config.eventNameConfig?.options !== 'undefined') {
     return null;
@@ -166,26 +176,33 @@ export const getEventNameAllowedValues = (
     return null;
   }
 
-  return collectEventNameOptionValues(getEventNameOptions(config.src, formValue), isEventNameCheckStrictly(config.src));
+  return collectEventNameOptionValues(
+    getEventNameOptions(config.src, formValue, services),
+    isEventNameCheckStrictly(config.src),
+  );
 };
 
 /**
  * 组装联动组件动作下拉/级联 options，与 EventSelect 默认 compActionConfig.options 逻辑一致。
  */
-export const getCompActionOptions = (toId?: Id): EventNameOption[] => {
+export const getCompActionOptions = (
+  toId?: Id,
+  services: EventUtilServices = getDefaultServices(),
+): EventNameOption[] => {
   if (typeof toId === 'undefined' || toId === null || toId === '') {
     return [];
   }
 
-  const node = editorService.getNodeById(toId);
+  const node = services.editorService.getNodeById(toId);
   if (!node?.type) {
     return [];
   }
 
-  let methods: EventOption[] | CascaderOption[] = eventsService.getMethod(node.type, { targetId: toId, node }) || [];
+  let methods: EventOption[] | CascaderOption[] =
+    services.eventsService.getMethod(node.type, { targetId: toId, node }) || [];
 
   if (node.type === 'page-fragment-container' && node.pageFragmentId) {
-    const pageFragment = editorService.get('root')?.items?.find((page) => page.id === node.pageFragmentId);
+    const pageFragment = services.editorService.get('root')?.items?.find((page) => page.id === node.pageFragmentId);
     if (!pageFragment) {
       return [];
     }
@@ -193,13 +210,13 @@ export const getCompActionOptions = (toId?: Id): EventNameOption[] => {
     methods = [];
     (pageFragment.items || []).forEach((item: MComponent | MContainer) => {
       traverseNode<MComponent | MContainer>(item, (current) => {
-        const node = editorService.getNodeById(current.id) || current;
+        const node = services.editorService.getNodeById(current.id) || current;
 
         if (!current.type) {
           return;
         }
 
-        const nodeMethods = eventsService.getMethod(current.type, { targetId: current.id, node }) || [];
+        const nodeMethods = services.eventsService.getMethod(current.type, { targetId: current.id, node }) || [];
         if (!nodeMethods.length) {
           return;
         }
@@ -228,10 +245,11 @@ export const getCompActionOptions = (toId?: Id): EventNameOption[] => {
 export const getCompActionAllowedValues = (
   config: { src?: string; compActionConfig?: { options?: unknown } } = {},
   model: { to?: Id } = {},
+  services: EventUtilServices = getDefaultServices(),
 ): Set<string> | null => {
   if (typeof config.compActionConfig?.options !== 'undefined') {
     return null;
   }
 
-  return collectEventNameOptionValues(getCompActionOptions(model.to), isEventNameCheckStrictly(config.src));
+  return collectEventNameOptionValues(getCompActionOptions(model.to, services), isEventNameCheckStrictly(config.src));
 };

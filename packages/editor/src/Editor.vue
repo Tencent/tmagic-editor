@@ -148,17 +148,19 @@ import FormPanel from './layouts/props-panel/FormPanel.vue';
 import PropsPanel from './layouts/props-panel/PropsPanel.vue';
 import Sidebar from './layouts/sidebar/Sidebar.vue';
 import Workspace from './layouts/workspace/Workspace.vue';
-import codeBlockService from './services/codeBlock';
-import componentListService from './services/componentList';
-import dataSourceService from './services/dataSource';
-import depService from './services/dep';
-import editorService from './services/editor';
-import eventsService from './services/events';
-import historyService from './services/history';
 import keybindingService from './services/keybinding';
-import propsService from './services/props';
+import {
+  codeBlockService,
+  componentListService,
+  dataSourceService,
+  depService,
+  editorService,
+  eventsService,
+  historyService,
+  propsService,
+  storageService,
+} from './services/sdk-instance';
 import stageOverlayService from './services/stageOverlay';
-import storageService from './services/storage';
 import uiService from './services/ui';
 import keybindingConfig from './utils/keybinding-config';
 import { defaultEditorProps, EditorProps, ENABLE_PROPS_FORM_VALIDATE } from './editorProps';

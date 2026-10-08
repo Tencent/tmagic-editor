@@ -76,7 +76,7 @@ import type { MPage, MPageFragment } from '@tmagic/core';
 
 import SplitView from '@editor/components/SplitView.vue';
 import { useServices } from '@editor/hooks/use-services';
-import { Protocol } from '@editor/services/storage';
+import { Protocol } from '@editor/services/sdk-instance';
 import type { FrameworkSlots, GetColumnWidth, PageBarSortOptions } from '@editor/type';
 import { getEditorConfig } from '@editor/utils/config';
 import {

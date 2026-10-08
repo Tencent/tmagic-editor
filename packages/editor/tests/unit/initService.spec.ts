@@ -35,6 +35,7 @@ const mkServices = () => {
   const editorService: any = {
     ...mkSvc('editor'),
     state: {} as any,
+    setConfig: vi.fn(),
     set: vi.fn((k: string, v: any) => (editorService.state[k] = v)),
     get: vi.fn((k: string) => editorService.state[k]),
     select: vi.fn(),

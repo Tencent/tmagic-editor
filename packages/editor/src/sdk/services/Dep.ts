@@ -15,18 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { reactive, shallowReactive } from 'vue';
 import { throttle } from 'lodash-es';
 
 import type { DepData, DepExtendedData, Id, MApp, MNode, Target } from '@tmagic/core';
 import { DepTargetType, traverseTarget, Watcher } from '@tmagic/core';
 import { isPage } from '@tmagic/utils';
 
-import { CollectWorkerClient } from '@editor/utils/dep/collect-worker-client';
 import { IdleTask } from '@editor/utils/dep/idle-task';
 import type { DepsData } from '@editor/utils/dep/worker';
 
+import type { CollectWorkerLike, SdkContext } from '../type';
+
 import BaseService from './BaseService';
+
+/** Node 下没有 worker 时使用：始终不可用，依赖收集退回主线程空闲队列 */
+const noopCollectWorker: CollectWorkerLike = {
+  isSupported: false,
+  collectDsl: () => Promise.resolve(null),
+  collect: () => Promise.resolve(null),
+  terminate: () => {},
+  abort: () => {},
+};
 
 export interface DepEvents {
   'add-target': [target: Target];
@@ -59,16 +68,13 @@ interface CollectBatch {
 }
 
 class Dep extends BaseService {
-  private state = shallowReactive<State>({
-    collecting: false,
-    taskLength: 0,
-  });
+  private state: State;
 
   private idleTask = new IdleTask<void>();
 
-  private collectWorker = new CollectWorkerClient();
+  private collectWorker: CollectWorkerLike;
 
-  private watcher = new Watcher({ initialTargets: reactive({}) });
+  private watcher: Watcher;
 
   private waitingWorker?: Promise<void>;
 
@@ -78,8 +84,15 @@ class Dep extends BaseService {
 
   private activeBatches = new Set<CollectBatch>();
 
-  constructor() {
+  constructor(private ctx: SdkContext) {
     super();
+
+    this.state = ctx.reactivity.shallowReactive<State>({
+      collecting: false,
+      taskLength: 0,
+    });
+    this.collectWorker = ctx.options.collectWorker ?? noopCollectWorker;
+    this.watcher = new Watcher({ initialTargets: ctx.reactivity.reactive({}) });
 
     this.idleTask.on(
       'update-task-length',
@@ -229,7 +242,7 @@ class Dep extends BaseService {
 
       traverseTarget(this.watcher.getTargetsList(), (target) => {
         if (depsData[target.type]?.[target.id]) {
-          target.deps = reactive(depsData[target.type][target.id]);
+          target.deps = this.ctx.reactivity.reactive(depsData[target.type][target.id]);
 
           if (target.type === DepTargetType.DATA_SOURCE && dsl.dataSourceDeps) {
             dsl.dataSourceDeps[target.id] = target.deps;
@@ -554,4 +567,4 @@ class Dep extends BaseService {
 
 export type DepService = Dep;
 
-export default new Dep();
+export default Dep;
