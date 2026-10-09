@@ -32,7 +32,7 @@ import {
 
 import { SimpleObservedData } from './observed-data/SimpleObservedData';
 import { DataSource, HttpDataSource } from './data-sources';
-import { getDeps } from './depsCache';
+import { clearDepsCache, getDeps } from './depsCache';
 import type {
   ChangeEvent,
   DataSourceManagerData,
@@ -263,6 +263,11 @@ class DataSourceManager extends EventEmitter {
    * @returns {MNode} 编译后的组件dsl
    */
   public compiledNode(n: MNode, sourceId?: Id, deep = false) {
+    if (deep && this.app.platform === 'editor') {
+      // 编辑属性不会改变节点 ID，更新配置后需重收集依赖，再供同批迭代项复用。
+      clearDepsCache();
+    }
+
     if (n[NODE_DISABLE_DATA_SOURCE_KEY]) {
       return n;
     }
