@@ -1,3 +1,14 @@
+## [1.8.3](https://github.com/Tencent/tmagic-editor/compare/v1.8.2...v1.8.3) (2026-10-13)
+
+
+### Bug Fixes
+
+* **form:** 日期/时间字段支持 valueFormat 为 X 的秒级时间戳 ([f12f78c](https://github.com/Tencent/tmagic-editor/commit/f12f78c9e045d41cf03be3e867d15aec5b50d202))
+
+
+### Features
+
+* **editor:** 新增 SDK 层并将核心服务迁移至 sdk 目录 ([94fae10](https://github.com/Tencent/tmagic-editor/commit/94fae10ae00b822ca0e2219f9e9bbc2c51ea0a1c))
 ## [1.8.2](https://github.com/Tencent/tmagic-editor/compare/v1.8.1...v1.8.2) (2026-09-23)
 
 
