@@ -1,0 +1,2 @@
+import{at as e,dt as t,st as n,tt as r}from"./src-BodtnAkU.js";import{r as i,t as a}from"./use-app-Dut0fMLD.js";import{r as o}from"./index-ihHyqn5X.js";var s=[`innerHTML`],c=e({name:`tmagic-text`,__name:`index`,props:{config:{},iteratorIndex:{},iteratorContainerId:{},containerIndex:{},pageFragmentContainerId:{},model:{},disabled:{type:Boolean}},setup(e){let c=e,l=n(`app`),u=i(c);a(u);let d=()=>{l&&u&&l.emit(`${o}click`,u)};return(n,i)=>(t(),r(`p`,{onClick:d,innerHTML:e.config.text},null,8,s))}});export{c as default};
+//# sourceMappingURL=src-plGnGj2H.js.map
