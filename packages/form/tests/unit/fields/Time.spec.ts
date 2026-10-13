@@ -60,4 +60,15 @@ describe('Time', () => {
     const value = await (wrapper.vm as any).submitForm();
     expect(value.time).toMatch('12:00:00');
   });
+
+  test('valueFormat 为 X 时把秒字符串收成数字', async () => {
+    const wrapper = getWrapper([{ type: 'time', text: 'time', name: 'time', valueFormat: 'X' }], { time: 1626507420 });
+
+    await nextTick();
+
+    wrapper.findComponent({ name: 'TMTimePicker' }).vm.$emit('update:modelValue', '1626507421');
+    await nextTick();
+
+    expect((wrapper.vm as any).values.time).toBe(1626507421);
+  });
 });

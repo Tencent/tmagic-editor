@@ -15,6 +15,7 @@
 import { TMagicDatePicker } from '@tmagic/design';
 
 import type { DateConfig, FieldProps } from '@form/schema';
+import { normalizeTimestampValue } from '@form/utils/form';
 import { useAddField } from '@form/utils/useAddField';
 
 defineOptions({
@@ -24,12 +25,12 @@ defineOptions({
 const props = defineProps<FieldProps<DateConfig>>();
 
 const emit = defineEmits<{
-  change: [value: string];
+  change: [value: string | number | null];
 }>();
 
 useAddField(props.prop);
 
-const changeHandler = (v: string) => {
-  emit('change', v);
+const changeHandler = (v: string | number | null) => {
+  emit('change', normalizeTimestampValue(v, props.config.valueFormat));
 };
 </script>

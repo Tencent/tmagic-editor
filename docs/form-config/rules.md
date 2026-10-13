@@ -29,7 +29,7 @@
 | `display` / `hidden` | 不校验 |
 | `number` | `number`（非 NaN） |
 | `number-range` | 长度为 2 的数字数组 |
-| `date` / `datetime` / `time` | 按 `valueFormat` 校验；`x` / `timestamp` 期望 `number`，其余按 [Day.js format](https://day.js.org/docs/en/display/format) 严格解析字符串 |
+| `date` / `datetime` / `time` | 按 `valueFormat` 校验；`x` / `X` / `timestamp` 期望 `number`（`x`、`timestamp` 为毫秒，`X` 为秒）。日期组件会把选择器写出的秒字符串收成 number。其余格式按 [Day.js format](https://day.js.org/docs/en/display/format) 严格解析字符串 |
 | `daterange` / `timerange` | 无 `names` 时为长度为 2 的数组，元素按 `valueFormat` 校验；有 `names` 时跳过 |
 | `switch` / `checkbox` | 值必须是解析后的 `activeValue` / `inactiveValue` 之一（显式配置优先；未配置且 `filter === 'number'` 时为 `1`/`0`；否则为 `true`/`false`） |
 | `select` | 单选：值 ∈ options；`multiple`：数组且每项 ∈ options；`allowCreate` / `remote`：只校验基础形态，不做 options 枚举 |

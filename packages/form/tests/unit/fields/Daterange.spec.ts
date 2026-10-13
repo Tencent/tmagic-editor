@@ -66,4 +66,32 @@ describe('Daterange', () => {
     const daterange = wrapper.findComponent(MDaterange);
     expect(daterange.exists()).toBe(true);
   });
+
+  test('valueFormat 为 X 时区间收成秒数字', async () => {
+    const wrapper = getWrapper([{ type: 'daterange', text: 'daterange', name: 'range', valueFormat: 'X' }], {
+      range: [1626507420, 1626593820],
+    });
+
+    await nextTick();
+
+    wrapper.findComponent({ name: 'TMDatePicker' }).vm.$emit('update:modelValue', ['1626507420', '1626593820']);
+    await nextTick();
+
+    expect((wrapper.vm as any).values.range).toEqual([1626507420, 1626593820]);
+  });
+
+  test('valueFormat 为 X 且 names 时分别写入秒数字', async () => {
+    const wrapper = getWrapper([{ type: 'daterange', text: 'daterange', names: ['start', 'end'], valueFormat: 'X' }], {
+      start: 1626507420,
+      end: 1626593820,
+    });
+
+    await nextTick();
+
+    wrapper.findComponent({ name: 'TMDatePicker' }).vm.$emit('update:modelValue', ['1626507420', '1626593820']);
+    await nextTick();
+
+    expect((wrapper.vm as any).values.start).toBe(1626507420);
+    expect((wrapper.vm as any).values.end).toBe(1626593820);
+  });
 });

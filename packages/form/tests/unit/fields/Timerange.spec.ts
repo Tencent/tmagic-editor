@@ -31,4 +31,32 @@ describe('Timerange', () => {
     await nextTick();
     expect(wrapper.findComponent(MTimerange).exists()).toBe(true);
   });
+
+  test('valueFormat 为 X 时区间收成秒数字', async () => {
+    const wrapper = mountForm([{ name: 'tr', type: 'timerange', text: 'tr', valueFormat: 'X' }], {
+      tr: [1626507420, 1626593820],
+    });
+
+    await nextTick();
+
+    wrapper.findComponent({ name: 'TMTimePicker' }).vm.$emit('change', ['1626507420', '1626593820']);
+    await nextTick();
+
+    expect((wrapper.vm as any).values.tr).toEqual([1626507420, 1626593820]);
+  });
+
+  test('valueFormat 为 X 且 names 时分别写入秒数字', async () => {
+    const wrapper = mountForm([{ type: 'timerange', text: 'tr', names: ['start', 'end'], valueFormat: 'X' }], {
+      start: 1626507420,
+      end: 1626593820,
+    });
+
+    await nextTick();
+
+    wrapper.findComponent({ name: 'TMTimePicker' }).vm.$emit('change', ['1626507420', '1626593820']);
+    await nextTick();
+
+    expect((wrapper.vm as any).values.start).toBe(1626507420);
+    expect((wrapper.vm as any).values.end).toBe(1626593820);
+  });
 });

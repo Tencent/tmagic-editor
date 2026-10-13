@@ -23,7 +23,7 @@ import { onUnmounted, ref, watch } from 'vue';
 import { TMagicDatePicker } from '@tmagic/design';
 
 import type { ChangeRecord, DaterangeConfig, FieldProps } from '../schema';
-import { datetimeFormatter } from '../utils/form';
+import { datetimeFormatter, normalizeTimestampValue } from '../utils/form';
 import { useAddField } from '../utils/useAddField';
 
 defineOptions({
@@ -37,7 +37,14 @@ const emit = defineEmits(['change']);
 useAddField(props.prop);
 
 const { names } = props.config;
-const value = ref<(Date | string | undefined)[] | null>([]);
+const value = ref<(Date | string | number | undefined)[] | null>([]);
+const rangeFormat = () => `${props.config.dateFormat || 'YYYY/MM/DD'} ${props.config.timeFormat || 'HH:mm:ss'}`;
+/** `X` 的选择器值就是秒级数字，展示格式不能拿去代替 valueFormat。 */
+const toPickerValue = (item: string | number | Date) => {
+  if (!item) return undefined;
+  if (props.config.valueFormat === 'X') return normalizeTimestampValue(item, 'X');
+  return datetimeFormatter(item, '', rangeFormat()) as string;
+};
 
 if (props.model !== undefined) {
   if (names?.length) {
@@ -48,10 +55,9 @@ if (props.model !== undefined) {
           value.value = [];
         }
 
-        const format = `${props.config.dateFormat || 'YYYY/MM/DD'} ${props.config.timeFormat || 'HH:mm:ss'}`;
         if (!start || !end) value.value = [];
-        if (start !== preStart) value.value[0] = datetimeFormatter(start, '', format) as string;
-        if (end !== preEnd) value.value[1] = datetimeFormatter(end, '', format) as string;
+        if (start !== preStart) value.value[0] = toPickerValue(start);
+        if (end !== preEnd) value.value[1] = toPickerValue(end);
       },
       {
         immediate: true,
@@ -65,12 +71,7 @@ if (props.model !== undefined) {
     const unWatch = watch(
       () => props.model[props.name],
       (start, preStart) => {
-        const format = `${props.config.dateFormat || 'YYYY/MM/DD'} ${props.config.timeFormat || 'HH:mm:ss'}`;
-
-        if (start !== preStart)
-          value.value = start.map((item: string) =>
-            item ? (datetimeFormatter(item, '', format) as string) : undefined,
-          );
+        if (start !== preStart) value.value = start.map((item: string | number | Date) => toPickerValue(item));
       },
       {
         immediate: true,
@@ -82,8 +83,9 @@ if (props.model !== undefined) {
   }
 }
 
-const changeHandler = (v: Date[]) => {
-  const value = v || [];
+const changeHandler = (v: Array<Date | string | number> | null) => {
+  const normalized = normalizeTimestampValue(v, props.config.valueFormat);
+  const value = normalized || [];
 
   if (props.name) {
     emit('change', value);
@@ -94,10 +96,10 @@ const changeHandler = (v: Date[]) => {
         if (!props.model) {
           return;
         }
-        if (Array.isArray(v)) {
+        if (Array.isArray(normalized)) {
           newChangeRecords.push({
             propPath: props.prop ? `${props.prop}.${item}` : item,
-            value: v[index],
+            value: normalized[index],
           });
         } else {
           newChangeRecords.push({

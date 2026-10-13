@@ -29,6 +29,7 @@ import {
   getDataByPage,
   getRules,
   initValue,
+  normalizeTimestampValue,
   sortArray,
   sortChange,
 } from '@form/utils/form';
@@ -680,6 +681,40 @@ describe('datetimeFormatter', () => {
 
   test('自定义format只显示时间', () => {
     expect(datetimeFormatter(date, defaultValue, 'HH:mm:ss')).toBe('15:37:00');
+  });
+
+  test('format是X时日期转成秒级时间戳', () => {
+    const seconds = Math.floor(date.getTime() / 1000);
+    expect(datetimeFormatter(date.toISOString(), defaultValue, 'X')).toBe(seconds);
+    expect(datetimeFormatter(date, defaultValue, 'X')).toBe(seconds);
+  });
+
+  test('format是X时已是秒的数字原样保留', () => {
+    const seconds = Math.floor(date.getTime() / 1000);
+    expect(datetimeFormatter(String(seconds), defaultValue, 'X')).toBe(seconds);
+    expect(datetimeFormatter(seconds, defaultValue, 'X')).toBe(seconds);
+  });
+
+  test('format是X时非法值回退默认值', () => {
+    expect(datetimeFormatter('abc', defaultValue, 'X')).toBe(defaultValue);
+  });
+});
+
+describe('normalizeTimestampValue', () => {
+  test('非 X 格式原样返回', () => {
+    expect(normalizeTimestampValue('1626507420', 'x')).toBe('1626507420');
+    expect(normalizeTimestampValue('2021/07/17', undefined)).toBe('2021/07/17');
+  });
+
+  test('X 格式：空值原样返回，秒字符串和日期收成秒数字', () => {
+    expect(normalizeTimestampValue(null, 'X')).toBeNull();
+    expect(normalizeTimestampValue('', 'X')).toBe('');
+    expect(normalizeTimestampValue('1626507420', 'X')).toBe(1626507420);
+    expect(normalizeTimestampValue(1626507420.9, 'X')).toBe(1626507420);
+    expect(normalizeTimestampValue(['1626507420', '1626593820'], 'X')).toEqual([1626507420, 1626593820]);
+    expect(normalizeTimestampValue('2021-07-17T07:37:00.000Z', 'X')).toBe(1626507420);
+    expect(normalizeTimestampValue('not-a-date', 'X')).toBe('not-a-date');
+    expect(normalizeTimestampValue(Infinity, 'X')).toBe(Infinity);
   });
 });
 

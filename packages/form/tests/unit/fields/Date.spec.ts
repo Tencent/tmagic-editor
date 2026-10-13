@@ -79,6 +79,20 @@ describe('Date', () => {
     expect(value.date).toMatch('2021-07-28');
   });
 
+  test('valueFormat 为 X 时收成秒级数字', async () => {
+    const source = '2021-07-17T07:37:00.000Z';
+    const wrapper = getWrapper([{ text: 'date', type: 'date', name: 'date', valueFormat: 'X' }], { date: source });
+
+    await nextTick();
+
+    expect((wrapper.vm as any).values.date).toBe(Math.floor(new Date(source).getTime() / 1000));
+
+    wrapper.findComponent({ name: 'TMDatePicker' }).vm.$emit('update:modelValue', '1626507420');
+    await nextTick();
+
+    expect((wrapper.vm as any).values.date).toBe(1626507420);
+  });
+
   test('清空', async () => {
     const wrapper = getWrapper();
 

@@ -153,13 +153,26 @@ describe('validateTypeMatch', () => {
       validateTypeMatch('25/01/2019', mForm, propsOf({ type: 'date', valueFormat: 'DD/MM/YYYY' })),
     ).toBeUndefined();
 
-    // timestamp / x → number
+    // timestamp / x → 毫秒 number；X → 秒 number（日期选择器写出的秒字符串不合法）
     expect(
       validateTypeMatch(1710000000000, mForm, propsOf({ type: 'date', valueFormat: 'timestamp' })),
     ).toBeUndefined();
     expect(validateTypeMatch(1710000000000, mForm, propsOf({ type: 'datetime', valueFormat: 'x' }))).toBeUndefined();
     expect(validateTypeMatch('2020-01-01', mForm, propsOf({ type: 'date', valueFormat: 'x' }))).toMatch(
-      /^值类型应为时间戳数字\n\n请参考以下示例值：\d+$/,
+      /^值类型应为毫秒级时间戳数字\n\n请参考以下示例值：\d{13}$/,
+    );
+    expect(validateTypeMatch(1626507420, mForm, propsOf({ type: 'date', valueFormat: 'X' }))).toBeUndefined();
+    expect(validateTypeMatch(1626507420.5, mForm, propsOf({ type: 'date', valueFormat: 'X' }))).toMatch(
+      /^值类型应为秒级时间戳数字/,
+    );
+    expect(validateTypeMatch(Infinity, mForm, propsOf({ type: 'date', valueFormat: 'X' }))).toMatch(
+      /^值类型应为秒级时间戳数字/,
+    );
+    expect(validateTypeMatch('1626507420', mForm, propsOf({ type: 'datetime', valueFormat: 'X' }))).toMatch(
+      /^值类型应为秒级时间戳数字\n\n请参考以下示例值：\d{10}$/,
+    );
+    expect(validateTypeMatch('2020-01-01', mForm, propsOf({ type: 'time', valueFormat: 'X' }))).toMatch(
+      /^值类型应为秒级时间戳数字\n\n请参考以下示例值：\d{10}$/,
     );
   });
 
@@ -553,6 +566,14 @@ describe('validateTypeMatch', () => {
       /^\["a"\] 格式应为长度为 2 的 YYYY\/MM\/DD HH:mm:ss 数组\n\n请参考以下示例值：\["\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}", "\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}:\d{2}"\]$/,
     );
     expect(validateTypeMatch([1, 2], mForm, propsOf({ type: 'daterange', valueFormat: 'timestamp' }))).toBeUndefined();
+    expect(
+      validateTypeMatch([1626507420, 1626593820], mForm, propsOf({ type: 'daterange', valueFormat: 'X' })),
+    ).toBeUndefined();
+    expect(
+      validateTypeMatch(['2020-01-01', '2020-01-02'], mForm, propsOf({ type: 'daterange', valueFormat: 'X' })),
+    ).toMatch(
+      /^\["2020-01-01","2020-01-02"\] 类型应为长度为 2 的秒级时间戳数字数组\n\n请参考以下示例值：\[\d{10}, \d{10}\]$/,
+    );
     expect(validateTypeMatch('x', mForm, propsOf({ type: 'daterange', names: ['a', 'b'] }))).toBeUndefined();
 
     expect(validateTypeMatch([{ id: 1 }], mForm, propsOf({ type: 'table' }))).toBeUndefined();

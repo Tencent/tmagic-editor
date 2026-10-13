@@ -150,7 +150,7 @@ const DATE_LIKE_DEFAULT_VALUE_FORMAT: Record<string, string> = {
   timerange: 'HH:mm:ss',
 };
 
-const TIMESTAMP_VALUE_FORMATS = new Set(['x', 'timestamp']);
+export const TIMESTAMP_VALUE_FORMATS = new Set(['x', 'X', 'timestamp']);
 
 /**
  * 将值格式化为可读的参考示例字符串。
@@ -281,7 +281,9 @@ const isTimestampValueFormat = (valueFormat: string) => TIMESTAMP_VALUE_FORMATS.
 
 const isValidDateValueByFormat = (value: any, valueFormat: string): boolean => {
   if (isTimestampValueFormat(valueFormat)) {
-    return typeof value === 'number' && !Number.isNaN(value);
+    if (typeof value !== 'number') return false;
+    // 秒级时间戳必须是有限整数，毫秒级只排除 NaN
+    return valueFormat === 'X' ? Number.isInteger(value) : !Number.isNaN(value);
   }
   if (typeof value !== 'string') {
     return false;
@@ -293,9 +295,11 @@ const isValidDateValueByFormat = (value: any, valueFormat: string): boolean => {
 /**
  * 生成单个日期类字段的参考示例值：时间戳格式给出当前时间戳，其余按 valueFormat 格式化当前时间。
  */
+const timestampExample = (valueFormat: string) => (valueFormat === 'X' ? Math.floor(Date.now() / 1000) : Date.now());
+
 const dateSuggestion = (valueFormat: string): string =>
   isTimestampValueFormat(valueFormat)
-    ? `请参考以下示例值：${Date.now()}`
+    ? `请参考以下示例值：${timestampExample(valueFormat)}`
     : `请参考以下示例值："${dayjs().format(valueFormat)}"`;
 
 /**
@@ -303,16 +307,19 @@ const dateSuggestion = (valueFormat: string): string =>
  */
 const dateRangeSuggestion = (valueFormat: string): string => {
   if (isTimestampValueFormat(valueFormat)) {
-    return `请参考以下示例值：[${Date.now()}, ${Date.now()}]`;
+    const example = timestampExample(valueFormat);
+    return `请参考以下示例值：[${example}, ${example}]`;
   }
   const example = dayjs().format(valueFormat);
   return `请参考以下示例值：["${example}", "${example}"]`;
 };
 
+const timestampTypeLabel = (valueFormat: string) => (valueFormat === 'X' ? '秒级时间戳数字' : '毫秒级时间戳数字');
+
 const dateValueFormatErrorMessage = (message: string | undefined, valueFormat: string) =>
   defaultMessage(
     message,
-    isTimestampValueFormat(valueFormat) ? '值类型应为时间戳数字' : `值格式应为 ${valueFormat}`,
+    isTimestampValueFormat(valueFormat) ? `值类型应为${timestampTypeLabel(valueFormat)}` : `值格式应为 ${valueFormat}`,
     dateSuggestion(valueFormat),
   );
 
@@ -748,7 +755,7 @@ const validateBuiltinTypeMatch = (
       return defaultMessage(
         message,
         isTimestampValueFormat(valueFormat)
-          ? `${formatErrorValue(value)} 类型应为长度为 2 的时间戳数字数组`
+          ? `${formatErrorValue(value)} 类型应为长度为 2 的${timestampTypeLabel(valueFormat)}数组`
           : `${formatErrorValue(value)} 格式应为长度为 2 的 ${valueFormat} 数组`,
         dateRangeSuggestion(valueFormat),
       );

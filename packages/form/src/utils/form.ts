@@ -42,7 +42,7 @@ import type {
 } from '../schema';
 
 import { getConfig } from './config';
-import { createTypeMatchValidator } from './typeMatch';
+import { createTypeMatchValidator, TIMESTAMP_VALUE_FORMATS } from './typeMatch';
 
 export { createFormStateProxy, mergeFormContexts } from './formStateProxy';
 
@@ -509,14 +509,44 @@ export const initValue = async (
   return valuesTmp || {};
 };
 
+/**
+ * 把值收成 Unix 秒，无法解析时返回 undefined。
+ *
+ * 纯数字（含数字字符串）按已是秒处理：dayjs 会把数字当成毫秒，不能再过一遍。
+ * Date、ISO 和日期字符串则解析后取秒。
+ */
+const toUnixSeconds = (v: string | Date | number): number | undefined => {
+  if (typeof v === 'number') {
+    return Number.isFinite(v) ? Math.trunc(v) : undefined;
+  }
+  if (typeof v === 'string' && /^-?\d+$/.test(v.trim())) {
+    return Math.trunc(Number(v));
+  }
+  const parsed = dayjs(v);
+  return parsed.isValid() ? parsed.unix() : undefined;
+};
+
+/**
+ * `valueFormat: 'X'` 时把选择器值收成秒级 number，其余格式原样返回。
+ * Element Plus 对 `X` 写出的是秒字符串（`x` 才会直接给毫秒数字）；空值、无法解析的值原样返回。
+ */
+export const normalizeTimestampValue = (value: any, valueFormat?: string): any => {
+  if (valueFormat !== 'X') return value;
+  if (Array.isArray(value)) return value.map((item) => normalizeTimestampValue(item, valueFormat));
+  if (value === null || value === undefined || value === '') return value;
+  return toUnixSeconds(value) ?? value;
+};
+
 export const datetimeFormatter = (
-  v: string | Date,
+  v: string | Date | number,
   defaultValue = '-',
   format = 'YYYY-MM-DD HH:mm:ss',
 ): string | number => {
   if (v) {
     let time: string | number;
-    if (['x', 'timestamp'].includes(format)) {
+    if (format === 'X') {
+      time = toUnixSeconds(v) ?? 'Invalid Date';
+    } else if (TIMESTAMP_VALUE_FORMATS.has(format)) {
       time = dayjs(Number.isNaN(Number(v)) ? v : Number(v)).valueOf();
     } else if ((typeof v === 'string' && v.includes('Z')) || v instanceof Date) {
       // dayjs.extend 内部有防重复机制 (plugin.$i)，无需额外判断
