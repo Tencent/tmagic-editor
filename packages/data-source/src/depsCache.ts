@@ -10,6 +10,8 @@ import {
 
 const cache = new Map();
 
+export const clearDepsCache = () => cache.clear();
+
 export const getDeps = (ds: DataSourceSchema, nodes: MNode[], inEditor: boolean) => {
   let cacheKey: string;
 
