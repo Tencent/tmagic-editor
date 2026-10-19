@@ -13,18 +13,14 @@
         :data="{
           type: 'button',
           text: '页面',
-          handler: () => {
-            addPage(NodeType.PAGE);
-          },
+          handler: addNormalPage,
         }"
       ></ToolButton>
       <ToolButton
         :data="{
           type: 'button',
           text: '页面片',
-          handler: () => {
-            addPage(NodeType.PAGE_FRAGMENT);
-          },
+          handler: addPageFragment,
         }"
       ></ToolButton>
     </TMagicPopover>
@@ -62,4 +58,7 @@ const addPage = (type: NodeType.PAGE | NodeType.PAGE_FRAGMENT) => {
   };
   editorService.add(pageConfig);
 };
+
+const addNormalPage = () => addPage(NodeType.PAGE);
+const addPageFragment = () => addPage(NodeType.PAGE_FRAGMENT);
 </script>
