@@ -120,7 +120,12 @@
   }
 }
 
-.m-editor-nav-menu-popover {
+.tmagic-design-popper.m-editor-nav-menu-popover {
+  // 不固定宽度，按内容撑开，避免下拉框超出菜单；content-box 让 padding 不挤占内容宽度。
+  width: max-content;
+  min-width: 180px;
+  box-sizing: content-box;
+
   .m-editor-nav-menu-overflow-list {
     display: flex;
     flex-direction: column;
@@ -139,8 +144,30 @@
       }
 
       &.divider {
-        padding: 0;
+        display: flex;
+        align-items: center;
+        align-self: stretch;
+        width: auto;
+        height: auto;
+        padding: 4px 12px;
         cursor: default;
+        box-sizing: border-box;
+
+        // 更多菜单是纵向列表，分割线必须盖过组件默认的竖线样式
+        .tmagic-design-divider,
+        .el-divider,
+        .t-divider {
+          display: block;
+          flex: 1 1 auto;
+          width: 100%;
+          min-width: 0;
+          height: 0;
+          margin: 0;
+          border: 0;
+          border-top: 1px solid var(--el-border-color, #dcdfe6);
+          border-left: 0;
+          position: static;
+        }
 
         &:hover {
           background-color: transparent;

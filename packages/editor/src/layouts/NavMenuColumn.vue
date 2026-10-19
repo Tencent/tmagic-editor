@@ -62,13 +62,14 @@ const props = withDefaults(
     width?: number;
     /** 子元素之间的间距，需与 SCSS gap 保持一致 */
     gap?: number;
-    /** Popover 内容宽度 */
-    popoverWidth?: number;
+    /**
+     * Popover 内容宽度。不传时按内容撑开，避免下拉框超出菜单。
+     */
+    popoverWidth?: number | string;
   }>(),
   {
     items: () => [],
     gap: 3,
-    popoverWidth: 180,
   },
 );
 
@@ -110,7 +111,18 @@ const containerWidth = ref(0);
 const hiddenIndexSet = ref<Set<number>>(new Set());
 
 const hasOverflow = computed(() => hiddenIndexSet.value.size > 0);
-const overflowItems = computed(() => props.items.filter((_, index) => hiddenIndexSet.value.has(index)));
+// 更多菜单是纵向列表：分割线改成横线；收进去的首尾分割线没有分组意义，直接去掉。
+const overflowItems = computed(() => {
+  const items = props.items
+    .filter((_, index) => hiddenIndexSet.value.has(index))
+    .map((item) => (item.type === 'divider' ? { ...item, direction: 'horizontal' as const } : item));
+
+  let start = 0;
+  let end = items.length;
+  while (start < end && items[start].type === 'divider') start += 1;
+  while (end > start && items[end - 1].type === 'divider') end -= 1;
+  return items.slice(start, end);
+});
 
 const measureAndCompute = () => {
   if (!columnEl.value) return;

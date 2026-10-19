@@ -21,7 +21,8 @@ vi.mock('@editor/components/ToolButton.vue', () => ({
           'button',
           {
             ref: rootEl,
-            class: ['tool-btn', (props.data as any)?.className],
+            class: ['tool-btn', (props.data as any)?.className, (props.data as any)?.type],
+            'data-direction': (props.data as any)?.direction || '',
           },
           (props.data as any)?.text || '',
         );
@@ -117,6 +118,15 @@ describe('NavMenuColumn', () => {
     const moreWrapper = wrapper.find('.m-editor-nav-menu-more-wrapper');
     expect(moreWrapper.exists()).toBe(true);
     expect(moreWrapper.classes()).toContain('m-editor-nav-menu-more-wrapper-hidden');
+  });
+
+  test('未指定 popoverWidth 时不给更多菜单固定宽度', () => {
+    const wrapper = mount(NavMenuColumn as any, {
+      props: { columnKey: 'left', items: [{ type: 'button', text: 'A' }] },
+    });
+    const popover = wrapper.findComponent({ name: 'TMagicPopover' });
+    expect(popover.exists()).toBe(true);
+    expect(popover.props('width')).toBeUndefined();
   });
 
   test('点击 more 引用元素切换 popover 显示状态', async () => {
@@ -340,6 +350,127 @@ describe('NavMenuColumn', () => {
     await flushRaf();
 
     expect(wrapper.find('.tmagic-popover').attributes('data-visible')).toBe('false');
+
+    wrapper.unmount();
+  });
+
+  test('更多菜单中的分割线改为横向，工具栏中的分割线保持竖向', async () => {
+    const items = [
+      { type: 'button', text: 'A' },
+      { type: 'button', text: 'B' },
+      { type: 'divider', className: 'sep' },
+      { type: 'button', text: 'C' },
+    ];
+
+    const wrapper = mount(NavMenuColumn as any, {
+      props: { columnKey: 'right', items, width: 80 },
+      attachTo: document.body,
+    });
+
+    const columnEl = wrapper.find('.m-editor-nav-menu-column').element as HTMLElement;
+    Object.defineProperty(columnEl, 'clientWidth', { configurable: true, get: () => 80 });
+
+    const moreEl = wrapper.find('.m-editor-nav-menu-more-wrapper').element as HTMLElement;
+    moreEl.getBoundingClientRect = () => ({
+      width: 30,
+      height: 0,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+
+    wrapper.findAll('.tool-btn').forEach((b) => {
+      const el = b.element as HTMLElement;
+      el.getBoundingClientRect = () => ({
+        width: 40,
+        height: 0,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        x: 0,
+        y: 0,
+        toJSON: () => ({}),
+      });
+    });
+
+    roCallbacks.forEach((cb) => cb());
+    await flushRaf();
+    await flushRaf();
+
+    const overflowDividers = wrapper.findAll('.m-editor-nav-menu-overflow-list .sep');
+    expect(overflowDividers.length).toBeGreaterThan(0);
+    overflowDividers.forEach((divider) => {
+      expect(divider.attributes('data-direction')).toBe('horizontal');
+    });
+
+    wrapper.findAll('.m-editor-nav-menu-column > .sep').forEach((divider) => {
+      expect(divider.attributes('data-direction')).toBe('');
+    });
+
+    wrapper.unmount();
+  });
+
+  test('更多菜单首尾的分割线会被去掉，中间的分割线保留', async () => {
+    const items = [
+      { type: 'button', text: 'A' },
+      { type: 'divider', className: 'lead' },
+      { type: 'button', text: 'B' },
+      { type: 'divider', className: 'mid' },
+      { type: 'button', text: 'C' },
+      { type: 'divider', className: 'trail' },
+    ];
+
+    const wrapper = mount(NavMenuColumn as any, {
+      props: { columnKey: 'right', items, width: 80 },
+      attachTo: document.body,
+    });
+
+    const columnEl = wrapper.find('.m-editor-nav-menu-column').element as HTMLElement;
+    Object.defineProperty(columnEl, 'clientWidth', { configurable: true, get: () => 80 });
+
+    const moreEl = wrapper.find('.m-editor-nav-menu-more-wrapper').element as HTMLElement;
+    moreEl.getBoundingClientRect = () => ({
+      width: 30,
+      height: 0,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+
+    wrapper.findAll('.tool-btn').forEach((b) => {
+      const el = b.element as HTMLElement;
+      el.getBoundingClientRect = () => ({
+        width: 40,
+        height: 0,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        x: 0,
+        y: 0,
+        toJSON: () => ({}),
+      });
+    });
+
+    roCallbacks.forEach((cb) => cb());
+    await flushRaf();
+    await flushRaf();
+
+    const overflow = wrapper.find('.m-editor-nav-menu-overflow-list');
+    expect(overflow.find('.lead').exists()).toBe(false);
+    expect(overflow.find('.trail').exists()).toBe(false);
+    expect(
+      overflow.findAll('.tool-btn').map((button) => button.text() || button.classes().find((name) => name === 'mid')),
+    ).toEqual(['B', 'mid', 'C']);
 
     wrapper.unmount();
   });
