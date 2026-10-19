@@ -5,6 +5,7 @@ import { type TableColumnOptions, TMagicIcon, TMagicTooltip } from '@tmagic/desi
 import type { FormItemConfig, FormState } from '@tmagic/form-schema';
 
 import type { ContainerChangeEventData } from '@form/schema';
+import { actionButtonText } from '@form/utils/actionButton';
 import { isGlobalFlat } from '@form/utils/config';
 import { appendProp, display as displayFunc, getDataByPage, sortArray } from '@form/utils/form';
 import { isTableColumnRendered, makeTableColumnConfig } from '@form/utils/tableGroupList';
@@ -112,11 +113,12 @@ export const useTableColumns = (
 
     const actionColumn = {
       props: {
-        label: '操作',
-        fixed: actionFixed,
-
-        width: props.config.operateColWidth ?? (props.config.dropSortHandle && props.config.dropSort ? 132 : 112),
         align: 'center',
+        fixed: actionFixed,
+        width: props.config.operateColWidth ?? (props.config.dropSortHandle && props.config.dropSort ? 132 : 112),
+        // props 覆盖列上的默认属性（宽度、对齐、fixed 等），标题仍以 text 为准
+        ...props.config.operateColConfig?.props,
+        label: actionButtonText(props.config.operateColConfig, 'operate'),
       },
       cell: ({ row, $index }: any) =>
         h(ActionsColumn, {

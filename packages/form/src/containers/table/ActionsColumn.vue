@@ -1,11 +1,16 @@
 <template>
   <slot name="operateCol" :scope="{ $index: index, row: row }"></slot>
-  <TMagicTooltip v-if="config.dropSort && config.dropSortHandle" content="拖动排序" placement="left-start">
+  <TMagicTooltip
+    v-if="config.dropSort && config.dropSortHandle"
+    :content="actionButtonText(config.dropSortButtonConfig, 'dropSort')"
+    placement="left-start"
+  >
     <TMagicButton
       size="small"
       link
       :class="{ 'tmagic-form-table-drag-target': config.dropSortHandle }"
       :icon="config.dropActionButtonIcon || Sort"
+      v-bind="config.dropSortButtonConfig?.props"
     >
     </TMagicButton>
   </TMagicTooltip>
@@ -15,11 +20,12 @@
     size="small"
     type="danger"
     link
-    title="删除"
+    :title="actionButtonText(config.deleteButtonConfig, 'delete')"
     :icon="flat ? undefined : config.deleteActionButtonIcon || Delete"
+    v-bind="config.deleteButtonConfig?.props"
     @click="removeHandler(index + 1 + currentPage * pageSize - 1)"
   >
-    <template v-if="flat">删除</template>
+    <template v-if="flat">{{ actionButtonText(config.deleteButtonConfig, 'delete') }}</template>
   </TMagicButton>
 
   <TMagicButton
@@ -27,12 +33,13 @@
     link
     size="small"
     type="primary"
-    title="复制"
+    :title="actionButtonText(config.copyButtonConfig, 'copy')"
     :icon="flat ? undefined : config.copyActionButtonIcon || DocumentCopy"
     :disabled="disabled"
+    v-bind="config.copyButtonConfig?.props"
     @click="copyHandler(index + 1 + currentPage * pageSize - 1)"
   >
-    <template v-if="flat">复制</template>
+    <template v-if="flat">{{ actionButtonText(config.copyButtonConfig, 'copy') }}</template>
   </TMagicButton>
 </template>
 
@@ -44,6 +51,7 @@ import { cloneDeep } from 'lodash-es';
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 
 import type { FormState, TableConfig } from '@form/schema';
+import { actionButtonText } from '@form/utils/actionButton';
 
 const emit = defineEmits(['change']);
 

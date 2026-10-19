@@ -661,6 +661,85 @@ describe('GroupList container', () => {
       expect(wrapper.find('.m-fields-group-list.is-header-sticky').exists()).toBe(false);
     });
 
+    test('行操作按钮用 text 改名称，形态与 addButtonConfig 相同', async () => {
+      const wrapper = mountForm(
+        [
+          {
+            type: 'group-list',
+            name: 'list',
+            copyable: true,
+            movable: true,
+            moveSpecifyLocation: true,
+            titleKey: 'text',
+            titlePrefix: '条目',
+            copyButtonConfig: { text: '克隆', props: { class: 'custom-copy', type: 'success' } },
+            moveUpButtonConfig: { text: '前移', props: { class: 'custom-up' } },
+            moveDownButtonConfig: { text: '后移', props: { class: 'custom-down' } },
+            moveToButtonConfig: { text: '挪到', props: { class: 'custom-move' } },
+            deleteButtonConfig: { text: '移除', props: { class: 'custom-remove' } },
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { list: [{ text: 'a' }, { text: 'b' }] },
+      );
+      await nextTick();
+
+      expect(wrapper.text()).toContain('克隆');
+      expect(wrapper.text()).toContain('前移');
+      expect(wrapper.text()).toContain('后移');
+      expect(wrapper.text()).toContain('挪到');
+      expect(wrapper.text()).not.toContain('复制');
+      expect(wrapper.find('.custom-copy').exists()).toBe(true);
+      expect(wrapper.find('.custom-up').exists()).toBe(true);
+      expect(wrapper.find('.custom-down').exists()).toBe(true);
+      expect(wrapper.find('.custom-move').exists()).toBe(true);
+      expect(wrapper.find('.custom-remove').exists()).toBe(true);
+      expect(
+        wrapper
+          .findAllComponents({ name: 'TMButton' })
+          .find((btn) => btn.text().includes('克隆'))
+          ?.props('type'),
+      ).toBe('success');
+      expect(wrapper.findComponent({ name: 'TMTooltip' }).props('content')).toBe('移除 条目 1: a');
+
+      await wrapper.find('.expand-button').trigger('click');
+      await wrapper
+        .findAll('button')
+        .find((btn) => btn.text().includes('挪到'))
+        ?.trigger('click');
+      await wrapper
+        .findAll('button')
+        .find((btn) => btn.text().includes('取消'))
+        ?.trigger('click');
+      await wrapper
+        .findAll('button')
+        .find((btn) => btn.text().includes('确认'))
+        ?.trigger('click');
+      await nextTick();
+      expect((wrapper.vm as any).values.list.map((item: { text: string }) => item.text)).toEqual(['a', 'b']);
+    });
+
+    test('delete 函数可隐藏单行删除，title 函数作为卡片标题', async () => {
+      const deleteFn = vi.fn(() => false);
+      const wrapper = mountForm(
+        [
+          {
+            type: 'group-list',
+            name: 'list',
+            delete: deleteFn,
+            title: () => '自定义标题',
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { list: [{ text: 'a' }] },
+      );
+      await nextTick();
+
+      expect(deleteFn).toHaveBeenCalled();
+      expect((wrapper.find('.delete-button').element as HTMLElement).style.display).toBe('none');
+      expect(wrapper.text()).toContain('自定义标题');
+    });
+
     test('嵌套列表各自按 header.sticky 决定是否吸顶', async () => {
       const wrapper = mountForm(
         [

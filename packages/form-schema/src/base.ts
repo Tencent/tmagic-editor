@@ -832,6 +832,14 @@ export interface AddButtonConfig {
 }
 // #endregion AddButtonConfig
 
+// #region ActionButtonConfig
+/**
+ * 行操作按钮。与 `addButtonConfig` 相同：`text` 是文案，`props` 透传给按钮。
+ * 不支持吸底。未配置 `text` 时使用内置中文。
+ */
+export type ActionButtonConfig = Omit<AddButtonConfig, 'sticky'>;
+// #endregion ActionButtonConfig
+
 // #region GroupListHeaderConfig
 /** group-list 卡片标题；仅 sticky 开启时吸顶 */
 export interface GroupListHeaderConfig {
@@ -862,6 +870,16 @@ export interface TableGroupListCommonConfig extends FormItem {
   /** 新增后滚动到最后一项（group-list 形态，默认关闭） */
   scrollLastItemIntoView?: boolean;
   addButtonConfig?: AddButtonConfig;
+  /** 删除按钮，text 默认「删除」 */
+  deleteButtonConfig?: ActionButtonConfig;
+  /** 复制按钮，text 默认「复制」 */
+  copyButtonConfig?: ActionButtonConfig;
+  /** 上移按钮，text 默认「上移」。仅 group-list 形态 */
+  moveUpButtonConfig?: ActionButtonConfig;
+  /** 下移按钮，text 默认「下移」。仅 group-list 形态 */
+  moveDownButtonConfig?: ActionButtonConfig;
+  /** 移动至按钮，text 默认「移动至」。仅 group-list 形态 */
+  moveToButtonConfig?: ActionButtonConfig;
   /** group-list 形态的标题吸顶（默认关闭）；table 形态忽略 */
   header?: GroupListHeaderConfig;
 }
@@ -898,6 +916,11 @@ export interface TableConfig<T = never> extends TableGroupListCommonConfig {
   showIndex?: boolean;
   /** 操作栏宽度 */
   operateColWidth?: number | string;
+  /**
+   * 操作列。`text` 是列标题，默认「操作」。
+   * `props` 透传给列（如 width、align、fixed、minWidth），可覆盖 operateColWidth / fixed。
+   */
+  operateColConfig?: ActionButtonConfig;
   pagination?: boolean;
   /** 表格标题前缀 ，新增xxx,暂无xxx数据，表明表格内容是什么 */
   titlePrefix?: string;
@@ -919,6 +942,8 @@ export interface TableConfig<T = never> extends TableGroupListCommonConfig {
   dropActionButtonIcon?: any;
   copyActionButtonIcon?: any;
   deleteActionButtonIcon?: any;
+  /** 拖动排序按钮，text 作为提示，默认「拖动排序」 */
+  dropSortButtonConfig?: ActionButtonConfig;
   /** 是否显示全屏按钮 */
   enableFullscreen?: boolean;
   fixed?: boolean | 'left' | 'right';

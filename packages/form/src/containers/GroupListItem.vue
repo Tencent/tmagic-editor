@@ -19,8 +19,9 @@
             type="primary"
             :icon="DocumentCopy"
             :disabled="disabled"
+            v-bind="config.copyButtonConfig?.props"
             @click="copyHandler"
-            >复制</TMagicButton
+            >{{ actionButtonText(config.copyButtonConfig, 'copy') }}</TMagicButton
           >
 
           <template v-if="movable && !isCompare">
@@ -30,8 +31,9 @@
               size="default"
               :disabled="disabled"
               :icon="Top"
+              v-bind="config.moveUpButtonConfig?.props"
               @click="changeOrder(-1)"
-              >上移</TMagicButton
+              >{{ actionButtonText(config.moveUpButtonConfig, 'moveUp') }}</TMagicButton
             >
             <TMagicButton
               v-show="index !== length - 1"
@@ -39,8 +41,9 @@
               size="default"
               :disabled="disabled"
               :icon="Bottom"
+              v-bind="config.moveDownButtonConfig?.props"
               @click="changeOrder(1)"
-              >下移</TMagicButton
+              >{{ actionButtonText(config.moveDownButtonConfig, 'moveDown') }}</TMagicButton
             >
           </template>
 
@@ -58,8 +61,9 @@
                 type="primary"
                 :icon="Position"
                 :disabled="disabled"
+                v-bind="config.moveToButtonConfig?.props"
                 @click="moveSpecifyLocationVisible = true"
-                >移动至</TMagicButton
+                >{{ actionButtonText(config.moveToButtonConfig, 'moveTo') }}</TMagicButton
               >
             </template>
             <div>
@@ -81,7 +85,10 @@
           </TMagicPopover>
 
           <!-- v-if 必须挂在 Tooltip 上：子节点为 false 时 ElOnlyChild 会报 no valid child node found -->
-          <TMagicTooltip v-if="!isCompare" :content="`删除 ${title}`">
+          <TMagicTooltip
+            v-if="!isCompare"
+            :content="`${actionButtonText(config.deleteButtonConfig, 'delete')} ${title}`"
+          >
             <TMagicButton
               v-show="showDelete"
               size="default"
@@ -89,6 +96,7 @@
               class="delete-button"
               :icon="Delete"
               :disabled="disabled"
+              v-bind="config.deleteButtonConfig?.props"
               @click="removeHandler"
             ></TMagicButton>
           </TMagicTooltip>
@@ -122,6 +130,7 @@ import { ArrowDown, ArrowRight, Bottom, Delete, DocumentCopy, Position, Top } fr
 import { TMagicButton, TMagicCard, TMagicIcon, TMagicInputNumber, TMagicPopover, TMagicTooltip } from '@tmagic/design';
 
 import type { ContainerChangeEventData, FormState, GroupListConfig } from '../schema';
+import { actionButtonText } from '../utils/actionButton';
 import { appendProp, filterFunction } from '../utils/form';
 import { getGroupListRowConfig } from '../utils/tableGroupList';
 
