@@ -154,6 +154,24 @@ describe('StageRender - NATIVE', () => {
     renderer.destroy();
   });
 
+  test('contentWindow 未就绪时 mount 不抛错，就绪后注入 magic', async () => {
+    const host = globalThis.document.createElement('div');
+    globalThis.document.body.appendChild(host);
+    const renderer = new StageRender({ renderType: RenderType.IFRAME, runtimeUrl: '' });
+    await expect(renderer.mount(host)).resolves.toBeUndefined();
+    expect(renderer.contentWindow).toBeNull();
+
+    const postMessage = vi.fn();
+    Object.defineProperty(renderer.iframe!, 'contentWindow', {
+      configurable: true,
+      value: { postMessage, document: globalThis.document },
+    });
+    renderer.postTmagicRuntimeReady();
+    expect(postMessage).toHaveBeenCalledWith({ tmagicRuntimeReady: true }, '*');
+    expect(renderer.contentWindow?.magic).toBeDefined();
+    renderer.destroy();
+  });
+
   test('IFRAME getElementsFromPoint 考虑 iframe 偏移', async () => {
     const host = globalThis.document.createElement('div');
     globalThis.document.body.appendChild(host);

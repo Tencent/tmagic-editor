@@ -194,7 +194,10 @@ export default class StageRender extends EventEmitter {
   }
 
   public postTmagicRuntimeReady() {
-    this.contentWindow = this.iframe?.contentWindow as RuntimeWindow;
+    this.contentWindow = (this.iframe?.contentWindow as RuntimeWindow | null) ?? null;
+
+    // iframe 尚未就绪时 contentWindow 为空，等 load 后再注入 magic
+    if (!this.contentWindow) return;
 
     this.contentWindow.magic = this.getMagicApi();
 
