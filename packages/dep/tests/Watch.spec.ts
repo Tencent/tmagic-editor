@@ -249,4 +249,86 @@ describe('Watcher', () => {
     expect(target1?.deps?.node_1).toBeUndefined();
     expect(target1?.deps?.node_2).toBeUndefined();
   });
+
+  test('collect keeps deps when roots share node ids', () => {
+    const watcher = new Watcher();
+
+    watcher.addTarget(
+      new Target({
+        type: 'target',
+        id: 'ds_a',
+        isTarget: (key: string | number, value: any) => key === 'text' && value === 'a',
+      }),
+    );
+    watcher.addTarget(
+      new Target({
+        type: 'target',
+        id: 'ds_b',
+        isTarget: (key: string | number, value: any) => key === 'text' && value === 'b',
+      }),
+    );
+
+    watcher.collect(
+      [
+        {
+          id: 'fragment_a',
+          name: 'fragmentA',
+          items: [
+            {
+              id: 'shared',
+              name: 'shared-a',
+              text: 'a',
+            },
+          ],
+        },
+        {
+          id: 'fragment_b',
+          name: 'fragmentB',
+          items: [
+            {
+              id: 'shared',
+              name: 'shared-b',
+              text: 'b',
+            },
+          ],
+        },
+      ],
+      {},
+      true,
+    );
+
+    const targetA = watcher.getTarget('ds_a', 'target');
+    const targetB = watcher.getTarget('ds_b', 'target');
+
+    expect(targetA?.deps?.shared.keys).toEqual(['text']);
+    expect(targetA?.deps?.shared.name).toBe('shared-a');
+    expect(targetB?.deps?.shared.keys).toEqual(['text']);
+    expect(targetB?.deps?.shared.name).toBe('shared-b');
+  });
+
+  test('collect merges keys when one target matches shared-id nodes in several roots', () => {
+    const watcher = new Watcher();
+
+    watcher.addTarget(
+      new Target({
+        type: 'target',
+        id: 'ds',
+        isTarget: (key: string | number, value: any) => key === 'text' && value === 'x',
+      }),
+    );
+
+    watcher.collect(
+      [
+        { id: 'root_a', items: [{ id: 'shared', name: 'shared-a', text: 'x' }] },
+        { id: 'root_b', items: [{ id: 'shared', name: 'shared-b', title: 'y', text: 'x' }] },
+      ],
+      {},
+      true,
+    );
+
+    const dep = watcher.getTarget('ds', 'target')?.deps?.shared;
+    expect(dep?.keys).toEqual(['text']);
+    // 同 id 的依赖只保留一条，name 取最后收集的节点
+    expect(dep?.name).toBe('shared-b');
+  });
 });

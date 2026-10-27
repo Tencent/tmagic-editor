@@ -133,9 +133,13 @@ export default class Watcher {
       return;
     }
 
-    // 整棵树只遍历一次、在每个属性上检查所有 target，把结构遍历开销从 ×targets 降到 ×1（详见 collectItems）
+    // 先清掉本次节点上的旧依赖，再统一收集。
+    // 复制出的页面片会共用节点 id。如果在收集每一棵树之前立刻删除，
+    // 后一棵树会按相同 id 把前一棵树刚写入的依赖清掉。
     for (const node of nodes) {
       this.removeTargetsDep(targets, node);
+    }
+    for (const node of nodes) {
       this.collectItems(node, targets, depExtendedData, deep);
     }
   }

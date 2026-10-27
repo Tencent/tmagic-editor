@@ -227,6 +227,49 @@ describe('Dep service', () => {
     expect(() => depService.collect([{ id: 'p1', type: 'page', items: [] }] as any, { pageId: 'p1' })).not.toThrow();
   });
 
+  const makeTextTarget = (id: string, text: string) =>
+    new Target({
+      id,
+      type: DepTargetType.DEFAULT,
+      isTarget: (key: string | number, value: any) => key === 'text' && value === text,
+    });
+
+  const makeSharedIdFragments = () => [
+    { id: 'fragment_a', type: 'container', items: [{ id: 'shared', type: 'text', text: 'a' }] },
+    { id: 'fragment_b', type: 'container', items: [{ id: 'shared', type: 'text', text: 'b' }] },
+  ];
+
+  test('collect 多个根节点共用子节点 id 时不会互相清掉依赖', () => {
+    const targetA = makeTextTarget('ds_a', 'a');
+    const targetB = makeTextTarget('ds_b', 'b');
+    depService.addTarget(targetA);
+    depService.addTarget(targetB);
+
+    depService.collect(makeSharedIdFragments() as any, {}, true);
+
+    expect(targetA.deps.shared?.keys).toEqual(['text']);
+    expect(targetB.deps.shared?.keys).toEqual(['text']);
+  });
+
+  test('collect 多个 page 节点同 pageId 时不会互相清掉依赖', () => {
+    const target = makeTextTarget('ds_a', 'a');
+    depService.addTarget(target);
+    target.deps.stale = { name: 'stale', keys: ['text'], data: { pageId: 'p' } };
+
+    depService.collect(
+      [
+        { id: 'page_1', type: 'page', text: 'a', items: [] },
+        { id: 'page_2', type: 'page', items: [{ id: 'child', type: 'text', text: 'a' }] },
+      ] as any,
+      { pageId: 'p' },
+      true,
+    );
+
+    expect(target.deps.stale).toBeUndefined();
+    expect(target.deps.page_1?.keys).toEqual(['text']);
+    expect(target.deps.child?.keys).toEqual(['text']);
+  });
+
   test('collectNode 支持 page 与普通节点两条路径', () => {
     const target = makeTarget('node-target');
     depService.addTarget(target);

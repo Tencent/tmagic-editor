@@ -150,8 +150,10 @@ class Dep extends BaseService {
     const targets = this.watcher.getCollectableTargets(type);
 
     if (targets.length) {
+      // 先统一删除所有节点的旧依赖，再统一收集。
+      // 如果逐节点“删除 + 收集”，共用 id 的多棵树（如复制出的页面片），
+      // 后一棵树的删除会清掉前一棵树刚写入的依赖。
       for (const node of nodes) {
-        // 先删除原有依赖，再批量收集
         if (isPage(node)) {
           for (const target of targets) {
             this.removePageDep(target, depExtendedData);
@@ -159,6 +161,8 @@ class Dep extends BaseService {
         } else {
           this.watcher.removeTargetsDep(targets, node);
         }
+      }
+      for (const node of nodes) {
         this.watcher.collectItems(node, targets, depExtendedData, deep);
       }
     }
