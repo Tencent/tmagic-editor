@@ -62,6 +62,16 @@ export interface EditorProps {
   runtimeUrl?: string;
   /** 是用iframe渲染还是直接渲染 */
   renderType?: RenderType;
+  /**
+   * 画布 iframe 的 sandbox 属性值（仅 iframe 渲染时生效）
+   *
+   * - 不传 / `false`：不设置 sandbox 属性（默认）
+   * - 字符串：原样写入，token 空格分隔，如 `'allow-scripts allow-same-origin allow-downloads'`
+   *
+   * 需要注意编辑器自身依赖 `allow-scripts` + `allow-same-origin`（读写 iframe 内 DOM），
+   * 其余 token（`allow-downloads`、`allow-popups`、`allow-forms` 等）按业务需要放开。
+   */
+  iframeSandbox?: string | false;
   /** 选中时是否自动滚动到可视区域 */
   autoScrollIntoView?: boolean;
   /** 组件的属性配置表单的dsl */

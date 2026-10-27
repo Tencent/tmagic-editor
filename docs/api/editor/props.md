@@ -503,6 +503,32 @@ const renderFunction = async (stage) => {
 </template>
 ```
 
+## iframeSandbox
+
+- **详情：**
+
+  画布 iframe 的 sandbox 属性值，仅 `renderType` 为 `iframe` 时生效。不传或传 `false` 时不设置 sandbox 属性。
+
+  token 用空格分隔，缺哪个 token，画布内对应能力就会静默失效。编辑器自身依赖 `allow-scripts` + `allow-same-origin`（需要读写 iframe 内的 DOM）；组件内需要下载、弹窗、表单提交时，分别要放开 `allow-downloads`、`allow-popups`、`allow-forms` 等。
+
+  注意：
+
+  - 仅在编辑器初始化时读取，运行期修改不会生效。
+  - runtime 与编辑器不同域时，会通过 `srcdoc` 加载，同样受 sandbox 约束；缺少 `allow-same-origin` 会导致编辑器无法访问 iframe 内的 DOM。
+  - `allow-scripts` 与 `allow-same-origin` 同时存在且 iframe 同源时，iframe 内脚本可以移除自身的 sandbox 属性，因此该配置只用于限制 `allow-top-navigation`、`allow-popups` 等能力，不能作为安全隔离手段。
+
+- **默认值：** `undefined`（不设置 sandbox 属性）
+
+- **类型：** `string | false`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor iframe-sandbox="allow-scripts allow-same-origin allow-downloads"></m-editor>
+</template>
+```
+
 ## autoScrollIntoView
 
 - **详情：**

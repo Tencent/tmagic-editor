@@ -133,6 +133,47 @@ describe('StageRender - NATIVE', () => {
     renderer.destroy();
   });
 
+  test('未配置 iframeSandbox 时不设置 sandbox 属性', async () => {
+    const host = globalThis.document.createElement('div');
+    globalThis.document.body.appendChild(host);
+    const renderer = new StageRender({ renderType: RenderType.IFRAME, runtimeUrl: '' });
+    await renderer.mount(host);
+
+    expect(host.querySelector('iframe')!.hasAttribute('sandbox')).toBe(false);
+    renderer.destroy();
+  });
+
+  test('iframeSandbox 为 false 时不设置 sandbox 属性', async () => {
+    const host = globalThis.document.createElement('div');
+    globalThis.document.body.appendChild(host);
+    const renderer = new StageRender({ renderType: RenderType.IFRAME, runtimeUrl: '', iframeSandbox: false });
+    await renderer.mount(host);
+
+    expect(host.querySelector('iframe')!.hasAttribute('sandbox')).toBe(false);
+    renderer.destroy();
+  });
+
+  test('iframeSandbox 配置的 token 原样写入 sandbox 属性', async () => {
+    const host = globalThis.document.createElement('div');
+    globalThis.document.body.appendChild(host);
+    const sandbox = 'allow-scripts allow-same-origin allow-downloads';
+    const renderer = new StageRender({ renderType: RenderType.IFRAME, runtimeUrl: '', iframeSandbox: sandbox });
+    await renderer.mount(host);
+
+    expect(host.querySelector('iframe')!.getAttribute('sandbox')).toBe(sandbox);
+    renderer.destroy();
+  });
+
+  test('空字符串 iframeSandbox 也写入 sandbox 属性（放开全部限制）', async () => {
+    const host = globalThis.document.createElement('div');
+    globalThis.document.body.appendChild(host);
+    const renderer = new StageRender({ renderType: RenderType.IFRAME, runtimeUrl: '', iframeSandbox: '' });
+    await renderer.mount(host);
+
+    expect(host.querySelector('iframe')!.getAttribute('sandbox')).toBe('');
+    renderer.destroy();
+  });
+
   test('getElementImage 找到元素时调用 snapdom', async () => {
     const page = globalThis.document.createElement('div');
     setIdToEl()(page, 'img-node');

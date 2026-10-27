@@ -31,6 +31,7 @@ export const useStage = (stageOptions: StageOptions) => {
     containerHighlightAddOnly: stageOptions.containerHighlightAddOnly,
     disabledDragStart: stageOptions.disabledDragStart,
     renderType: stageOptions.renderType,
+    iframeSandbox: stageOptions.iframeSandbox,
     canSelect: (el, event, stop) => {
       if (!stageOptions.canSelect) return true;
 

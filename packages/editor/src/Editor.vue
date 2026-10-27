@@ -224,6 +224,7 @@ const stageOptions: StageOptions = {
   containerHighlightAddOnly: props.containerHighlightAddOnly,
   disabledDragStart: props.disabledDragStart,
   renderType: props.renderType,
+  iframeSandbox: props.iframeSandbox,
   guidesOptions: props.guidesOptions,
   disabledMultiSelect: props.disabledMultiSelect,
   alwaysMultiSelect: props.alwaysMultiSelect,

@@ -104,6 +104,8 @@ export interface StageCoreConfig {
    * 用于从图层树、面包屑等外部选中组件时，帮助用户快速定位组件在画布中的位置。
    */
   disabledFlashTip?: boolean;
+  /** 画布 iframe 的 sandbox 属性值，见 StageRenderConfig.iframeSandbox */
+  iframeSandbox?: string | false;
 }
 
 export interface ActionManagerConfig {
@@ -153,6 +155,17 @@ export interface StageRenderConfig {
   runtimeUrl?: string;
   zoom: number | undefined;
   renderType?: RenderType;
+  /**
+   * iframe 渲染时给画布 iframe 设置的 sandbox 属性值
+   *
+   * - 不传 / `false`：不设置 sandbox 属性（默认，与未引入该配置前行为一致）
+   * - 字符串：原样写入 sandbox 属性，token 用空格分隔，如
+   *   `'allow-scripts allow-same-origin allow-forms allow-popups allow-downloads'`
+   *
+   * 注意：沙箱缺哪个 token，iframe 内对应能力就会静默失效（下载、弹窗、表单提交等），
+   * 编辑器自身需要 `allow-scripts` + `allow-same-origin`，否则画布不可用。
+   */
+  iframeSandbox?: string | false;
   customizedRender?: () => Promise<HTMLElement | null | void>;
 }
 

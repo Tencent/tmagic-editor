@@ -5,6 +5,7 @@
       ref="editor"
       :menu="menu"
       :runtime-url="runtimeUrl"
+      :iframe-sandbox="iframeSandbox"
       :props-configs="propsConfigs"
       :props-values="propsValues"
       :event-method-list="eventMethodList"
@@ -82,6 +83,22 @@ uiService.set('propsPanelSize', 'default');
 
 const datasourceList: DatasourceTypeOption[] = [];
 const runtimeUrl = `${VITE_RUNTIME_PATH}/playground/index.html`;
+
+/**
+ * 画布 iframe 的 sandbox 配置（较宽松的演示值，非推荐值），演示「是否加、加哪些 token」由使用方决定：
+ * - 改成 `false` 即不设置 sandbox 属性（与未配置时一致）
+ * - 画布需要 allow-scripts + allow-same-origin（编辑器要读写 iframe 内的 DOM），
+ *   allow-downloads 用于画布内组件的下载，其余 token 保留表单提交、弹窗、新窗口打开能力
+ */
+const iframeSandbox = [
+  'allow-downloads',
+  'allow-forms',
+  'allow-modals',
+  'allow-popups',
+  'allow-popups-to-escape-sandbox',
+  'allow-same-origin',
+  'allow-scripts',
+].join(' ');
 
 const { propsValues, propsConfigs, eventMethodList, datasourceConfigs, datasourceValues, datasourceEventMethodList } =
   useEditorRes();

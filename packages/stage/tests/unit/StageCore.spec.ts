@@ -100,6 +100,21 @@ describe('StageCore', () => {
     stage.destroy();
   });
 
+  test('iframeSandbox 透传到 iframe 的 sandbox 属性', async () => {
+    const host = globalThis.document.createElement('div');
+    globalThis.document.body.appendChild(host);
+    const sandbox = 'allow-scripts allow-same-origin';
+    const stage = new StageCore({
+      renderType: RenderType.IFRAME,
+      runtimeUrl: '',
+      iframeSandbox: sandbox,
+      disabledRule: true,
+    });
+    await stage.mount(host);
+    expect(host.querySelector('iframe')!.getAttribute('sandbox')).toBe(sandbox);
+    stage.destroy();
+  });
+
   test('select 选中节点并触发 flash', async () => {
     const { host, page, stage } = createStage();
     await stage.mount(host);

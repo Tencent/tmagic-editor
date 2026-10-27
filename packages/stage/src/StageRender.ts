@@ -38,13 +38,21 @@ export default class StageRender extends EventEmitter {
   private runtimeUrl?: string;
   private zoom = DEFAULT_ZOOM;
   private renderType: RenderType;
+  private iframeSandbox?: string | false;
   private customizedRender?: () => Promise<HTMLElement | null | void>;
 
-  constructor({ runtimeUrl, zoom, customizedRender, renderType = RenderType.IFRAME }: StageRenderConfig) {
+  constructor({
+    runtimeUrl,
+    zoom,
+    customizedRender,
+    renderType = RenderType.IFRAME,
+    iframeSandbox,
+  }: StageRenderConfig) {
     super();
 
     this.renderType = renderType;
     this.runtimeUrl = runtimeUrl || '';
+    this.iframeSandbox = iframeSandbox;
     this.customizedRender = customizedRender;
     this.setZoom(zoom);
 
@@ -250,6 +258,11 @@ export default class StageRender extends EventEmitter {
 
   private createIframe(): HTMLIFrameElement {
     this.iframe = globalThis.document.createElement('iframe');
+    // 沙箱由使用方配置（空字符串也是合法取值，表示放开全部限制），必须在设置 src 之前写入，
+    // 否则首次导航不受沙箱约束
+    if (typeof this.iframeSandbox === 'string') {
+      this.iframe.setAttribute('sandbox', this.iframeSandbox);
+    }
     // 同源，直接加载
     this.iframe.src = this.runtimeUrl && isSameDomain(this.runtimeUrl) ? this.runtimeUrl : '';
     this.iframe.style.cssText = `

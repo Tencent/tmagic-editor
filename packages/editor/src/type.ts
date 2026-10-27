@@ -221,6 +221,8 @@ export interface StageOptions {
    */
   disabledFlashTip?: boolean;
   zoom?: number;
+  /** 画布 iframe 的 sandbox 属性值，不传 / false 表示不设置，见 @tmagic/stage 的 StageRenderConfig.iframeSandbox */
+  iframeSandbox?: string | false;
   /** 画布双击前的钩子函数，返回 false 则阻止默认的双击行为 */
   beforeDblclick?: (event: MouseEvent) => Promise<boolean | void> | boolean | void;
 }
