@@ -5,6 +5,7 @@
  */
 import { describe, expect, test, vi } from 'vitest';
 import { nextTick, reactive } from 'vue';
+import { Sort } from '@element-plus/icons-vue';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
@@ -165,5 +166,45 @@ describe('ActionsColumn', () => {
       { text: 'b', order: 1 },
       { text: 'a', order: 0 },
     ]);
+  });
+
+  test('actionButtons 渲染自定义按钮，点击收到行与下标，禁用时不触发', async () => {
+    const handler = vi.fn();
+    const wrapper = mountColumn({
+      flat: true,
+      actionButtons: [
+        { text: '详情', props: { class: 'custom-detail' }, handler },
+        { text: '隐藏', display: false, handler },
+        { text: '禁用', disabled: () => true, props: { class: 'custom-disabled' }, handler },
+      ],
+    });
+    await nextTick();
+
+    expect(wrapper.text()).toContain('详情');
+    expect(wrapper.text()).not.toContain('隐藏');
+    expect(wrapper.find('.custom-detail').exists()).toBe(true);
+
+    await wrapper.find('.custom-detail').trigger('click');
+    expect(handler).toHaveBeenCalledTimes(1);
+    expect(handler.mock.calls[0][1]).toMatchObject({
+      model: { text: 'a' },
+      index: 0,
+      prop: 'list',
+    });
+
+    await wrapper.find('.custom-disabled').trigger('click');
+    expect(handler).toHaveBeenCalledTimes(1);
+  });
+
+  test('非 flat 且有 icon 时自定义按钮只显示图标，text 作为 title', async () => {
+    const wrapper = mountColumn({
+      actionButtons: [{ text: '详情', icon: Sort, props: { class: 'custom-icon' }, handler: () => undefined }],
+    });
+    await nextTick();
+
+    const btn = wrapper.find('.custom-icon');
+    expect(btn.exists()).toBe(true);
+    expect(btn.attributes('title')).toBe('详情');
+    expect(btn.text()).not.toContain('详情');
   });
 });

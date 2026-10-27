@@ -41,17 +41,32 @@
   >
     <template v-if="flat">{{ actionButtonText(config.copyButtonConfig, 'copy') }}</template>
   </TMagicButton>
+
+  <TMagicButton
+    v-for="(item, i) in customButtons"
+    :key="i"
+    link
+    size="small"
+    type="primary"
+    :title="item.button.text"
+    :icon="flat ? undefined : item.button.icon"
+    :disabled="item.disabled"
+    v-bind="item.button.props"
+    @click="item.onClick"
+  >
+    <template v-if="flat || !item.button.icon">{{ item.button.text }}</template>
+  </TMagicButton>
 </template>
 
 <script setup lang="ts">
-import { inject } from 'vue';
+import { computed, inject } from 'vue';
 import { Delete, DocumentCopy, Sort } from '@element-plus/icons-vue';
 import { cloneDeep } from 'lodash-es';
 
 import { TMagicButton, TMagicTooltip } from '@tmagic/design';
 
 import type { FormState, TableConfig } from '@form/schema';
-import { actionButtonText } from '@form/utils/actionButton';
+import { actionButtonText, resolveCustomActionButtons } from '@form/utils/actionButton';
 
 const emit = defineEmits(['change']);
 
@@ -70,6 +85,22 @@ const props = defineProps<{
 }>();
 
 const mForm = inject<FormState | undefined>('mForm');
+
+const customButtons = computed(() =>
+  resolveCustomActionButtons(
+    mForm,
+    props.config.actionButtons,
+    {
+      model: props.row,
+      index: props.index + 1 + props.currentPage * props.pageSize - 1,
+      groupModel: props.model[props.name],
+      prop: props.prop,
+      config: props.config,
+      formValue: mForm?.values || props.model,
+    },
+    props.disabled,
+  ),
+);
 
 const removeHandler = (index: number) => {
   if (props.disabled) return;

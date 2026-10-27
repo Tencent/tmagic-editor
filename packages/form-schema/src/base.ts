@@ -840,6 +840,39 @@ export interface AddButtonConfig {
 export type ActionButtonConfig = Omit<AddButtonConfig, 'sticky'>;
 // #endregion ActionButtonConfig
 
+// #region CustomActionButtonContext
+/** 自定义行操作按钮回调收到的上下文 */
+export interface CustomActionButtonContext {
+  /** 当前行数据 */
+  model: any;
+  /** 当前行在整个列表中的下标（table 分页时为全局下标） */
+  index: number;
+  /** 整个列表数据 */
+  groupModel: any[];
+  prop?: string;
+  config: any;
+  formValue: any;
+}
+// #endregion CustomActionButtonContext
+
+// #region CustomActionButtonConfig
+/** table / group-list 行操作中的自定义按钮，渲染在内置按钮之后 */
+export interface CustomActionButtonConfig {
+  /** 按钮文案；table 非 flat 模式下仅作为 title 提示（有 icon 时） */
+  text?: string;
+  /** 透传给按钮的属性 */
+  props?: Record<string, any>;
+  /** 按钮图标组件 */
+  icon?: any;
+  /** 是否显示，默认显示 */
+  display?: boolean | ((mForm: FormState | undefined, ctx: CustomActionButtonContext) => boolean);
+  /** 是否禁用，表单禁用时始终禁用 */
+  disabled?: boolean | ((mForm: FormState | undefined, ctx: CustomActionButtonContext) => boolean);
+  /** 点击回调 */
+  handler: (mForm: FormState | undefined, ctx: CustomActionButtonContext) => void;
+}
+// #endregion CustomActionButtonConfig
+
 // #region GroupListHeaderConfig
 /** group-list 卡片标题；仅 sticky 开启时吸顶 */
 export interface GroupListHeaderConfig {
@@ -880,6 +913,8 @@ export interface TableGroupListCommonConfig extends FormItem {
   moveDownButtonConfig?: ActionButtonConfig;
   /** 移动至按钮，text 默认「移动至」。仅 group-list 形态 */
   moveToButtonConfig?: ActionButtonConfig;
+  /** 自定义行操作按钮，渲染在内置按钮之后 */
+  actionButtons?: CustomActionButtonConfig[];
   /** group-list 形态的标题吸顶（默认关闭）；table 形态忽略 */
   header?: GroupListHeaderConfig;
 }

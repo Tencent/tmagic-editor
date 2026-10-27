@@ -719,6 +719,33 @@ describe('GroupList container', () => {
       expect((wrapper.vm as any).values.list.map((item: { text: string }) => item.text)).toEqual(['a', 'b']);
     });
 
+    test('actionButtons 渲染自定义按钮并收到当前行上下文', async () => {
+      const handler = vi.fn();
+      const wrapper = mountForm(
+        [
+          {
+            type: 'group-list',
+            name: 'list',
+            actionButtons: [
+              { text: '详情', props: { class: 'custom-detail' }, handler },
+              { text: '隐藏', display: () => false, handler },
+            ],
+            items: [{ name: 'text', type: 'text', text: 'text' }],
+          },
+        ],
+        { list: [{ text: 'a' }, { text: 'b' }] },
+      );
+      await nextTick();
+
+      expect(wrapper.text()).not.toContain('隐藏');
+      const buttons = wrapper.findAll('.custom-detail');
+      expect(buttons).toHaveLength(2);
+
+      await buttons[1].trigger('click');
+      expect(handler).toHaveBeenCalledTimes(1);
+      expect(handler.mock.calls[0][1]).toMatchObject({ index: 1, model: { text: 'b' } });
+    });
+
     test('delete 函数可隐藏单行删除，title 函数作为卡片标题', async () => {
       const deleteFn = vi.fn(() => false);
       const wrapper = mountForm(

@@ -101,6 +101,21 @@
             ></TMagicButton>
           </TMagicTooltip>
 
+          <template v-if="!isCompare">
+            <TMagicButton
+              v-for="(item, i) in customButtons"
+              :key="i"
+              link
+              size="default"
+              type="primary"
+              :icon="item.button.icon"
+              :disabled="item.disabled"
+              v-bind="item.button.props"
+              @click="item.onClick"
+              >{{ item.button.text }}</TMagicButton
+            >
+          </template>
+
           <span v-if="itemExtra" v-html="itemExtra" class="m-form-tip"></span>
         </div>
       </div>
@@ -130,7 +145,7 @@ import { ArrowDown, ArrowRight, Bottom, Delete, DocumentCopy, Position, Top } fr
 import { TMagicButton, TMagicCard, TMagicIcon, TMagicInputNumber, TMagicPopover, TMagicTooltip } from '@tmagic/design';
 
 import type { ContainerChangeEventData, FormState, GroupListConfig } from '../schema';
-import { actionButtonText } from '../utils/actionButton';
+import { actionButtonText, resolveCustomActionButtons } from '../utils/actionButton';
 import { appendProp, filterFunction } from '../utils/form';
 import { getGroupListRowConfig } from '../utils/tableGroupList';
 
@@ -218,6 +233,22 @@ const movable = computed(() => {
   }
   return movable;
 });
+
+const customButtons = computed(() =>
+  resolveCustomActionButtons(
+    mForm,
+    props.config.actionButtons,
+    {
+      model: props.model,
+      index: props.index,
+      groupModel: props.groupModel,
+      prop: rowProp.value,
+      config: props.config,
+      formValue: mForm?.values || props.model,
+    },
+    props.disabled,
+  ),
+);
 
 const copyable = computed(() => filterFunction<boolean>(mForm, props.config.copyable, props));
 const onAddDiffCount = () => emit('addDiffCount');
