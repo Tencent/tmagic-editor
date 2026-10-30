@@ -841,3 +841,314 @@ describe('createDataSourceManager - 自定义数据源类型尚未注册', () =>
     expect(manager?.get('ds_lazy')).toBeInstanceOf(LazyDataSource);
   });
 });
+
+describe('createDataSourceManager - batch 批量更新', () => {
+  let app: TMagicApp;
+  let manager: DataSourceManager;
+
+  beforeEach(() => {
+    const dsl: MApp = {
+      type: NodeType.ROOT,
+      id: 'app_batch',
+      items: [
+        {
+          type: NodeType.PAGE,
+          id: 'page_1',
+          items: [
+            { type: 'text', id: 'text_a', text: 'a ${ds_1.name}' } as any,
+            { type: 'text', id: 'text_b', text: 'b ${ds_2.title}' } as any,
+            { type: 'text', id: 'text_ab', text: '${ds_1.name}-${ds_2.title}' } as any,
+          ],
+        },
+      ],
+      dataSourceDeps: {
+        ds_1: {
+          text_a: { name: 'a', keys: ['text'] },
+          text_ab: { name: 'ab', keys: ['text'] },
+        },
+        ds_2: {
+          text_b: { name: 'b', keys: ['text'] },
+          text_ab: { name: 'ab', keys: ['text'] },
+        },
+      },
+      dataSources: [
+        { id: 'ds_1', type: 'base', fields: [{ name: 'name', defaultValue: 'n1' }], methods: [], events: [] },
+        { id: 'ds_2', type: 'base', fields: [{ name: 'title', defaultValue: 't1' }], methods: [], events: [] },
+      ],
+    };
+    app = new TMagicApp({ config: dsl, platform: 'mobile' });
+    manager = createDataSourceManager(app)!;
+  });
+
+  test('batch 内多次 setData 只在结束后统一更新一次，数据本身实时更新', () => {
+    const update = vi.fn();
+    manager.on('update-data', update);
+    const change = vi.fn();
+    manager.on('change', change);
+    const dataChange = vi.fn();
+    manager.onDataChange('ds_1', 'name', dataChange);
+
+    const compiledSpy = vi.spyOn(manager, 'compiledNode');
+
+    const ds1 = manager.get('ds_1')!;
+    const result = manager.batch(
+      () => {
+        expect(manager.isBatching).toBe(true);
+        ds1.setData('x', 'name');
+        // 数据、change 事件、onDataChange 仍然实时生效
+        expect(manager.data.ds_1.name).toBe('x');
+        expect(change).toHaveBeenCalledTimes(1);
+        expect(dataChange).toHaveBeenCalledTimes(1);
+        expect(update).not.toHaveBeenCalled();
+
+        ds1.setData('y', 'name');
+        return 'ret';
+      },
+      { mergeChangeEvents: true },
+    );
+
+    expect(result).toBe('ret');
+    expect(manager.isBatching).toBe(false);
+    expect(change).toHaveBeenCalledTimes(2);
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(compiledSpy).toHaveBeenCalledTimes(2); // text_a, text_ab 各编译一次
+
+    const [nodes, sourceId, changeEvent, pageId] = update.mock.calls[0];
+    expect(sourceId).toBe('ds_1');
+    expect(pageId).toBe('page_1');
+    // 同一数据源多次变化，只保留最后一次 changeEvent
+    expect(changeEvent.updateData).toBe('y');
+    expect(nodes.map((n: any) => n.id)).toEqual(['text_a', 'text_ab']);
+    expect(app.getNode('text_a')?.data.text).toBe('a y');
+  });
+
+  test('多个数据源的变化：节点只编译一次，按数据源分别发出 update-data', () => {
+    const update = vi.fn();
+    manager.on('update-data', update);
+    const compiledSpy = vi.spyOn(manager, 'compiledNode');
+
+    manager.batch(() => {
+      manager.get('ds_1')!.setData('N', 'name');
+      manager.get('ds_2')!.setData('T', 'title');
+    });
+
+    // text_a、text_b、text_ab 各编译一次
+    expect(compiledSpy).toHaveBeenCalledTimes(3);
+    expect(update).toHaveBeenCalledTimes(2);
+
+    const bySource: Record<string, string[]> = {};
+    update.mock.calls.forEach(([nodes, sourceId]) => {
+      bySource[sourceId] = nodes.map((n: any) => n.id);
+    });
+    expect(bySource.ds_1).toEqual(['text_a', 'text_ab']);
+    expect(bySource.ds_2).toEqual(['text_b', 'text_ab']);
+
+    expect(app.getNode('text_ab')?.data.text).toBe('N-T');
+    expect(app.getNode('text_b')?.data.text).toBe('b T');
+  });
+
+  test('嵌套 batch 只在最外层结束时更新', () => {
+    const update = vi.fn();
+    manager.on('update-data', update);
+
+    manager.batch(() => {
+      manager.batch(() => {
+        manager.get('ds_1')!.setData('inner', 'name');
+      });
+      expect(manager.isBatching).toBe(true);
+      expect(update).not.toHaveBeenCalled();
+    });
+
+    expect(update).toHaveBeenCalledTimes(1);
+  });
+
+  test('batch 内没有数据变化时不触发更新；fn 抛错时也会更新并恢复状态', () => {
+    const update = vi.fn();
+    manager.on('update-data', update);
+
+    manager.batch(() => undefined);
+    expect(update).not.toHaveBeenCalled();
+
+    expect(() =>
+      manager.batch(() => {
+        manager.get('ds_1')!.setData('err', 'name');
+        throw new Error('boom');
+      }),
+    ).toThrow('boom');
+
+    expect(manager.isBatching).toBe(false);
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(app.getNode('text_a')?.data.text).toBe('a err');
+
+    // 恢复后普通 setData 仍然同步更新
+    manager.get('ds_1')!.setData('after', 'name');
+    expect(update).toHaveBeenCalledTimes(2);
+  });
+
+  test('mergeChangeEvents: false 时每次变化各触发一次 update-data，节点仍只编译一次', () => {
+    const update = vi.fn();
+    manager.on('update-data', update);
+    const compiledSpy = vi.spyOn(manager, 'compiledNode');
+
+    manager.batch(
+      () => {
+        manager.get('ds_1')!.setData('x', 'name');
+        manager.get('ds_1')!.setData('y', 'name');
+      },
+      { mergeChangeEvents: false },
+    );
+
+    // 每次变化各一次，各自携带自己的 changeEvent
+    expect(update).toHaveBeenCalledTimes(2);
+    expect(update.mock.calls.map((call) => call[2].updateData)).toEqual(['x', 'y']);
+    expect(update.mock.calls.map((call) => call[1])).toEqual(['ds_1', 'ds_1']);
+
+    // 页面节点仍然只编译一次
+    expect(compiledSpy).toHaveBeenCalledTimes(2);
+    expect(app.getNode('text_a')?.data.text).toBe('a y');
+    expect(app.getNode('text_ab')?.data.text).toBe('y-t1');
+  });
+
+  test('mergeChangeEvents: false 时多个数据源各自触发，且只带自己依赖的节点', () => {
+    const update = vi.fn();
+    manager.on('update-data', update);
+
+    manager.batch(
+      () => {
+        manager.get('ds_1')!.setData('N', 'name');
+        manager.get('ds_2')!.setData('T', 'title');
+      },
+      { mergeChangeEvents: false },
+    );
+
+    expect(update).toHaveBeenCalledTimes(2);
+    const bySource: Record<string, string[]> = {};
+    update.mock.calls.forEach(([nodes, sourceId]) => {
+      bySource[sourceId] = nodes.map((n: any) => n.id);
+    });
+    expect(bySource.ds_1).toEqual(['text_a', 'text_ab']);
+    expect(bySource.ds_2).toEqual(['text_b', 'text_ab']);
+  });
+
+  test('嵌套 batch 的选项以最外层为准', () => {
+    const update = vi.fn();
+    manager.on('update-data', update);
+
+    manager.batch(
+      () => {
+        manager.batch(
+          () => {
+            manager.get('ds_1')!.setData('x', 'name');
+            manager.get('ds_1')!.setData('y', 'name');
+          },
+          { mergeChangeEvents: false },
+        );
+      },
+      { mergeChangeEvents: true },
+    );
+
+    expect(update).toHaveBeenCalledTimes(1);
+    expect(update.mock.calls[0][2].updateData).toBe('y');
+  });
+
+  test('默认（不传选项）每次变化各触发一次，各自携带自己的 changeEvent', () => {
+    const update = vi.fn();
+    manager.on('update-data', update);
+
+    manager.batch(() => {
+      manager.get('ds_1')!.setData('x', 'name');
+      manager.get('ds_1')!.setData('y', 'name');
+    });
+
+    expect(update).toHaveBeenCalledTimes(2);
+    expect(update.mock.calls.map((call) => call[2].updateData)).toEqual(['x', 'y']);
+  });
+
+  test('destroy 会清空 batch 状态', () => {
+    const update = vi.fn();
+    manager.on('update-data', update);
+
+    manager.batch(() => {
+      manager.get('ds_1')!.setData('x', 'name');
+      manager.destroy();
+    });
+
+    expect(manager.isBatching).toBe(false);
+    expect(update).not.toHaveBeenCalled();
+  });
+});
+
+describe('createDataSourceManager - 父子节点同时依赖同一数据源', () => {
+  const create = () => {
+    const dsl: MApp = {
+      type: NodeType.ROOT,
+      id: 'app_nested',
+      items: [
+        {
+          type: NodeType.PAGE,
+          id: 'page_1',
+          items: [
+            {
+              type: 'container',
+              id: 'node_b',
+              title: 'b ${ds_1.name}',
+              items: [{ type: 'text', id: 'node_a', text: 'a ${ds_1.name}' }],
+            } as any,
+          ],
+        },
+      ],
+      dataSourceDeps: {
+        ds_1: {
+          node_b: { name: 'b', keys: ['title'] },
+          node_a: { name: 'a', keys: ['text'] },
+        },
+      },
+      dataSources: [
+        { id: 'ds_1', type: 'base', fields: [{ name: 'name', defaultValue: 'n' }], methods: [], events: [] },
+      ],
+    };
+    const app = new TMagicApp({ config: dsl, platform: 'mobile' });
+    const manager = createDataSourceManager(app)!;
+    return { app, manager };
+  };
+
+  test('页面数据中父、子节点都是最新编译结果，子节点不会被覆盖', () => {
+    const { app, manager } = create();
+    manager.get('ds_1')!.setData('v1', 'name');
+
+    const pageData: any = app.page!.data;
+    expect(pageData.items[0].title).toBe('b v1');
+    expect(pageData.items[0].items[0].text).toBe('a v1');
+
+    manager.get('ds_1')!.setData('v2', 'name');
+    expect(pageData.items[0].title).toBe('b v2');
+    expect(pageData.items[0].items[0].text).toBe('a v2');
+  });
+
+  test('update-data 的节点顺序为父节点在前，运行时按顺序替换不会丢失子节点更新', () => {
+    const { app, manager } = create();
+    const update = vi.fn();
+    manager.on('update-data', update);
+
+    manager.get('ds_1')!.setData('v1', 'name');
+
+    const nodes = update.mock.calls[0][0] as any[];
+    expect(nodes.map((n) => n.id)).toEqual(['node_b', 'node_a']);
+
+    // 新父节点与原父节点共用同一个 items 数组
+    const container: any = app.page!.data.items![0];
+    expect(nodes[0].items).toBe(container.items);
+  });
+
+  test('batch 中的父子节点同样不会互相覆盖', () => {
+    const { app, manager } = create();
+    manager.batch(() => {
+      manager.get('ds_1')!.setData('x', 'name');
+      manager.get('ds_1')!.setData('y', 'name');
+    });
+
+    const pageData: any = app.page!.data;
+    expect(pageData.items[0].title).toBe('b y');
+    expect(pageData.items[0].items[0].text).toBe('a y');
+  });
+});

@@ -17,11 +17,11 @@
  */
 import { cloneDeep, union } from 'lodash-es';
 
-import type { default as TMagicApp } from '@tmagic/core';
-import { getDepNodeIds, getNodes, isPage, isPageFragment, replaceChildNode } from '@tmagic/core';
+import type { default as TMagicApp, MNode, Page } from '@tmagic/core';
+import { getDepNodeIds, getNodes, isPage, isPageFragment, replaceChildNodes } from '@tmagic/core';
 
 import DataSourceManager from './DataSourceManager';
-import type { ChangeEvent, DataSourceManagerData } from './types';
+import type { BatchChange, BatchOptions, ChangeEvent, DataSourceManagerData } from './types';
 import { updateNode } from './utils';
 
 /**
@@ -56,11 +56,25 @@ export const createDataSourceManager = (app: TMagicApp, useMock?: boolean, initi
     return dataSourceManager;
   }
 
-  dataSourceManager.on('change', (sourceId: string, changeEvent: ChangeEvent) => {
-    const dep = dsl.dataSourceDeps?.[sourceId] || {};
-    const condDep = dsl.dataSourceCondDeps?.[sourceId] || {};
+  const updateByChanges = (changes: BatchChange[], options: BatchOptions = {}) => {
+    // 按数据源归组，同一个数据源的多次变化按顺序保留
+    const sources = new Map<string, { nodeIds: Set<string>; changeEvents: ChangeEvent[] }>();
+    for (const { sourceId, changeEvent } of changes) {
+      const dep = dsl.dataSourceDeps?.[sourceId] || {};
+      const condDep = dsl.dataSourceCondDeps?.[sourceId] || {};
+      const ids = [...Object.keys(condDep), ...Object.keys(dep)];
 
-    const nodeIds = union([...Object.keys(condDep), ...Object.keys(dep)]);
+      const source = sources.get(sourceId);
+      if (source) {
+        ids.forEach((id) => source.nodeIds.add(id));
+        source.changeEvents.push(changeEvent);
+      } else {
+        sources.set(sourceId, { nodeIds: new Set(ids), changeEvents: [changeEvent] });
+      }
+    }
+
+    // 所有数据源涉及的节点只编译一次
+    const nodeIds = union(...Array.from(sources.values()).map(({ nodeIds }) => Array.from(nodeIds)));
 
     for (const page of dsl.items) {
       if (app.platform === 'editor' || (isPage(page) && page.id === app.page?.data.id) || isPageFragment(page)) {
@@ -69,16 +83,22 @@ export const createDataSourceManager = (app: TMagicApp, useMock?: boolean, initi
             node.condResult = dataSourceManager.compliedConds(node);
           }
 
-          const newNode = dataSourceManager.compiledNode(node);
+          return dataSourceManager.compiledNode(node);
+        });
 
-          if (typeof app.page?.setData === 'function') {
+        if (typeof app.page?.setData === 'function') {
+          // 需要替换到页面数据、页面片数据中的节点，收集后批量替换，避免每个节点都做一次全树搜索
+          const replaceInPage: MNode[] = [];
+          const replaceInFragments = new Map<Page, MNode[]>();
+
+          for (const newNode of newNodes) {
             if (isPage(newNode)) {
               app.page.setData(newNode);
             } else if (page.id === app.page.data.id && !app.page.instance) {
-              replaceChildNode(newNode, [app.page.data]);
+              replaceInPage.push(newNode);
             }
 
-            app.getNode(node.id, { strict: true })?.setData(newNode);
+            app.getNode(newNode.id, { strict: true })?.setData(newNode);
 
             for (const [, pageFragment] of app.pageFragments) {
               if (pageFragment.data.id === newNode.id) {
@@ -86,21 +106,57 @@ export const createDataSourceManager = (app: TMagicApp, useMock?: boolean, initi
               } else if (pageFragment.data.id === page.id) {
                 pageFragment.getNode(newNode.id, { strict: true })?.setData(cloneDeep(newNode));
                 if (!pageFragment.instance) {
-                  replaceChildNode(cloneDeep(newNode), [pageFragment.data]);
+                  const list = replaceInFragments.get(pageFragment);
+                  if (list) {
+                    list.push(cloneDeep(newNode));
+                  } else {
+                    replaceInFragments.set(pageFragment, [cloneDeep(newNode)]);
+                  }
                 }
               }
             }
           }
 
-          return newNode;
-        });
+          replaceChildNodes(replaceInPage, [app.page.data]);
+          replaceInFragments.forEach((list, pageFragment) => {
+            replaceChildNodes(list, [pageFragment.data]);
+          });
+        }
 
         if (newNodes.length) {
-          dataSourceManager.emit('update-data', newNodes, sourceId, changeEvent, page.id);
+          sources.forEach(({ nodeIds: sourceNodeIds, changeEvents }, sourceId) => {
+            const nodes =
+              sources.size === 1 ? newNodes : newNodes.filter((newNode) => sourceNodeIds.has(`${newNode.id}`));
+
+            if (!nodes.length) {
+              return;
+            }
+
+            if (options.mergeChangeEvents === true) {
+              // 合并成一次，changeEvent 为该数据源最后一次变化，中间变化（path / updateData）会丢失
+              dataSourceManager.emit('update-data', nodes, sourceId, changeEvents[changeEvents.length - 1], page.id);
+            } else {
+              // 默认：每次变化各触发一次，各自携带自己的 changeEvent，中间变化不会丢失
+              for (const changeEvent of changeEvents) {
+                dataSourceManager.emit('update-data', nodes, sourceId, changeEvent, page.id);
+              }
+            }
+          });
         }
       }
     }
+  };
+
+  dataSourceManager.on('change', (sourceId: string, changeEvent: ChangeEvent) => {
+    // batch 期间的变化在 batch 结束后统一更新
+    if (dataSourceManager.isBatching) {
+      return;
+    }
+
+    updateByChanges([{ sourceId, changeEvent }]);
   });
+
+  dataSourceManager.on('batch-change', updateByChanges);
 
   return dataSourceManager;
 };

@@ -64,6 +64,39 @@ const dsl: MApp = {
       },
       params: [],
     },
+    code_batch_update: {
+      name: 'batchUpdate',
+      desc: '演示 dataSourceManager.batch 批量更新',
+      timing: '',
+      params: [],
+      content: ({ app }) => {
+        const manager = app?.dataSourceManager;
+        const ds = manager?.get('ds_b64c92b5');
+
+        if (!manager || !ds) {
+          return;
+        }
+
+        // 一次业务操作里连续多次 setData，用 batch 包起来，页面节点只编译、替换一次
+        manager.batch(() => {
+          ds.setData('批量更新', 'text');
+          ds.setData([{ a: 1 }, { a: 2 }, { a: 3 }], 'array');
+          ds.setData({ a: 3 }, 'object');
+        });
+
+        // 默认（mergeChangeEvents 为 false）：每次 setData 各触发一次 update-data / replaced-node，
+        // 各自携带自己的 path 与 updateData，监听方不会漏掉中间变化；页面节点只编译一次，
+        // 渲染层按节点对象去重，因此不会重复替换
+        // 传 { mergeChangeEvents: true } 则每个数据源只触发一次，只带最后一次变化
+        manager.batch(
+          () => {
+            ds.setData('逐次更新', 'text');
+            ds.setData([{ a: 4 }], 'array');
+          },
+          { mergeChangeEvents: false },
+        );
+      },
+    },
     code_6778: {
       name: 'toOtherPage',
       desc: '',
@@ -297,6 +330,35 @@ const dsl: MApp = {
           displayConds: [],
         },
         {
+          id: 'button_batch_update',
+          text: 'batch 更新数据源',
+          multiple: true,
+          style: {
+            width: '270',
+            height: '37.5',
+            border: 0,
+            backgroundColor: '#fb6f00',
+            position: 'absolute',
+            left: 56,
+            top: 306,
+          },
+          type: 'button',
+          name: '按钮',
+          events: [
+            {
+              name: 'magic:common:events:click',
+              actions: [
+                {
+                  actionType: ActionType.CODE,
+                  codeId: 'code_batch_update',
+                  params: {},
+                },
+              ],
+            },
+          ],
+          displayConds: [],
+        },
+        {
           type: 'overlay',
           id: 'overlay_2159',
           style: {
@@ -470,6 +532,14 @@ const dsl: MApp = {
       layout: 'absolute',
     },
   ],
+  dataSourceDeps: {
+    ds_b64c92b5: {
+      button_430: {
+        name: 'button_430',
+        keys: ['text'],
+      },
+    },
+  },
   dataSources: [
     {
       id: 'ds_b64c92b5',

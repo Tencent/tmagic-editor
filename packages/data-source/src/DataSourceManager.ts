@@ -34,6 +34,8 @@ import { SimpleObservedData } from './observed-data/SimpleObservedData';
 import { DataSource, HttpDataSource } from './data-sources';
 import { getDeps } from './depsCache';
 import type {
+  BatchChange,
+  BatchOptions,
   ChangeEvent,
   DataSourceManagerData,
   DataSourceManagerOptions,
@@ -86,6 +88,10 @@ class DataSourceManager extends EventEmitter {
   public useMock?: boolean = false;
   /** 页面是否已经渲染完成 */
   public isMounted = false;
+
+  private batchDepth = 0;
+  private batchChanges: BatchChange[] = [];
+  private batchOptions: BatchOptions = {};
 
   constructor({ app, useMock, initialData }: DataSourceManagerOptions) {
     super();
@@ -223,7 +229,49 @@ class DataSourceManager extends EventEmitter {
 
   public setData(ds: DataSource, changeEvent: ChangeEvent) {
     this.data[ds.id] = ds.data;
+
+    if (this.batchDepth > 0) {
+      this.batchChanges.push({ sourceId: ds.id, changeEvent });
+    }
+
     this.emit('change', ds.id, changeEvent);
+  }
+
+  /** 是否处于 batch 中 */
+  public get isBatching() {
+    return this.batchDepth > 0;
+  }
+
+  /**
+   * 批量更新：fn 中产生的所有数据源变化只会在 fn 执行结束后统一更新一次页面（同步），
+   * 页面节点只编译、替换一次，并按数据源分别触发 update-data。
+   * - 数据源的数据（ds.data / manager.data）仍然实时更新，onDataChange 监听也仍然实时触发，manager 的 change 事件也照常触发
+   * - 支持嵌套，最外层 batch 结束时才统一更新
+   * - 仅支持同步函数，fn 返回 Promise 时不会等待
+   * @param fn 同步执行的函数
+   * @param options 批量更新选项，嵌套时以最外层为准
+   * @returns fn 的返回值
+   */
+  public batch<T>(fn: () => T, options?: BatchOptions): T {
+    const isOutermost = this.batchDepth === 0;
+    if (isOutermost) {
+      this.batchOptions = options ?? {};
+    }
+
+    this.batchDepth += 1;
+    try {
+      return fn();
+    } finally {
+      this.batchDepth -= 1;
+
+      if (this.batchDepth === 0 && this.batchChanges.length) {
+        const changes = this.batchChanges;
+        const { batchOptions } = this;
+        this.batchChanges = [];
+        this.batchOptions = {};
+        this.emit('batch-change', changes, batchOptions);
+      }
+    }
   }
 
   public removeDataSource(id: string) {
@@ -371,6 +419,9 @@ class DataSourceManager extends EventEmitter {
 
   public destroy() {
     this.removeAllListeners();
+    this.batchDepth = 0;
+    this.batchChanges = [];
+    this.batchOptions = {};
     this.data = {};
     this.initialData = {};
     this.dataSourceMap.forEach((ds) => {

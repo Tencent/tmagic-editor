@@ -61,6 +61,22 @@ export interface ChangeEvent {
   updateData: any;
 }
 
+/** DataSourceManager.batch 期间收集到的数据变化 */
+export interface BatchChange {
+  sourceId: string;
+  changeEvent: ChangeEvent;
+}
+
+export interface BatchOptions {
+  /**
+   * 是否把同一数据源在 batch 中的多次变化合并成一次 update-data，默认 true。
+   * - true：每个数据源只触发一次 update-data，changeEvent 为该数据源最后一次变化（中间变化会丢失）
+   * - false：每次变化各触发一次 update-data，各自携带自己的 changeEvent（如 path / updateData），
+   *   页面节点仍然只编译、替换一次
+   */
+  mergeChangeEvents?: boolean;
+}
+
 export type AsyncDataSourceResolveResult<T = typeof DataSource> = {
   default: T;
 };

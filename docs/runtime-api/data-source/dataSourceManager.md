@@ -330,6 +330,53 @@ dataSourceManager.onDataChange('ds_1', 'user.name', (newVal) => {
 
   取消监听数据源数据变化。
 
+### batch
+
+- **参数：**
+  - `{() => T} fn` 同步执行的函数
+  - `{BatchOptions} [options]` 批量更新选项，嵌套时以最外层为准
+    - `{boolean} [mergeChangeEvents=false]` 是否把同一数据源的多次变化合并成一次 `update-data`
+
+- **返回：**
+  - `{T}` fn 的返回值
+
+- **详情：**
+
+  批量更新。`fn` 中产生的所有数据变化，会在 `fn` 执行结束后（同步）统一更新一次页面：受影响的节点只编译、替换一次，并按数据源分别触发 `update-data`。
+
+  - 数据本身（`data`、`onDataChange`、`change` 事件）仍然实时生效，只是页面节点的更新被合并
+  - 支持嵌套，最外层 `batch` 结束时才统一更新
+  - 仅支持同步函数，`fn` 返回 Promise 时不会等待
+
+  `mergeChangeEvents` 默认为 `false`：每次 `setData` 各触发一次 `update-data`，各自携带自己的 `changeEvent`（`path`、`updateData`），与不使用 `batch` 时一致，监听 `update-data` / `replaced-node` 的业务不会漏掉中间变化。页面节点只编译一次，且渲染层会按节点对象去重（同一份已编译节点只替换一次），因此事件变多不会带来重复的替换开销。
+
+  传 `true` 时每个数据源只触发一次 `update-data`，`changeEvent` 是该数据源最后一次变化，中间变化会丢失；适合不关心每次变化、只想少收事件的场景。
+
+  ```typescript
+  dataSourceManager.batch(() => {
+    ds1.setData(list, 'list');
+    ds1.setData(total, 'total');
+    ds2.setData(title, 'title');
+  });
+
+  // 每个数据源只触发一次 update-data，只带最后一次 changeEvent
+  dataSourceManager.batch(
+    () => {
+      ds1.setData(list, 'list');
+      ds1.setData(total, 'total');
+    },
+    { mergeChangeEvents: true },
+  );
+  ```
+
+### isBatching
+
+- **类型：** `{boolean}`
+
+- **详情：**
+
+  当前是否处于 `batch` 中（只读属性）。
+
 ### destroy
 
 - **返回：**
@@ -349,6 +396,7 @@ DataSourceManager 继承自 EventEmitter，支持以下事件：
 | `init` | 所有数据源初始化完成；现代分支携带 `(data, errors)`，旧 Promise.all 分支为 `(this.data)` | `(data, errors?)` |
 | `mounted` | 由 runtime 在顶层组件渲染完成后触发，manager 收到后统一执行各数据源的 `mounted` | 无 |
 | `registered-all` | 所有数据源注册完成 | 无 |
+| `batch-change` | `batch` 结束时发出，携带期间所有的数据变化，`createDataSourceManager` 据此统一更新页面 | `(changes: { sourceId: string, changeEvent: ChangeEvent }[])` |
 | `update-data` | 由 `createDataSourceManager` 在数据变化后发出，用于通知节点重新渲染 | `(newNodes: MNode[], sourceId: string, changeEvent: ChangeEvent, pageId: Id)` |
 
 ### 事件监听示例
