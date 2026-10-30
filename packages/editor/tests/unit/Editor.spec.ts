@@ -211,6 +211,24 @@ describe('Editor', () => {
     expect(canDropIn).toHaveBeenLastCalledWith(['s1'], 't1', 'stage-drag');
   });
 
+  test('beforeDropComponent 透传到 stageOptions', async () => {
+    const beforeDropComponent = vi.fn();
+    const stageOverlayMod = (await import('@editor/services/stageOverlay')) as any;
+    mount(Editor, { props: { beforeDropComponent } as any });
+    await nextTick();
+    const stageOptions = stageOverlayMod.default.set.mock.calls.find((c: any[]) => c[0] === 'stageOptions')?.[1];
+    expect(stageOptions.beforeDropComponent).toBe(beforeDropComponent);
+  });
+
+  test('beforeAppendComponent 透传到 stageOptions', async () => {
+    const beforeAppendComponent = vi.fn();
+    const stageOverlayMod = (await import('@editor/services/stageOverlay')) as any;
+    mount(Editor, { props: { beforeAppendComponent } as any });
+    await nextTick();
+    const stageOptions = stageOverlayMod.default.set.mock.calls.find((c: any[]) => c[0] === 'stageOptions')?.[1];
+    expect(stageOptions.beforeAppendComponent).toBe(beforeAppendComponent);
+  });
+
   test('未传 canDropIn 时 stageOptions.canDropIn 为 undefined', async () => {
     const stageOverlayMod = (await import('@editor/services/stageOverlay')) as any;
     mount(Editor, { props: {} as any });

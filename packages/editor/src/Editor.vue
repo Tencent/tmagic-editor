@@ -230,6 +230,8 @@ const stageOptions: StageOptions = {
   alwaysMultiSelect: props.alwaysMultiSelect,
   disabledFlashTip: props.disabledFlashTip,
   beforeDblclick: props.beforeDblclick,
+  beforeAppendComponent: props.beforeAppendComponent,
+  beforeDropComponent: props.beforeDropComponent,
 };
 
 stageOverlayService.set('stageOptions', stageOptions);

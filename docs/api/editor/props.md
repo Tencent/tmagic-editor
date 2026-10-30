@@ -1590,6 +1590,74 @@ const onLayerNodeDblclick = (event, data) => {
 - 返回 `false` 时，会同时阻断默认的"展开/收起"行为以及向上抛出的 [`layer-node-dblclick`](./events.md#layer-node-dblclick) 事件；返回其他值则继续触发默认行为并抛出事件。
 :::
 
+## beforeAppendComponent
+
+- **详情：**
+
+  从组件列表新增组件前的钩子函数
+
+  在用户点击组件列表项时，先于写入节点执行。入参是当前组件列表项 `ComponentItem`（见 [`componentGroupList`](#componentgrouplist)）。允许异步函数；返回 `false` 时取消本次新增。返回其他值（包括 `true`、`undefined`）则继续新增。
+
+  拖入画布不走该钩子，拖入请使用 [`beforeDropComponent`](#beforedropcomponent)。
+
+  可以直接修改入参（例如补全 `data`），修改会反映到最终写入的节点上。
+
+- **默认值：** `undefined`
+
+- **类型：** `(item: ComponentItem) => boolean | void | Promise<boolean | void>`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :before-append-component="beforeAppendComponent"></m-editor>
+</template>
+
+<script setup>
+const beforeAppendComponent = async (item) => {
+  if (item.type === 'paid-button') {
+    const allowed = await checkPermission(item.type);
+    if (!allowed) return false;
+  }
+  item.data = { ...item.data, from: 'component-list' };
+};
+</script>
+```
+
+::: tip
+该钩子只作用于组件列表的点击新增，不影响拖入画布、复制、粘贴、页面新增等其它写入路径。
+:::
+
+## beforeDropComponent
+
+- **详情：**
+
+  组件列表拖入画布、落点前的钩子函数
+
+  仅当拖拽数据的 `dragType` 为组件列表（`component-list`）时，在位置计算完成、写入节点前执行。入参是即将新增的节点 `dragData` 和父节点 `parent`。允许异步函数；返回 `false` 时取消本次拖入。返回其他值（包括 `true`、`undefined`）则继续新增。
+
+  点击组件列表新增不会触发该钩子，点击请使用 [`beforeAppendComponent`](#beforeappendcomponent)。
+
+- **默认值：** `undefined`
+
+- **类型：** `(dragData: AddMNode, parent: MContainer) => boolean | void | Promise<boolean | void>`
+
+- **示例：**
+
+```html
+<template>
+  <m-editor :before-drop-component="beforeDropComponent"></m-editor>
+</template>
+
+<script setup>
+const beforeDropComponent = async (dragData, parent) => {
+  if (parent.type === 'page' && dragData.type === 'paid-button') {
+    return false;
+  }
+};
+</script>
+```
+
 ## 表单业务上下文
 
 - **详情：**

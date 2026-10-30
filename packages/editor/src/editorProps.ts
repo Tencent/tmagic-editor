@@ -13,6 +13,8 @@ import StageCore, {
 import { getIdFromEl } from '@tmagic/utils';
 
 import type {
+  BeforeAppendComponent,
+  BeforeDropComponent,
   CanDropInFunction,
   ComponentGroup,
   CustomContentMenuFunction,
@@ -160,6 +162,17 @@ export interface EditorProps {
   canDropIn?: CanDropInFunction;
   /** 画布双击前的钩子函数，返回 false 则阻止默认的双击行为 */
   beforeDblclick?: (event: MouseEvent) => Promise<boolean | void> | boolean | void;
+  /**
+   * 点击组件列表新增组件前的钩子，入参为当前组件列表项，允许异步函数。
+   * 仅点击新增时调用，拖入画布不走该钩子；返回 false 取消本次新增。
+   * 可直接修改入参（例如补全 data），修改会反映到最终新增的节点上。
+   */
+  beforeAppendComponent?: BeforeAppendComponent;
+  /**
+   * 组件列表拖入画布、写入节点前的钩子，入参为即将新增的节点和父节点，允许异步函数。
+   * 仅当拖拽类型为组件列表时，在位置计算完成之后调用；返回 false 取消本次拖入。
+   */
+  beforeDropComponent?: BeforeDropComponent;
   /** 组件树节点双击前的钩子函数，返回 false 则阻止默认的双击行为 */
   beforeLayerNodeDblclick?: (event: MouseEvent, data: TreeNodeData) => Promise<boolean | void> | boolean | void;
   /** 历史记录面板的自定义扩展 tab，追加在内置的页面/数据源/代码块 tab 之后 */

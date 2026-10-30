@@ -97,7 +97,13 @@ let timeout: ReturnType<typeof setTimeout> | undefined;
 let clientX: number;
 let clientY: number;
 
-const appendComponent = ({ text, type, data = {} }: ComponentItem): void => {
+const appendComponent = async (item: ComponentItem): Promise<void> => {
+  if (stageOptions?.beforeAppendComponent) {
+    const result = await stageOptions.beforeAppendComponent(item);
+    if (result === false) return;
+  }
+
+  const { text, type, data = {} } = item;
   editorService.add(
     {
       name: text,

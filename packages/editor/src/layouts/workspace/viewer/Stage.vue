@@ -450,6 +450,11 @@ const dropHandler = async (e: DragEvent) => {
 
     dragData.inputEvent = e;
 
+    if (props.stageOptions.beforeDropComponent) {
+      const result = await props.stageOptions.beforeDropComponent(dragData, parent);
+      if (result === false) return;
+    }
+
     editorService.add(dragData, parent, { historySource: 'component-panel' });
   }
 };

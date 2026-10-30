@@ -281,13 +281,50 @@ describe('Stage', () => {
   });
 
   test('drop 非 COMPONENT_LIST 时不处理', async () => {
-    const wrapper = mountIt();
+    const beforeDropComponent = vi.fn();
+    const wrapper = mountIt({
+      stageOptions: { runtimeUrl: 'http://x', containerHighlightClassName: 'highlight', beforeDropComponent },
+    });
     await nextTick();
     const event = createDropEvent('{"dragType":"other","data":{"name":"text","style":{}}}');
     const stageContainer = wrapper.find('.m-editor-stage-container').element;
     startInternalDrag();
     stageContainer.dispatchEvent(event);
     await waitMacrotask();
+    expect(beforeDropComponent).not.toHaveBeenCalled();
+    expect(editorService.add).not.toHaveBeenCalled();
+  });
+
+  test('drop beforeDropComponent 返回 false 时不新增', async () => {
+    editorService.getNodeById.mockReturnValue(null);
+    const beforeDropComponent = vi.fn(async () => false);
+    const wrapper = mountIt({
+      stageOptions: { runtimeUrl: 'http://x', containerHighlightClassName: 'highlight', beforeDropComponent },
+    });
+    await nextTick();
+    const event = createDropEvent(COMPONENT_LIST_JSON);
+    event.clientX = 10;
+    event.clientY = 10;
+    startInternalDrag();
+    wrapper.find('.m-editor-stage-container').element.dispatchEvent(event);
+    await waitMacrotask();
+    expect(beforeDropComponent).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'text', inputEvent: event }),
+      expect.objectContaining({ id: 'p1' }),
+    );
+    expect(editorService.add).not.toHaveBeenCalled();
+  });
+
+  test('drop 缺少 data 时不调用 beforeDropComponent', async () => {
+    const beforeDropComponent = vi.fn(async () => undefined);
+    const wrapper = mountIt({
+      stageOptions: { runtimeUrl: 'http://x', containerHighlightClassName: 'highlight', beforeDropComponent },
+    });
+    await nextTick();
+    startInternalDrag();
+    wrapper.find('.m-editor-stage-container').element.dispatchEvent(createDropEvent('{"dragType":"component-list"}'));
+    await waitMacrotask();
+    expect(beforeDropComponent).not.toHaveBeenCalled();
     expect(editorService.add).not.toHaveBeenCalled();
   });
 

@@ -225,6 +225,16 @@ export interface StageOptions {
   iframeSandbox?: string | false;
   /** 画布双击前的钩子函数，返回 false 则阻止默认的双击行为 */
   beforeDblclick?: (event: MouseEvent) => Promise<boolean | void> | boolean | void;
+  /**
+   * 点击组件列表新增组件前的钩子，详见 EditorProps.beforeAppendComponent。
+   * 仅点击新增时调用；返回 false 取消新增，支持异步。
+   */
+  beforeAppendComponent?: BeforeAppendComponent;
+  /**
+   * 组件列表拖入画布、写入节点前的钩子，详见 EditorProps.beforeDropComponent。
+   * 仅 dragType 为组件列表时调用；返回 false 取消本次拖入，支持异步。
+   */
+  beforeDropComponent?: BeforeDropComponent;
 }
 
 // #region NodeInvalidInfo
@@ -677,6 +687,18 @@ export interface ComponentItem {
   };
 }
 // #endregion ComponentItem
+
+/**
+ * 点击组件列表新增组件前的钩子。
+ * 入参为当前组件列表项，允许异步；返回 false 时取消本次新增。
+ */
+export type BeforeAppendComponent = (item: ComponentItem) => boolean | void | Promise<boolean | void>;
+
+/**
+ * 组件列表拖入画布、写入节点前的钩子。
+ * 入参为即将新增的节点和父节点，允许异步；返回 false 时取消本次拖入。
+ */
+export type BeforeDropComponent = (dragData: AddMNode, parent: MContainer) => boolean | void | Promise<boolean | void>;
 
 // #region ComponentGroup
 export interface ComponentGroup {

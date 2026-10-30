@@ -8,6 +8,7 @@ import { defineComponent, h } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import ComponentListPanel from '@editor/layouts/sidebar/ComponentListPanel.vue';
+import type { ComponentItem } from '@editor/type';
 
 const editorService = {
   get: vi.fn(),
@@ -136,5 +137,28 @@ describe('ComponentListPanel', () => {
     await item.trigger('drag', { clientX: 0, clientY: 0 });
     await item.trigger('drag', { clientX: 0, clientY: 0 });
     expect(stage.delayedMarkContainer).toHaveBeenCalledWith(expect.anything(), [], true);
+  });
+
+  test('beforeAppendComponent 返回 false 时不新增', async () => {
+    const beforeAppendComponent = vi.fn(async () => false);
+    const wrapper = mount(ComponentListPanel, {
+      global: { provide: { stageOptions: { beforeAppendComponent } } },
+    });
+    await wrapper.find('.component-item').trigger('click');
+    expect(beforeAppendComponent).toHaveBeenCalledWith(expect.objectContaining({ text: '按钮', type: 'button' }));
+    expect(editorService.add).not.toHaveBeenCalled();
+  });
+
+  test('beforeAppendComponent 异步修改组件后再新增', async () => {
+    const beforeAppendComponent = vi.fn(async (item: ComponentItem) => {
+      item.data = { text: 'hello' };
+    });
+    const wrapper = mount(ComponentListPanel, {
+      global: { provide: { stageOptions: { beforeAppendComponent } } },
+    });
+    await wrapper.find('.component-item').trigger('click');
+    expect(editorService.add).toHaveBeenCalledWith({ name: '按钮', type: 'button', text: 'hello' }, undefined, {
+      historySource: 'component-panel',
+    });
   });
 });
