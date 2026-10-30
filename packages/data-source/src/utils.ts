@@ -76,6 +76,45 @@ export const updateNode = (node: MNode, dsl: MApp) => {
 };
 
 /**
+ * 将 source 的字段复制到 target，对象型字段使用惰性深拷贝（首次读取时拷贝并缓存）
+ * @param target 目标对象
+ * @param source 源对象
+ * @param skipKey 需要跳过的字段
+ */
+const assignLazyClone = (target: Record<string, any>, source: Record<string, any> | undefined, skipKey: string) => {
+  if (!source) return;
+
+  for (const key of Object.keys(source)) {
+    if (key === skipKey) continue;
+
+    const value = source[key];
+
+    if (typeof value !== 'object' || value === null) {
+      target[key] = value;
+      continue;
+    }
+
+    let cloned: any;
+    let isCloned = false;
+    Object.defineProperty(target, key, {
+      enumerable: true,
+      configurable: true,
+      get() {
+        if (!isCloned) {
+          cloned = cloneDeep(value);
+          isCloned = true;
+        }
+        return cloned;
+      },
+      set(newValue) {
+        cloned = newValue;
+        isCloned = true;
+      },
+    });
+  }
+};
+
+/**
  * 创建迭代器容器编译的数据上下文
  * @param itemData 迭代数据
  * @param dsId 数据源id
@@ -93,24 +132,26 @@ export const createIteratorContentData = (
     [dsId]: {},
   };
 
-  let rawData = cloneDeep(dsData[dsId]);
+  // 沿 fields 路径逐层构造新对象，不修改原始数据。
+  // 路径之外的对象型字段不会预先整体深拷贝（迭代项很多时会导致 O(N²)），而是在首次被读取时才拷贝并缓存，
+  // 这样依然是与数据源隔离的快照（引用每次编译都是新的，保证 vue 组件的 props 能感知到按 path 原地修改的数据）。
+  let rawData: Record<string, any> | undefined = dsData[dsId];
   let obj: Record<string, any> = data[dsId];
 
   fields.forEach((key, index) => {
-    Object.assign(obj, rawData);
+    assignLazyClone(obj, rawData, key);
 
     if (index === fields.length - 1) {
       obj[key] = itemData;
       return;
     }
 
-    if (Array.isArray(rawData[key])) {
-      rawData[key] = {};
-      obj[key] = {};
-    }
+    const next = rawData?.[key];
+    const nextObj: Record<string, any> = {};
+    obj[key] = nextObj;
 
-    rawData = rawData[key];
-    obj = obj[key];
+    rawData = Array.isArray(next) ? undefined : next;
+    obj = nextObj;
   });
 
   return data;

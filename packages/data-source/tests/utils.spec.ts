@@ -193,6 +193,63 @@ describe('createIteratorContentData', () => {
     });
     expect(ctxData.ds.a.c.a).toBe(1);
   });
+
+  test('不修改原始数据源数据', () => {
+    const dsData: any = {
+      ds: {
+        a: [{ b: 0, c: [{ a: 1 }] }],
+        obj: { x: { y: 1 }, z: 2 },
+        b: 2,
+      },
+    };
+    const snapshot = JSON.parse(JSON.stringify(dsData));
+
+    const ctxData: any = createIteratorContentData({ a: 1 }, 'ds', ['a', 'c'], dsData);
+    expect(ctxData.ds.a.c).toEqual({ a: 1 });
+
+    const objCtx: any = createIteratorContentData({ n: 1 }, 'ds', ['obj', 'x'], dsData);
+    expect(objCtx.ds.obj.x).toEqual({ n: 1 });
+    expect(objCtx.ds.obj.z).toBe(2);
+    expect(objCtx.ds.b).toBe(2);
+
+    expect(dsData).toEqual(snapshot);
+    expect(ctxData.ds).not.toBe(dsData.ds);
+    expect(objCtx.ds.obj).not.toBe(dsData.ds.obj);
+  });
+
+  test('路径之外的对象型字段惰性深拷贝：与原数据隔离、多次读取引用稳定、可被覆盖', () => {
+    const dsData: any = { ds: { a: [{ b: 1 }], matrix: [{ v: 1 }], n: 1 } };
+
+    const ctxData: any = createIteratorContentData({ b: 1 }, 'ds', ['a'], dsData);
+
+    expect(ctxData.ds.n).toBe(1);
+    const { matrix } = ctxData.ds;
+    expect(matrix).toEqual([{ v: 1 }]);
+    expect(matrix).not.toBe(dsData.ds.matrix);
+    expect(matrix[0]).not.toBe(dsData.ds.matrix[0]);
+    expect(ctxData.ds.matrix).toBe(matrix);
+
+    // 修改拷贝不影响原数据，原地修改原数据也不影响已读取过的快照
+    matrix[0].v = 2;
+    expect(dsData.ds.matrix[0].v).toBe(1);
+    dsData.ds.matrix[0].v = 3;
+    expect(ctxData.ds.matrix[0].v).toBe(2);
+
+    // 每次创建的上下文拿到的都是新的引用
+    expect(createIteratorContentData({ b: 1 }, 'ds', ['a'], dsData).ds).not.toBe(ctxData.ds);
+    expect((createIteratorContentData({ b: 1 }, 'ds', ['a'], dsData) as any).ds.matrix).not.toBe(dsData.ds.matrix);
+
+    // 支持覆盖，对象展开可枚举
+    ctxData.ds.matrix = 'x';
+    expect(ctxData.ds.matrix).toBe('x');
+    expect(Object.keys(ctxData.ds)).toEqual(expect.arrayContaining(['a', 'matrix', 'n']));
+  });
+
+  test('数据源数据或路径中间层缺失时不抛错', () => {
+    expect((createIteratorContentData({ a: 1 }, 'ds', ['a', 'c'], {}) as any).ds.a.c).toEqual({ a: 1 });
+    expect((createIteratorContentData({ a: 1 }, 'ds', ['a', 'c'], { ds: {} }) as any).ds.a.c).toEqual({ a: 1 });
+    expect((createIteratorContentData({ a: 1 }, 'ds', [], { ds: { b: 1 } }) as any).ds).toEqual({});
+  });
 });
 
 describe('compliedConditions', () => {
