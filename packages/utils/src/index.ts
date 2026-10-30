@@ -356,29 +356,71 @@ export const setValueByKeyPath = (keys: string | number, value: any, data: Recor
   return objectSet(data, keys, value);
 };
 
+/**
+ * 按 id 获取节点（先序遍历顺序），找到的 id 会从传入的 ids 中移除。
+ * 内部使用 Map 查找，并在所有 id 都找到后提前结束遍历
+ */
 export const getNodes = (ids: Id[], data: MNode[] = []): MNode[] => {
   const nodes: MNode[] = [];
 
-  const get = function (ids: Id[], data: MNode[]) {
+  if (!ids.length) {
+    return nodes;
+  }
+
+  // id -> 待查找的次数
+  const remain = new Map<string, number>();
+  for (const id of ids) {
+    const key = `${id}`;
+    remain.set(key, (remain.get(key) || 0) + 1);
+  }
+  let remainCount = ids.length;
+  const used = new Map<string, number>();
+
+  const get = function (data: MNode[]) {
     if (!Array.isArray(data)) {
       return;
     }
 
     for (const item of data) {
-      const index = ids.findIndex((id: Id) => `${id}` === `${item.id}`);
+      if (!remainCount) {
+        return;
+      }
 
-      if (index > -1) {
-        ids.splice(index, 1);
+      const key = `${item.id}`;
+      const count = remain.get(key);
+
+      if (count) {
+        remain.set(key, count - 1);
+        used.set(key, (used.get(key) || 0) + 1);
+        remainCount -= 1;
         nodes.push(item);
       }
 
       if (item.items) {
-        get(ids, item.items);
+        get(item.items);
       }
     }
   };
 
-  get(ids, data);
+  get(data);
+
+  if (nodes.length) {
+    // 保持原有行为：将已找到的 id 从 ids 中移除
+    const rest: Id[] = [];
+    for (const id of ids) {
+      const key = `${id}`;
+      const count = used.get(key);
+      if (count) {
+        used.set(key, count - 1);
+      } else {
+        rest.push(id);
+      }
+    }
+    ids.length = 0;
+    for (const id of rest) {
+      ids.push(id);
+    }
+  }
 
   return nodes;
 };
@@ -430,6 +472,101 @@ export const replaceChildNode = (newNode: MNode, data?: MNode[], parentId?: Id):
   parent.items.splice(index, 1, newNode);
 };
 
+/**
+ * 批量将新节点更新到data中对应id的节点位置，效果等同于依次调用 replaceChildNode，
+ * 但只需遍历一次树来定位所有节点，避免每个节点都做一次全树搜索（O(K*N) -> O(N+K)）
+ * @param newNodes 新节点列表
+ * @param data 需要修改的数据
+ */
+export const replaceChildNodes = (newNodes: MNode[], data: MNode[] = []): void => {
+  if (!newNodes.length) {
+    return;
+  }
+
+  interface Location {
+    /** 节点所在的数组，undefined 表示节点在 data 顶层（没有父节点） */
+    container?: MNode[];
+    index: number;
+    node: MNode;
+    /** 节点在树中的层级，data 顶层为 0 */
+    depth: number;
+  }
+
+  const locate = (nodes: MNode[]) => {
+    const ids = new Set(nodes.map((node) => `${node.id}`));
+    const locations = new Map<string, Location>();
+
+    const walk = (list: MNode[], depth: number) => {
+      for (let i = 0, l = list.length; i < l; i++) {
+        if (locations.size === ids.size) {
+          return;
+        }
+
+        const item = list[i];
+        const key = `${item.id}`;
+
+        if (ids.has(key) && !locations.has(key)) {
+          locations.set(key, { container: depth === 0 ? undefined : list, index: i, node: item, depth });
+        }
+
+        if (Array.isArray(item.items)) {
+          walk(item.items, depth + 1);
+        }
+      }
+    };
+
+    if (Array.isArray(data)) {
+      walk(data, 0);
+    }
+
+    return locations;
+  };
+
+  let locations = locate(newNodes);
+
+  // 层级浅的先替换（父节点先于子节点），避免先替换了子节点后，父节点的新数据中仍是旧的子节点而把子节点的更新覆盖掉；
+  // 同一层级保持传入顺序，未找到的节点排在最后
+  const sortedNodes = newNodes
+    .map((node, order) => ({ node, order, depth: locations.get(`${node.id}`)?.depth ?? Infinity }))
+    .sort((a, b) => (a.depth === b.depth ? a.order - b.order : a.depth - b.depth))
+    .map(({ node }) => node);
+
+  for (let i = 0, l = sortedNodes.length; i < l; i++) {
+    const newNode = sortedNodes[i];
+    const location = locations.get(`${newNode.id}`);
+
+    if (!location) {
+      console.warn(`未找到目标节点(${newNode.id})`);
+      continue;
+    }
+
+    const { container, node } = location;
+
+    if (!container) {
+      console.warn(`未找到父节点(${newNode.id})`);
+      continue;
+    }
+
+    let { index } = location;
+    if (container[index]?.id !== node.id) {
+      index = container.findIndex((child: MNode) => child.id === node.id);
+    }
+
+    if (index === -1) {
+      console.warn(`未找到目标节点(${newNode.id})`);
+      continue;
+    }
+
+    const oldItems = node.items;
+    container.splice(index, 1, newNode);
+
+    // 新节点的 items 不是原来的数组时，后续节点的位置信息可能失效，需要重新定位
+    if (newNode.items !== oldItems && i < l - 1) {
+      locations = locate(sortedNodes.slice(i + 1));
+    }
+  }
+};
+
 export const DSL_NODE_KEY_COPY_PREFIX = '__tmagic__';
 export const IS_DSL_NODE_KEY = '__tmagic__dslNode';
 export const PAGE_FRAGMENT_CONTAINER_ID_KEY = 'tmagic-page-fragment-container-id';
@@ -445,7 +582,7 @@ export const compiledNode = (
     keys = getDepKeys(dataSourceDeps, node.id);
   } else {
     const dep = dataSourceDeps[sourceId];
-    keys = dep?.[node.id].keys || [];
+    keys = dep?.[node.id]?.keys || [];
   }
 
   keys.forEach((key) => {

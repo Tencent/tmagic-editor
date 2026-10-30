@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-import { assert, describe, expect, test } from 'vitest';
+import { assert, describe, expect, test, vi } from 'vitest';
 
 import type { DataSchema } from '@tmagic/schema';
 
@@ -468,6 +468,188 @@ describe('getNodes', () => {
   });
 });
 
+describe('getNodes - 补充', () => {
+  const createRoot = (): any[] => [
+    { id: 1, items: [{ id: 11, items: [{ id: 111 }] }, { id: 12 }] },
+    { id: 2, items: [{ id: 21 }] },
+  ];
+
+  test('按先序遍历顺序返回，且 id 类型不敏感', () => {
+    const nodes = util.getNodes(['21', 111, 1], createRoot());
+    expect(nodes.map((n) => n.id)).toEqual([1, 111, 21]);
+  });
+
+  test('找到的 id 会从传入的 ids 中移除，未找到的保留', () => {
+    const ids: (string | number)[] = [11, 'none', 21];
+    const nodes = util.getNodes(ids, createRoot());
+    expect(nodes.map((n) => n.id)).toEqual([11, 21]);
+    expect(ids).toEqual(['none']);
+  });
+
+  test('ids 为空时直接返回空数组', () => {
+    expect(util.getNodes([], createRoot())).toEqual([]);
+  });
+
+  test('ids 中重复的 id 按次数匹配', () => {
+    const root = [{ id: 1 }, { id: 1 }, { id: 1 }];
+    const ids = [1, 1];
+    expect(util.getNodes(ids, root).length).toBe(2);
+    expect(ids).toEqual([]);
+  });
+
+  test('所有 id 找到后提前结束遍历', () => {
+    const root: any[] = createRoot();
+    const lateAccess = vi.fn();
+    Object.defineProperty(root[1], 'items', {
+      get() {
+        lateAccess();
+        return [];
+      },
+    });
+    const nodes = util.getNodes([11], root);
+    expect(nodes.length).toBe(1);
+    expect(lateAccess).not.toHaveBeenCalled();
+  });
+
+  test('data 默认值与非数组 items', () => {
+    expect(util.getNodes([1])).toEqual([]);
+    expect(util.getNodes([33], [{ id: 3, items: { id: 33 } } as any])).toEqual([]);
+  });
+});
+
+describe('replaceChildNodes', () => {
+  const createRoot = (): any[] => [
+    {
+      id: 'page',
+      items: [
+        { id: 'a', text: '', items: [{ id: 'a1', text: '' }] },
+        { id: 'b', text: '' },
+        { id: 'c', text: '', items: [{ id: 'c1', text: '', items: [{ id: 'c11', text: '' }] }] },
+      ],
+    },
+  ];
+
+  test('批量替换多个节点', () => {
+    const root = createRoot();
+    util.replaceChildNodes(
+      [
+        { id: 'a1', text: 'A1' },
+        { id: 'b', text: 'B' },
+        { id: 'c11', text: 'C11' },
+      ],
+      root,
+    );
+    expect(root[0].items[0].items[0].text).toBe('A1');
+    expect(root[0].items[1].text).toBe('B');
+    expect(root[0].items[2].items[0].items[0].text).toBe('C11');
+  });
+
+  test('结果与依次调用 replaceChildNode 一致', () => {
+    const newNodes = [
+      { id: 'c1', text: 'C1', items: [] as any[] },
+      { id: 'a', text: 'A' },
+    ];
+    const rootA = createRoot();
+    const rootB = createRoot();
+    newNodes.forEach((n) => util.replaceChildNode(n as any, rootA));
+    util.replaceChildNodes(newNodes as any, rootB);
+    expect(rootB).toEqual(rootA);
+  });
+
+  test('父节点与子节点同时替换，且新父节点的 items 是新数组时仍能替换到新父节点下', () => {
+    const root = createRoot();
+    const newChild = { id: 'c11', text: 'new' };
+    const newParent = { id: 'c1', text: 'p', items: [{ id: 'c11', text: 'old-copy' }] };
+    util.replaceChildNodes([newParent, newChild], root);
+    expect(root[0].items[2].items[0]).toBe(newParent);
+    expect(newParent.items[0]).toBe(newChild);
+  });
+
+  test('父节点与子节点同时替换，新父节点共用原 items 数组', () => {
+    const root = createRoot();
+    const oldItems = root[0].items[2].items;
+    const newParent = { id: 'c', text: 'p', items: oldItems };
+    const newChild = { id: 'c1', text: 'child' };
+    util.replaceChildNodes([newParent, newChild], root);
+    expect(root[0].items[2]).toBe(newParent);
+    expect(root[0].items[2].items[0]).toBe(newChild);
+  });
+
+  test('传入顺序为子节点在前、父节点在后时，也会先替换父节点，子节点的更新不会被覆盖', () => {
+    const root = createRoot();
+    const newChild = { id: 'c11', text: 'new-child' };
+    // 新父节点的 items 是新数组，里面还是旧的子节点副本
+    const newParent = { id: 'c1', text: 'p', items: [{ id: 'c11', text: 'old-copy' }] };
+
+    util.replaceChildNodes([newChild, newParent], root);
+
+    expect(root[0].items[2].items[0]).toBe(newParent);
+    expect(newParent.items[0]).toBe(newChild);
+  });
+
+  test('传入顺序为子节点在前、新父节点共用原 items 数组时同样正确', () => {
+    const root = createRoot();
+    const newParent = { id: 'c', text: 'p', items: root[0].items[2].items };
+    const newChild = { id: 'c1', text: 'child' };
+
+    util.replaceChildNodes([newChild, newParent], root);
+
+    expect(root[0].items[2]).toBe(newParent);
+    expect(root[0].items[2].items[0]).toBe(newChild);
+  });
+
+  test('同一层级保持传入顺序，不影响传入的数组', () => {
+    const root = createRoot();
+    const first = { id: 'b', text: '1' };
+    const second = { id: 'b', text: '2' };
+    const deep = { id: 'c11', text: 'deep' };
+    const input = [deep, first, second];
+
+    util.replaceChildNodes(input, root);
+
+    expect(root[0].items[1]).toBe(second);
+    expect(root[0].items[2].items[0].items[0]).toBe(deep);
+    expect(input).toEqual([deep, first, second]);
+  });
+
+  test('目标节点不存在、位于顶层、newNodes 为空时的处理', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const root = createRoot();
+
+    util.replaceChildNodes([], root);
+    expect(warn).not.toHaveBeenCalled();
+
+    util.replaceChildNodes([{ id: 'none' }], root);
+    expect(warn).toHaveBeenCalledWith('未找到目标节点(none)');
+
+    util.replaceChildNodes([{ id: 'page' }], root);
+    expect(warn).toHaveBeenCalledWith('未找到父节点(page)');
+
+    // data 使用默认值
+    expect(() => util.replaceChildNodes([{ id: 'x' }])).not.toThrow();
+
+    warn.mockRestore();
+  });
+
+  test('位置信息失效（数组被外部修改）时回退到 findIndex', () => {
+    const root = createRoot();
+    const first = { id: 'a', text: 'A', items: root[0].items[0].items };
+    const second = { id: 'b', text: 'B' };
+    // 第一次替换时通过 getter 在中途改变数组顺序
+    const container = root[0].items;
+    const origSplice = container.splice.bind(container);
+    container.splice = (...args: any[]) => {
+      const r = origSplice(...(args as [number, number, ...any[]]));
+      container.unshift({ id: 'inserted' });
+      return r;
+    };
+    util.replaceChildNodes([first, second], root);
+    container.splice = origSplice;
+    expect(container.find((n: any) => n.id === 'b')).toBe(second);
+    expect(container.find((n: any) => n.id === 'a')).toBe(first);
+  });
+});
+
 describe('getDepKeys', () => {
   test('get keys', () => {
     const keys = util.getDepKeys(
@@ -599,6 +781,21 @@ describe('replaceChildNode', () => {
 });
 
 describe('compiledNode', () => {
+  test('传入 sourceId 但节点不在该数据源依赖中时不抛错，节点保持不变', () => {
+    const node: any = { id: 'x', type: 'text', text: 't' };
+    const compile = vi.fn((v: any) => v);
+
+    expect(() =>
+      util.compiledNode(compile, node, { ds_1: { other: { name: 'o', keys: ['text'] } } } as any, 'ds_1'),
+    ).not.toThrow();
+    expect(util.compiledNode(compile, node, { ds_1: { other: { name: 'o', keys: ['text'] } } } as any, 'ds_1')).toBe(
+      node,
+    );
+    expect(util.compiledNode(compile, node, {}, 'ds_none')).toBe(node);
+    expect(compile).not.toHaveBeenCalled();
+    expect(node.text).toBe('t');
+  });
+
   test('compiled', () => {
     const node = util.compiledNode(
       (_str: string) => '123',
