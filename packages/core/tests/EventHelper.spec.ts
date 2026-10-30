@@ -187,6 +187,67 @@ describe('EventHelper - bindNodeEvents / initEvents / removeNodeEvents', () => {
     helper.removeNodeEvents();
     expect((helper as any).nodeEventList.size).toBe(0);
   });
+
+  test('removeNodeEventsOf 只移除指定节点的监听，未绑定过的节点安全返回', () => {
+    const app = new App({
+      config: createDsl({
+        items: [
+          {
+            type: NodeType.PAGE,
+            id: 'page_1',
+            items: [
+              { id: 'btn_1', type: 'button', events: [{ name: 'click', actions: [] }] },
+              { id: 'btn_2', type: 'button', events: [{ name: 'click', actions: [] }] },
+              { id: 'btn_3', type: 'button' },
+            ],
+          },
+        ],
+      } as any),
+    });
+
+    const helper = app.eventHelper!;
+    const node1 = app.getNode('btn_1')!;
+    const node2 = app.getNode('btn_2')!;
+    const symbol1 = node1.eventKeys.get('click_btn_1')!;
+    const symbol2 = node2.eventKeys.get('click_btn_2')!;
+    expect((helper as any).nodeEventList.size).toBe(2);
+
+    expect(() => helper.removeNodeEventsOf(app.getNode('btn_3')!)).not.toThrow();
+    expect((helper as any).nodeEventList.size).toBe(2);
+
+    helper.removeNodeEventsOf(node1);
+    expect((helper as any).nodeEventList.size).toBe(1);
+    expect(helper.listenerCount(symbol1)).toBe(0);
+    expect(helper.listenerCount(symbol2)).toBe(1);
+
+    // 重复调用无副作用
+    helper.removeNodeEventsOf(node1);
+    expect((helper as any).nodeEventList.size).toBe(1);
+  });
+
+  test('节点 destroy 时会移除其在 eventHelper 上的监听', () => {
+    const app = new App({
+      config: createDsl({
+        items: [
+          {
+            type: NodeType.PAGE,
+            id: 'page_1',
+            items: [{ id: 'btn_1', type: 'button', events: [{ name: 'click', actions: [] }] }],
+          },
+        ],
+      } as any),
+    });
+
+    const helper = app.eventHelper!;
+    const node = app.getNode('btn_1')!;
+    const symbol = node.eventKeys.get('click_btn_1')!;
+    expect(helper.listenerCount(symbol)).toBe(1);
+
+    node.destroy();
+
+    expect(helper.listenerCount(symbol)).toBe(0);
+    expect((helper as any).nodeEventList.size).toBe(0);
+  });
 });
 
 describe('EventHelper - 事件队列', () => {

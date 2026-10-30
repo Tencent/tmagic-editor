@@ -55,6 +55,7 @@ export default class EventHelper extends EventEmitter {
   public eventQueue: EventCache[] = [];
 
   private nodeEventList = new Map<(fromCpt: TMagicNode, ...args: any[]) => void, symbol>();
+  private nodeEventHandlers = new WeakMap<TMagicNode, ((fromCpt: TMagicNode, ...args: any[]) => void)[]>();
   private dataSourceEventList = new Map<string, Map<string, (...args: any[]) => void>>();
   private beforeEventHandler?: BeforeEventHandler;
   private afterEventHandler?: AfterEventHandler;
@@ -125,6 +126,13 @@ export default class EventHelper extends EventEmitter {
 
       this.nodeEventList.set(eventHandler, eventName);
       this.on(eventName, eventHandler);
+
+      const handlers = this.nodeEventHandlers.get(node);
+      if (handlers) {
+        handlers.push(eventHandler);
+      } else {
+        this.nodeEventHandlers.set(node, [eventHandler]);
+      }
     });
   }
 
@@ -135,6 +143,25 @@ export default class EventHelper extends EventEmitter {
     }
 
     this.nodeEventList.clear();
+    this.nodeEventHandlers = new WeakMap();
+  }
+
+  /**
+   * 移除单个节点绑定的事件，节点销毁时调用，避免迭代容器等场景反复重建节点导致监听泄漏
+   */
+  public removeNodeEventsOf(node: TMagicNode) {
+    const handlers = this.nodeEventHandlers.get(node);
+    if (!handlers) {
+      return;
+    }
+
+    for (const handler of handlers) {
+      const name = this.nodeEventList.get(handler);
+      name && this.off(name, handler);
+      this.nodeEventList.delete(handler);
+    }
+
+    this.nodeEventHandlers.delete(node);
   }
 
   public bindDataSourceEvents() {

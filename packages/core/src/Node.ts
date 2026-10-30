@@ -149,6 +149,7 @@ class Node extends EventEmitter {
   }
 
   public destroy() {
+    this.app?.eventHelper?.removeNodeEventsOf(this);
     this.eventQueue.length = 0;
     this.instance = null;
     this.events = [];
