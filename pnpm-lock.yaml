@@ -926,7 +926,7 @@ importers:
         specifier: 1.8.4-beta.1
         version: link:../../packages/core
       '@tmagic/react-runtime-help':
-        specifier: 0.2.2
+        specifier: 0.2.3-beta.1
         version: link:../react-runtime-help
       '@tmagic/stage':
         specifier: 1.8.4-beta.1
@@ -978,11 +978,11 @@ importers:
   runtime/react-runtime-help:
     dependencies:
       '@tmagic/core':
-        specifier: '>=1.7.0'
-        version: 1.8.3(typescript@6.0.3)
+        specifier: '>=1.8.4-beta.1'
+        version: link:../../packages/core
       '@tmagic/stage':
-        specifier: '>=1.7.0'
-        version: 1.8.3(@tmagic/core@1.8.3(typescript@6.0.3))(typescript@6.0.3)
+        specifier: '>=1.8.4-beta.1'
+        version: link:../../packages/stage
       lodash-es:
         specifier: ^4.18.1
         version: 4.18.1
