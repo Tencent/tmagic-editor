@@ -1027,7 +1027,7 @@ importers:
         specifier: 1.8.4-beta.1
         version: link:../../packages/stage
       '@tmagic/vue-runtime-help':
-        specifier: ^2.0.4
+        specifier: ^2.0.6-beta.1
         version: link:../vue-runtime-help
       axios:
         specifier: ^1.20.0
@@ -1076,11 +1076,11 @@ importers:
   runtime/vue-runtime-help:
     dependencies:
       '@tmagic/core':
-        specifier: '>=1.7.0'
-        version: 1.8.3(typescript@6.0.3)
+        specifier: '>=1.8.4-beta.1'
+        version: link:../../packages/core
       '@tmagic/stage':
-        specifier: '>=1.7.0'
-        version: 1.8.3(@tmagic/core@1.8.3(typescript@6.0.3))(typescript@6.0.3)
+        specifier: '>=1.8.4-beta.1'
+        version: link:../../packages/stage
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
