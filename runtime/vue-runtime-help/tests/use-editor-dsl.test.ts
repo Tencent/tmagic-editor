@@ -17,6 +17,47 @@ const createDsl = () =>
     ],
   }) as unknown as MApp;
 
+const createFragmentDsl = () =>
+  ({
+    type: NodeType.ROOT,
+    id: 'app',
+    items: [
+      {
+        type: NodeType.PAGE,
+        id: 'p1',
+        items: [{ id: 'pfc', type: 'page-fragment-container' }],
+      },
+      {
+        type: NodeType.PAGE_FRAGMENT,
+        id: 'f1',
+        items: [{ id: 'text_in_f1', type: 'text' }],
+      },
+      {
+        type: NodeType.PAGE_FRAGMENT,
+        id: 'f2',
+        items: [{ id: 'text_in_f2', type: 'text' }],
+      },
+    ],
+  }) as unknown as MApp;
+
+const setupFragment = () => {
+  const app = new Core({});
+  let runtime: Runtime = {};
+
+  (window as any).magic = {
+    onRuntimeReady: (rt: Runtime) => {
+      runtime = rt;
+    },
+  };
+
+  useEditorDsl(app);
+
+  const dsl = createFragmentDsl();
+  runtime.updateRootConfig?.(dsl);
+
+  return { app, runtime, dsl };
+};
+
 const setup = (curPageId?: string) => {
   const app = new Core({});
   let runtime: Runtime = {};
@@ -93,6 +134,105 @@ describe('useEditorDsl add', () => {
     });
 
     expect(dsl.items[0].items?.map((item) => item.id)).toEqual(['btn', 'n1', 'n2']);
+  });
+});
+
+describe('useEditorDsl 页面片容器关联', () => {
+  beforeEach(() => {
+    (window as any).magic = undefined;
+  });
+
+  test('新增未关联的容器不会创建页面片实例', () => {
+    const { app } = setupFragment();
+    expect(app.pageFragments.size).toBe(0);
+  });
+
+  test('属性面板关联页面片后创建页面片实例', () => {
+    const { app, runtime, dsl } = setupFragment();
+
+    runtime.update?.({
+      config: { id: 'pfc', type: 'page-fragment-container', pageFragmentId: 'f1' } as any,
+      parentId: 'p1',
+      root: dsl,
+    });
+
+    const fragment = app.pageFragments.get('pfc');
+    expect(fragment?.data.id).toBe('f1');
+    expect(fragment?.getNode('text_in_f1')?.data.id).toBe('text_in_f1');
+  });
+
+  test('切换关联的页面片会替换实例', () => {
+    const { app, runtime, dsl } = setupFragment();
+
+    runtime.update?.({
+      config: { id: 'pfc', type: 'page-fragment-container', pageFragmentId: 'f1' } as any,
+      parentId: 'p1',
+      root: dsl,
+    });
+    runtime.update?.({
+      config: { id: 'pfc', type: 'page-fragment-container', pageFragmentId: 'f2' } as any,
+      parentId: 'p1',
+      root: dsl,
+    });
+
+    expect(app.pageFragments.get('pfc')?.data.id).toBe('f2');
+    expect(app.pageFragments.get('pfc')?.getNode('text_in_f2')?.data.id).toBe('text_in_f2');
+  });
+
+  test('容器其它属性更新不会重建页面片实例', () => {
+    const { app, runtime, dsl } = setupFragment();
+
+    runtime.update?.({
+      config: { id: 'pfc', type: 'page-fragment-container', pageFragmentId: 'f1' } as any,
+      parentId: 'p1',
+      root: dsl,
+    });
+    const fragment = app.pageFragments.get('pfc');
+
+    runtime.update?.({
+      config: {
+        id: 'pfc',
+        type: 'page-fragment-container',
+        pageFragmentId: 'f1',
+        style: { width: '100px' },
+      } as any,
+      parentId: 'p1',
+      root: dsl,
+    });
+
+    expect(app.pageFragments.get('pfc')).toBe(fragment);
+  });
+
+  test('取消关联后移除页面片实例', () => {
+    const { app, runtime, dsl } = setupFragment();
+
+    runtime.update?.({
+      config: { id: 'pfc', type: 'page-fragment-container', pageFragmentId: 'f1' } as any,
+      parentId: 'p1',
+      root: dsl,
+    });
+    runtime.update?.({
+      config: { id: 'pfc', type: 'page-fragment-container', pageFragmentId: '' } as any,
+      parentId: 'p1',
+      root: dsl,
+    });
+
+    expect(app.pageFragments.size).toBe(0);
+  });
+
+  test('删除容器后移除页面片实例', () => {
+    const { app, runtime, dsl } = setupFragment();
+
+    runtime.update?.({
+      config: { id: 'pfc', type: 'page-fragment-container', pageFragmentId: 'f1' } as any,
+      parentId: 'p1',
+      root: dsl,
+    });
+    expect(app.pageFragments.size).toBe(1);
+
+    runtime.remove?.({ id: 'pfc', parentId: 'p1', root: dsl });
+
+    expect(app.pageFragments.size).toBe(0);
   });
 });
 

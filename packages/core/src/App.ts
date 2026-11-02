@@ -18,10 +18,10 @@
 
 import { EventEmitter } from 'events';
 
-import { isEmpty } from 'lodash-es';
+import { cloneDeep, isEmpty } from 'lodash-es';
 
 import { createDataSourceManager, DataSourceManager, type DataSourceManagerData } from '@tmagic/data-source';
-import type { CodeBlockDSL, Id, JsEngine, MApp, RequestFunction } from '@tmagic/schema';
+import type { CodeBlockDSL, Id, JsEngine, MApp, MComponent, MContainer, RequestFunction } from '@tmagic/schema';
 
 import Env from './Env';
 import EventHelper from './EventHelper';
@@ -206,6 +206,66 @@ class App extends EventEmitter {
     this.page?.destroy();
     this.eventHelper?.removeNodeEvents();
     this.page = undefined;
+  }
+
+  /**
+   * 按页面片容器的配置同步页面片实例
+   *
+   * 容器新增、关联/切换/取消关联页面片时都要调用，否则 app.pageFragments 里没有对应实例，页面片内容不会渲染
+   * @param config 页面片容器配置
+   * @param force 为 true 时即使关联的还是同一个页面片也重建，用于页面重建时拿到最新的页面片内容
+   */
+  public setPageFragment(config: MComponent | MContainer, force = false) {
+    if (!(config.type && this.pageFragmentContainerType.has(config.type))) return;
+
+    const { id, pageFragmentId } = config;
+
+    if (!id) return;
+
+    const pageFragmentConfig = pageFragmentId
+      ? this.dsl?.items?.find((page) => `${page.id}` === `${pageFragmentId}`)
+      : undefined;
+
+    const existPageFragment = this.pageFragments.get(id);
+
+    // 关联的还是同一个页面片时保持不变，避免容器每次更新都重建页面片，导致节点实例与数据源状态被重置
+    if (!force && pageFragmentConfig && existPageFragment && `${existPageFragment.data.id}` === `${pageFragmentId}`) {
+      return;
+    }
+
+    if (existPageFragment) {
+      existPageFragment.destroy();
+      this.pageFragments.delete(id);
+    }
+
+    if (pageFragmentConfig) {
+      this.pageFragments.set(
+        id,
+        new Page({
+          config: cloneDeep(pageFragmentConfig),
+          app: this,
+        }),
+      );
+
+      this.eventHelper?.initEvents();
+    }
+
+    super.emit('page-fragments-change', { id, pageFragmentId });
+  }
+
+  /**
+   * 删除页面片实例，页面片容器被删除时调用
+   * @param id 页面片容器 id
+   */
+  public deletePageFragment(id: Id) {
+    const pageFragment = this.pageFragments.get(id);
+
+    if (!pageFragment) return;
+
+    pageFragment.destroy();
+    this.pageFragments.delete(id);
+
+    super.emit('page-fragments-change', { id });
   }
 
   /**

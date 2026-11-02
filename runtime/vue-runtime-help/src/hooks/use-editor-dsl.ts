@@ -139,6 +139,9 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), runtimeApi: Runtime
         nodeInstance.setData(newNode);
       }
 
+      // 关联/切换/取消关联页面片时同步页面片实例，否则容器拿不到页面片内容
+      app.setPageFragment(newNode);
+
       if (app.page?.data.id === config.id) {
         app.page.setData(newNode);
       }
@@ -167,6 +170,7 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), runtimeApi: Runtime
         }
       } else {
         app?.page?.deleteNode(node.id);
+        app?.deletePageFragment(node.id);
       }
 
       const index = parent.items?.findIndex((child: MNode) => child.id === node.id);

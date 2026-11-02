@@ -191,6 +191,33 @@ app.setPage('page_2');
 
   删除当前页面。
 
+### setPageFragment
+
+- **参数：**
+  - `{MComponent | MContainer} config` 页面片容器配置
+  - `{boolean} [force]` 是否强制重建，默认 `false`
+
+- **返回：**
+  - `{void}`
+
+- **详情：**
+
+  按页面片容器的 `pageFragmentId` 同步 `pageFragments` 中的页面片实例。容器新增、关联/切换/取消关联页面片时都需要调用，否则容器拿不到页面片内容。
+
+  默认在已关联同一个页面片时保持不变，避免容器每次更新都重建页面片；`force` 为 `true` 时即使关联的是同一个页面片也会重建，用于页面重建时拿到最新的页面片内容。
+
+### deletePageFragment
+
+- **参数：**
+  - `{Id} id` 页面片容器 id
+
+- **返回：**
+  - `{void}`
+
+- **详情：**
+
+  删除页面片实例，页面片容器被删除时调用。
+
 ### getPage
 
 - **参数：**
@@ -361,6 +388,7 @@ app.destroy();
 |--------|----------|----------|
 | `dsl-change` | 调用 `setConfig` 时触发 | `({ dsl: MApp, curPage: Id })` |
 | `page-change` | 调用 `setPage` 切换页面时触发；切换到不存在的页面时也会触发，此时回调无参数。**注意**：当 `pageConfig === this.page.data`（重复 setPage 到当前页）时会直接 `return`，**不**触发该事件 | `(page?: Page)` |
+| `page-fragments-change` | 调用 `setPageFragment` / `deletePageFragment` 导致页面片实例创建、替换或删除时触发 | `({ id: Id, pageFragmentId?: Id })` |
 
 ### 监听示例
 

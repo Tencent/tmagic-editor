@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 
-import { cloneDeep } from 'lodash-es';
-
 import type { Id, MComponent, MContainer, MPage, MPageFragment } from '@tmagic/schema';
 
 import App from './App';
@@ -65,19 +63,8 @@ class Page extends Node {
 
     this.setNode(config.id, node);
 
-    if (config.type && this.app.pageFragmentContainerType.has(config.type) && config.pageFragmentId) {
-      const pageFragment = this.app.dsl?.items?.find((page) => page.id === config.pageFragmentId);
-
-      if (pageFragment) {
-        this.app.pageFragments.set(
-          config.id,
-          new Page({
-            config: cloneDeep(pageFragment),
-            app: this.app,
-          }),
-        );
-      }
-    }
+    // 页面重建时强制同步，保证拿到的是页面片的最新内容
+    this.app.setPageFragment(config, true);
 
     if (Array.isArray(config.items)) {
       config.items?.forEach((element: MComponent | MContainer) => {

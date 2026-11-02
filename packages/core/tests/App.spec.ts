@@ -72,6 +72,31 @@ const createAppDsl = (pageLength: number, nodeLength = 0) => {
   return dsl;
 };
 
+const createFragmentApp = () =>
+  new App({
+    config: {
+      type: NodeType.ROOT,
+      id: 'app',
+      items: [
+        {
+          type: NodeType.PAGE,
+          id: 'p1',
+          items: [{ id: 'pfc', type: 'page-fragment-container' }],
+        },
+        {
+          type: NodeType.PAGE_FRAGMENT,
+          id: 'f1',
+          items: [{ id: 'text_in_f1', type: 'text' }],
+        },
+        {
+          type: NodeType.PAGE_FRAGMENT,
+          id: 'f2',
+          items: [{ id: 'text_in_f2', type: 'text' }],
+        },
+      ],
+    },
+  });
+
 describe('App', () => {
   test('instance', () => {
     const app = new App({});
@@ -495,6 +520,98 @@ describe('App 配置/方法/组件注册', () => {
 
     expect(cb).toHaveBeenCalledTimes(1);
     expect(cb).toHaveBeenCalledWith(node, 'arg1');
+  });
+
+  test('setPageFragment: 关联页面片时创建实例', () => {
+    const app = new App({
+      config: {
+        type: NodeType.ROOT,
+        id: 'app',
+        items: [
+          {
+            type: NodeType.PAGE,
+            id: 'p1',
+            items: [{ id: 'pfc', type: 'page-fragment-container' }],
+          },
+          {
+            type: NodeType.PAGE_FRAGMENT,
+            id: 'f1',
+            items: [{ id: 'text_in_f1', type: 'text' }],
+          },
+        ],
+      },
+    });
+
+    expect(app.pageFragments.size).toBe(0);
+
+    app.setPageFragment({ id: 'pfc', type: 'page-fragment-container', pageFragmentId: 'f1' });
+
+    expect(app.pageFragments.get('pfc')?.data.id).toBe('f1');
+    expect(app.pageFragments.get('pfc')?.getNode('text_in_f1')?.data.id).toBe('text_in_f1');
+  });
+
+  test('setPageFragment: 非页面片容器的配置被忽略', () => {
+    const app = new App({
+      config: {
+        type: NodeType.ROOT,
+        id: 'app',
+        items: [{ type: NodeType.PAGE, id: 'p1', items: [{ id: 'btn', type: 'button' }] }],
+      },
+    });
+
+    app.setPageFragment({ id: 'btn', type: 'button', pageFragmentId: 'f1' });
+    app.setPageFragment({ type: 'page-fragment-container', pageFragmentId: 'f1' } as any);
+
+    expect(app.pageFragments.size).toBe(0);
+  });
+
+  test('setPageFragment: 已关联同一个页面片时默认不重建', () => {
+    const app = createFragmentApp();
+
+    app.setPageFragment({ id: 'pfc', type: 'page-fragment-container', pageFragmentId: 'f1' });
+    const fragment = app.pageFragments.get('pfc');
+
+    app.setPageFragment({ id: 'pfc', type: 'page-fragment-container', pageFragmentId: 'f1' });
+
+    expect(app.pageFragments.get('pfc')).toBe(fragment);
+  });
+
+  test('setPageFragment: force 时重建页面片实例', () => {
+    const app = createFragmentApp();
+
+    app.setPageFragment({ id: 'pfc', type: 'page-fragment-container', pageFragmentId: 'f1' });
+    const fragment = app.pageFragments.get('pfc');
+
+    app.setPageFragment({ id: 'pfc', type: 'page-fragment-container', pageFragmentId: 'f1' }, true);
+
+    expect(app.pageFragments.get('pfc')).not.toBe(fragment);
+    expect(app.pageFragments.get('pfc')?.data.id).toBe('f1');
+  });
+
+  test('setPageFragment: 关联不存在的页面片时清理旧实例', () => {
+    const app = createFragmentApp();
+
+    app.setPageFragment({ id: 'pfc', type: 'page-fragment-container', pageFragmentId: 'f1' });
+    app.setPageFragment({ id: 'pfc', type: 'page-fragment-container', pageFragmentId: 'not-exist' });
+
+    expect(app.pageFragments.size).toBe(0);
+  });
+
+  test('setPageFragment / deletePageFragment 会触发 page-fragments-change', () => {
+    const app = createFragmentApp();
+    const cb = vi.fn();
+    app.on('page-fragments-change', cb);
+
+    app.setPageFragment({ id: 'pfc', type: 'page-fragment-container', pageFragmentId: 'f1' });
+    expect(cb).toHaveBeenCalledTimes(1);
+
+    app.deletePageFragment('pfc');
+    expect(cb).toHaveBeenCalledTimes(2);
+    expect(app.pageFragments.size).toBe(0);
+
+    // 不存在的实例不触发
+    app.deletePageFragment('pfc');
+    expect(cb).toHaveBeenCalledTimes(2);
   });
 
   test('destroy 清理所有资源', () => {
