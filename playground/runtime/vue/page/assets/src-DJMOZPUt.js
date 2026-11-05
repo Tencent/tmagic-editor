@@ -1,0 +1,2 @@
+import{ct as e,ft as t,nt as n,ot as r}from"./src-BTmtxcT-.js";import{r as i}from"./index-OGa7zM6r.js";import{r as a,t as o}from"./use-app-CeRTdSAr.js";var s=[`innerHTML`],c=r({name:`tmagic-text`,__name:`index`,props:{config:{},iteratorIndex:{},iteratorContainerId:{},containerIndex:{},pageFragmentContainerId:{},model:{},disabled:{type:Boolean}},setup(r){let c=r,l=e(`app`),u=a(c);o(u);let d=()=>{l&&u&&l.emit(`${i}click`,u)};return(e,i)=>(t(),n(`p`,{onClick:d,innerHTML:r.config.text},null,8,s))}});export{c as default};
+//# sourceMappingURL=src-DJMOZPUt.js.map
