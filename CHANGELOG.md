@@ -1,3 +1,36 @@
+## [1.8.4](https://github.com/Tencent/tmagic-editor/compare/v1.8.3...v1.8.4) (2026-11-05)
+
+
+### Bug Fixes
+
+* **core:** 节点销毁时移除其事件监听 ([522a006](https://github.com/Tencent/tmagic-editor/commit/522a0068f5807ec2212e6ca7e87b96891594b3fc))
+* **data-source:** 依赖缓存按节点对象引用判断失效 ([6f2ffc3](https://github.com/Tencent/tmagic-editor/commit/6f2ffc3ca1a5702270f1d262d4776983d24d4ba0))
+* **dep:** 修复共用节点 id 的多个根节点收集依赖时互相清除 ([c4cf3b9](https://github.com/Tencent/tmagic-editor/commit/c4cf3b9525af8a39888ff15c5afe06dc5fbfdda5))
+* **design:** 修复 Popconfirm 浮层被裁剪及 Element Plus 复合方位失效 ([8e43919](https://github.com/Tencent/tmagic-editor/commit/8e4391972b9017ae04e1a78808d0c23890fec07b))
+* **editor:** 事件动作与高级配置表单标签改用固定宽度 ([b4747c3](https://github.com/Tencent/tmagic-editor/commit/b4747c3e89ca56bb15f3557bbdbe5c53e8f2fae5))
+* **editor:** 优化导航更多菜单宽度与溢出分割线 ([8ac1a38](https://github.com/Tencent/tmagic-editor/commit/8ac1a38601b49d1ccf47560e79bfee216b23cb42))
+* **editor:** 修复组件名超长不省略的问题 ([8e40d8d](https://github.com/Tencent/tmagic-editor/commit/8e40d8d79768c9179c1621744be37cb2ebb1e193))
+* **editor:** 数据源与代码块删除确认改用 Popconfirm ([c2272b1](https://github.com/Tencent/tmagic-editor/commit/c2272b12d84880b7d86ca29075508e3a58865847))
+* **form:** 修复切换同类型节点时表单字段配置串台 ([abcd875](https://github.com/Tencent/tmagic-editor/commit/abcd875731ef41aae0b11a5655c4495279990cbe))
+* **runtime:** 修复 useDsl 换页后更新失效与重复替换 ([0c1d103](https://github.com/Tencent/tmagic-editor/commit/0c1d103cd054caa49de70af6b97488c8474f2c27))
+* **stage:** iframe 未就绪时跳过注入 magic，避免 contentWindow 为空报错 ([d017f43](https://github.com/Tencent/tmagic-editor/commit/d017f435731ce7742f896268963ac1009b190bd5))
+
+
+### Features
+
+* **core:** 新增 setPageFragment/deletePageFragment 同步页面片实例 ([dfc4f55](https://github.com/Tencent/tmagic-editor/commit/dfc4f55390033b8ac7961c07c76b7ea2a8d96783))
+* **data-source:** 支持批量更新数据源 ([dfad691](https://github.com/Tencent/tmagic-editor/commit/dfad6914931c369ef9b3d7e3477b454a151cc3a6))
+* **editor:** 支持通过 insertIndex 指定 add 插入位置 ([5e7f7ad](https://github.com/Tencent/tmagic-editor/commit/5e7f7ad7f1f8fd520a6eec7e75c9ebf2517dffec))
+* **editor:** 支持配置画布 iframe 的 sandbox 属性 ([7e8cb1f](https://github.com/Tencent/tmagic-editor/commit/7e8cb1f9db6b8241f02f4b1a5be073b46fcf3534))
+* **editor:** 新增从组件面板点击/拖动添加组件前的处理函数配置 ([ccfc8c0](https://github.com/Tencent/tmagic-editor/commit/ccfc8c0733b511861fb2d27c23c45640d1da4ed3))
+* **form:** 支持 table/group-list 行操作按钮文案与 props 配置 ([cbd0442](https://github.com/Tencent/tmagic-editor/commit/cbd0442ffca2747bed99b3683ab358f95e8574c4))
+* **form:** 支持 table/group-list 行操作自定义按钮 ([d01bc45](https://github.com/Tencent/tmagic-editor/commit/d01bc45b1736d4ae443dda8739696d0b7791d618))
+
+
+### Performance Improvements
+
+* **data-source:** 迭代器容器数据上下文改为惰性深拷贝 ([35ed2cc](https://github.com/Tencent/tmagic-editor/commit/35ed2cc0d0d8a9b6cb555b6612e4ef4988552d09))
+* **utils:** 优化节点查找与批量替换 ([2f8a504](https://github.com/Tencent/tmagic-editor/commit/2f8a504163909e179058a4321b236f6119991537))
 ## [1.8.4-beta.1](https://github.com/Tencent/tmagic-editor/compare/v1.8.3...v1.8.4-beta.1) (2026-11-02)
 
 
