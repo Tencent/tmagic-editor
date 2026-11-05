@@ -35,10 +35,12 @@ DSL 操作方法（`add` / `remove` / `update` 等）默认返回操作结果（
 - 数据源：[dataSourceService.revertById(uuids)](./dataSourceServiceMethods.md#revertbyid)
 - 代码块：[codeBlockService.revertById(uuids)](./codeBlockServiceMethods.md#revertbyid)
 
-::: details 查看 HistoryOpOptions / DslOpOptions / DslOpWithHistoryIdsResult / HistoryOpSource 类型定义
+::: details 查看 HistoryOpOptions / DslOpOptions / AddOpOptions / DslOpWithHistoryIdsResult / HistoryOpSource 类型定义
 <<< @/../packages/editor/src/type.ts#HistoryOpOptions{ts}
 
 <<< @/../packages/editor/src/type.ts#DslOpOptions{ts}
+
+<<< @/../packages/editor/src/type.ts#AddOpOptions{ts}
 
 <<< @/../packages/editor/src/type.ts#DslOpWithHistoryIdsResult{ts}
 
@@ -386,6 +388,9 @@ editorService.highlight("text_123");
 
   - {`MContainer`} parent 指定的容器节点
 
+  - `{Object}` options 可选配置（类型见 `AddOpOptions`）
+    - `{number | 'end'}` insertIndex 插入下标；指定后不依赖选中节点，详见 [add](#add)
+
 - **返回：**
   - {Promise<`MNode`>} 新增的组件
 
@@ -406,6 +411,7 @@ editorService.highlight("text_123");
     - `{boolean}` doNotSelect 添加后是否不更新当前选中节点（默认 false，添加后会选中新增的节点）
     - `{boolean}` doNotSwitchPage 添加后是否不切换当前页面（默认 false；新增页面 / 跨页新增时为 true 会跳过会引发页面切换的选中操作）
     - `{boolean}` doNotPushHistory 是否不写入历史记录（默认 false）
+    - `{number | 'end'}` insertIndex 插入下标，落在 `[0, 父容器 items.length]`，`'end'` 固定追加到末尾。指定后不按当前选中节点 / 上一次新增节点计算锚点，也不要求有选中节点；越界或非数字统一追加到末尾。批量添加时数字下标是本批节点的起始位置（按父容器分别累计偏移，保持传入顺序），`'end'` 逐个追加。人工添加不传，沿用锚点行为
     - `{string}` historyDescription 见[历史记录相关 options](#历史记录相关-options)
     - `{HistoryOpSource}` historySource 见[历史记录相关 options](#历史记录相关-options)
 

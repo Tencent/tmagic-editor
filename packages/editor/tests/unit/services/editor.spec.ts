@@ -19,7 +19,7 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { cloneDeep } from 'lodash-es';
 
-import type { MApp, MContainer, MNode } from '@tmagic/core';
+import type { Id, MApp, MContainer, MNode } from '@tmagic/core';
 import { NodeType } from '@tmagic/core';
 import { getNodePath } from '@tmagic/utils';
 
@@ -525,6 +525,130 @@ describe('add', () => {
 
     // 当前 page 保持不变（没有自动切到新加的页面）
     expect(editorService.get('page')?.id).toBe(beforePageId);
+  });
+
+  test('insertIndex 指定下标时不受当前选中节点影响', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID);
+
+    const first = await editorService.add({ id: 'explicit-a', type: 'text', style: {} }, null, {
+      doNotSelect: true,
+      insertIndex: 0,
+    });
+    const firstId = Array.isArray(first) ? first[0].id : first.id;
+
+    // 换一个选中节点，仍按显式下标插入到末尾
+    await editorService.select(NodeId.NODE_ID2);
+    const second = await editorService.add({ id: 'explicit-b', type: 'text', style: {} }, null, {
+      doNotSelect: true,
+      insertIndex: 'end',
+    });
+    const secondId = Array.isArray(second) ? second[0].id : second.id;
+
+    const parent = editorService.getParentById(firstId);
+    expect(parent?.items.map((item) => item.id)).toEqual([firstId, NodeId.NODE_ID, NodeId.NODE_ID2, secondId]);
+  });
+
+  test('insertIndex 越界或非有限时统一追加到末尾', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID);
+
+    const ids: Id[] = [];
+    for (const [i, insertIndex] of [99, -5, Number.NaN, Number.POSITIVE_INFINITY].entries()) {
+      const added = await editorService.add({ id: `clamp-${i}`, type: 'text', style: {} }, null, {
+        doNotSelect: true,
+        insertIndex,
+      });
+      ids.push(Array.isArray(added) ? added[0].id : added.id);
+    }
+
+    const parent = editorService.getParentById(ids[0]);
+    expect(parent?.items.map((item) => item.id)).toEqual([NodeId.NODE_ID, NodeId.NODE_ID2, ...ids]);
+  });
+
+  test('批量 add 的数字下标为起始位置、end 逐个追加，均保持传入顺序', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID);
+
+    const firstBatch = ['batch-a', 'batch-b', 'batch-c'].map((id) => ({ id, type: 'text', style: {} }));
+    await editorService.add(firstBatch, null, { doNotSelect: true, insertIndex: 0 });
+
+    const secondBatch = ['batch-d', 'batch-e'].map((id) => ({ id, type: 'text', style: {} }));
+    await editorService.add(secondBatch, null, { doNotSelect: true, insertIndex: 'end' });
+
+    const parent = editorService.getParentById('batch-a');
+    expect(parent?.items.map((item) => item.id)).toEqual([
+      'batch-a',
+      'batch-b',
+      'batch-c',
+      NodeId.NODE_ID,
+      NodeId.NODE_ID2,
+      'batch-d',
+      'batch-e',
+    ]);
+  });
+
+  test('显式下标不要求选中节点，未指定时仍要求选中', async () => {
+    editorService.set('root', cloneDeep(root));
+    editorService.set('node', null);
+    editorService.set('nodes', []);
+    const parent = editorService.getNodeById(NodeId.PAGE_ID) as MContainer;
+
+    const added = await editorService.add({ id: 'no-selection', type: 'text', style: {} }, parent, {
+      doNotSelect: true,
+      insertIndex: 0,
+    });
+    const addedId = Array.isArray(added) ? added[0].id : added.id;
+    expect(parent.items.map((item) => item.id)).toEqual([addedId, NodeId.NODE_ID, NodeId.NODE_ID2]);
+
+    await expect(
+      editorService.add({ id: 'anchor', type: 'text', style: {} }, parent, { doNotSelect: true }),
+    ).rejects.toThrow('当前选中节点为空');
+  });
+
+  test('小数下标取整后同步传给画布', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.NODE_ID);
+    const stageAdd = vi.fn(() => Promise.resolve());
+    editorService.set('stage', { add: stageAdd } as any);
+
+    let addedId: Id = '';
+    try {
+      const added = await editorService.add({ id: 'stage-index', type: 'text', style: { left: 0, top: 0 } }, null, {
+        doNotSelect: true,
+        insertIndex: 1.8,
+      });
+      addedId = Array.isArray(added) ? added[0].id : added.id;
+    } finally {
+      editorService.set('stage', null);
+    }
+
+    expect(stageAdd).toHaveBeenCalledWith(expect.objectContaining({ index: 1 }));
+    const parent = editorService.getParentById(addedId);
+    expect(parent?.items.map((item) => item.id)).toEqual([NodeId.NODE_ID, addedId, NodeId.NODE_ID2]);
+  });
+
+  test('显式下标的撤销 / 重做仍还原插入位置', async () => {
+    editorService.set('root', cloneDeep(root));
+    historyService.reset();
+    await editorService.select(NodeId.NODE_ID);
+
+    const added = await editorService.add({ id: 'history-index', type: 'text', style: {} }, null, {
+      doNotSelect: true,
+      insertIndex: 0,
+    });
+    const addedId = Array.isArray(added) ? added[0].id : added.id;
+    expect(editorService.getParentById(addedId)?.items[0].id).toBe(addedId);
+
+    await editorService.undo();
+    expect(editorService.getNodeById(addedId)).toBeNull();
+
+    await editorService.redo();
+    expect(editorService.getParentById(addedId)?.items.map((item) => item.id)).toEqual([
+      addedId,
+      NodeId.NODE_ID,
+      NodeId.NODE_ID2,
+    ]);
   });
 });
 

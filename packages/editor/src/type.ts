@@ -1491,6 +1491,19 @@ export interface DslOpOptions extends HistoryOpOptions {
 }
 // #endregion DslOpOptions
 
+// #region AddOpOptions
+/**
+ * {@link EditorService.add} / {@link EditorService.doAdd} 的额外配置
+ * - insertIndex: 插入下标，落在 [0, 父容器 items.length]；'end' 表示固定追加到末尾。
+ *   指定后不再按当前选中节点与上一次新增节点计算锚点，也不要求有选中节点；越界 / 非数字一律追加到末尾。
+ *   批量 add 时数字下标是本批节点的起始位置，按父容器分别累计偏移，保持传入顺序；'end' 逐个追加。
+ *   页面 / 页面片作用于 root.items，同样不再固定追加到末尾。人工添加不传，沿用锚点行为。
+ */
+export interface AddOpOptions extends DslOpOptions {
+  insertIndex?: number | 'end';
+}
+// #endregion AddOpOptions
+
 // #region UpdateOptions
 /**
  * {@link EditorService.update} / {@link EditorService.doUpdate} 的额外数据

@@ -35,6 +35,7 @@ import {
 
 import type {
   AddMNode,
+  AddOpOptions,
   AsyncHookPlugin,
   AsyncMethodName,
   CanDropInFunction,
@@ -85,9 +86,11 @@ import { Protocol } from './WebStorage';
 
 type MoveItem = { node: MNode; parent: MContainer; pageForOp: { name: string; id: Id } | null };
 
-/** 历史插回时把记录的下标收敛到 [0, length]，越界（含未记录）一律追加到末尾 */
-const clampIndex = (index: number | undefined, length: number): number =>
-  typeof index === 'number' && index >= 0 && index <= length ? index : length;
+/** 把插入下标收敛到 [0, length]：非整数取整，非法 / 越界（含未记录）一律追加到末尾 */
+const clampIndex = (index: number | undefined, length: number): number => {
+  const normalized = typeof index === 'number' ? Math.trunc(index) : length;
+  return Number.isFinite(normalized) && normalized >= 0 && normalized <= length ? normalized : length;
+};
 
 /**
  * 把「变更前后节点快照」列表归一成 update 类型的 {@link StepDiffItem} 列表，供 {@link StepValue.diff} 使用。
@@ -434,30 +437,44 @@ class Editor extends BaseService {
     return this.config;
   }
 
-  public async doAdd(node: MNode, parent: MContainer, _options: DslOpOptions = {}): Promise<MNode> {
+  public async doAdd(node: MNode, parent: MContainer, options: AddOpOptions = {}): Promise<MNode> {
     const root = this.get('root');
 
     if (!root) throw new Error('root为空');
 
     const curNode = this.get('node');
     const stage = this.get('stage');
+    const explicitIndex = options.insertIndex;
 
-    if (!curNode) throw new Error('当前选中节点为空');
+    // 未指定 insertIndex 时需要选中节点作为锚点；显式下标不依赖选中状态
+    if (!curNode && explicitIndex === undefined) throw new Error('当前选中节点为空');
 
     if ((parent.type === NodeType.ROOT || curNode?.type === NodeType.ROOT) && !isPageOrFragment(node)) {
       throw new Error('app下不能添加组件');
     }
 
-    // 连续 add 时接在上一个新增节点之后，否则接在当前选中节点之后；
-    // 锚点节点可能已不在 items 中（被删 / DSL 整体替换），回退到当前选中节点，都不在则追加到末尾
-    const anchorId = this.lastAdded?.selectedId === curNode.id ? this.lastAdded.nodeId : curNode.id;
-    const anchorIndex = isPageOrFragment(node)
-      ? -1
-      : Math.max(getNodeIndex(anchorId, parent), getNodeIndex(curNode.id, parent));
-    const insertIndex = anchorIndex < 0 ? parent.items.length : anchorIndex + 1;
+    // 默认：连续 add 时接在上一个新增节点之后，否则接在当前选中节点之后；
+    // 锚点节点可能已不在 items 中（被删 / DSL 整体替换），回退到当前选中节点，都不在则追加到末尾。
+    // 指定 insertIndex 时按显式下标插入，批量写入顺序不再受编辑器选中状态影响。
+    let insertIndex: number;
+    if (explicitIndex === 'end') {
+      insertIndex = parent.items.length;
+    } else if (typeof explicitIndex === 'number') {
+      insertIndex = clampIndex(explicitIndex, parent.items.length);
+    } else {
+      // 上面的校验已保证锚点分支存在选中节点
+      const selectedId = curNode!.id;
+      const anchorId = this.lastAdded?.selectedId === selectedId ? this.lastAdded.nodeId : selectedId;
+      const anchorIndex = isPageOrFragment(node)
+        ? -1
+        : Math.max(getNodeIndex(anchorId, parent), getNodeIndex(selectedId, parent));
+      insertIndex = anchorIndex < 0 ? parent.items.length : anchorIndex + 1;
+    }
 
     parent.items.splice(insertIndex, 0, node);
-    this.lastAdded = { selectedId: curNode.id, nodeId: node.id };
+    if (curNode) {
+      this.lastAdded = { selectedId: curNode.id, nodeId: node.id };
+    }
 
     const layout = await this.getLayout(this.toRaw(parent), node as MNode);
     node.style = getInitPositionStyle(node.style, layout);
@@ -492,7 +509,7 @@ class Editor extends BaseService {
   public async add(
     addNode: AddMNode | MNode[],
     parent?: MContainer | null,
-    options: DslOpOptions = {},
+    options: AddOpOptions = {},
   ): Promise<MNode | MNode[]> {
     this.captureSelectionBeforeOp();
 
@@ -532,8 +549,15 @@ class Editor extends BaseService {
     // 校验放在真正修改 DSL 之前，strict 模式下校验不通过则整批都不会被添加
     const commitInvalid = await this.runGuard(() => this.ctx.validator.guardAdd(targets));
 
+    // 数字下标是整批节点的起始位置：按父容器分别累计偏移，保证批量写入保持传入顺序
+    const explicitIndex = options.insertIndex;
+    const offsets = new Map<Id, number>();
     for (const { node, parentNode } of targets) {
-      newNodes.push(await this.doAdd(node, parentNode, options));
+      const offset = offsets.get(parentNode.id) ?? 0;
+      offsets.set(parentNode.id, offset + 1);
+      const nodeOptions =
+        typeof explicitIndex === 'number' ? { ...options, insertIndex: Math.trunc(explicitIndex) + offset } : options;
+      newNodes.push(await this.doAdd(node, parentNode, nodeOptions));
     }
 
     // record 模式：在写入历史记录之前落库，使历史快照包含本次的错误状态
@@ -1369,7 +1393,7 @@ class Editor extends BaseService {
   public async addAndGetHistoryId(
     addNode: AddMNode | MNode[],
     parent?: MContainer | null,
-    options: DslOpOptions = {},
+    options: AddOpOptions = {},
   ): Promise<DslOpWithHistoryIdsResult<MNode | MNode[]>> {
     this.lastPushedHistoryId = null;
     const result = await this.add(addNode, parent, options);
