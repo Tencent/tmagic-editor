@@ -4,7 +4,8 @@
  * Copyright (C) 2025 Tencent.
  */
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { nextTick } from 'vue';
+import { markRaw, nextTick } from 'vue';
+import { Sort } from '@element-plus/icons-vue';
 import { mount } from '@vue/test-utils';
 import ElementPlus from 'element-plus';
 
@@ -32,6 +33,16 @@ const waitFor = async (predicate: () => boolean, timeout = 1000) => {
   }
   return predicate();
 };
+
+/** 行操作按钮的文案改由 Tooltip 承载，这里按 tooltip content 找按钮 */
+const actionTooltips = (scope: any) => scope.findAllComponents({ name: 'TMTooltip' }) as any[];
+
+const actionTooltipContents = (scope: any) => actionTooltips(scope).map((tooltip) => tooltip.props('content'));
+
+const actionButton = (scope: any, content: string) =>
+  actionTooltips(scope)
+    .find((tooltip) => tooltip.props('content') === content)
+    ?.find('button');
 
 describe('GroupList container', () => {
   test('空数据时显示暂无数据', async () => {
@@ -147,8 +158,13 @@ describe('GroupList container', () => {
       const wrapper = mountForm(compareConfig, { list: [{ text: 'a' }, { text: 'b' }] });
       await nextTick();
       expect(wrapper.find('.m-fields-group-list-footer').exists()).toBe(true);
-      expect(wrapper.text()).toContain('复制');
-      expect(wrapper.text()).toContain('上移');
+      const contents = actionTooltipContents(wrapper);
+      expect(contents).toContain('复制');
+      expect(contents).toContain('上移');
+      expect(contents).toContain('下移');
+      // 文案只在 tooltip 里，不再渲染成按钮文本
+      expect(wrapper.text()).not.toContain('复制');
+      expect(wrapper.text()).not.toContain('上移');
     });
 
     test('每项只有一个删除按钮，且位于上移下移之后', async () => {
@@ -159,8 +175,8 @@ describe('GroupList container', () => {
       expect(actions).toHaveLength(2);
       actions.forEach((action) => {
         expect(action.findAll('.delete-button')).toHaveLength(1);
-        const html = action.html();
-        expect(html.indexOf('下移')).toBeLessThan(html.indexOf('delete-button'));
+        const buttons = action.findAll('button');
+        expect(buttons[buttons.length - 1].classes()).toContain('delete-button');
       });
     });
 
@@ -194,6 +210,8 @@ describe('GroupList container', () => {
       await nextTick();
       expect(wrapper.find('.m-fields-group-list-footer').exists()).toBe(false);
       expect(wrapper.find('.delete-button').exists()).toBe(false);
+      // 行操作按钮整组不渲染，也就没有 tooltip 触发器
+      expect(actionTooltips(wrapper)).toHaveLength(0);
       expect(wrapper.text()).not.toContain('复制');
       expect(wrapper.text()).not.toContain('上移');
       expect(wrapper.text()).not.toContain('下移');
@@ -218,7 +236,7 @@ describe('GroupList container', () => {
       const wrapper = mountForm(compareConfig, { list: [{ text: 'a' }, { text: 'b' }] });
       await nextTick();
 
-      const copyButton = wrapper.findAll('button').find((btn) => btn.text().includes('复制'));
+      const copyButton = actionButton(wrapper, '复制');
       await copyButton?.trigger('click');
       await nextTick();
 
@@ -234,11 +252,8 @@ describe('GroupList container', () => {
       await nextTick();
 
       // 首项的「上移」与末项的「下移」只是 v-show 隐藏，仍在 DOM 里，按 item 作用域取才不会点错
-      const buttonIn = (index: number, text: string) =>
-        wrapper
-          .findAll('.m-fields-group-list-item')
-          [index].findAll('button')
-          .find((btn) => btn.text().includes(text));
+      const buttonIn = (index: number, content: string) =>
+        actionButton(wrapper.findAll('.m-fields-group-list-item')[index], content);
 
       await buttonIn(0, '下移')?.trigger('click');
       await nextTick();
@@ -684,29 +699,29 @@ describe('GroupList container', () => {
       );
       await nextTick();
 
-      expect(wrapper.text()).toContain('克隆');
-      expect(wrapper.text()).toContain('前移');
-      expect(wrapper.text()).toContain('后移');
-      expect(wrapper.text()).toContain('挪到');
-      expect(wrapper.text()).not.toContain('复制');
+      const contents = actionTooltipContents(wrapper);
+      expect(contents).toContain('克隆');
+      expect(contents).toContain('前移');
+      expect(contents).toContain('后移');
+      expect(contents).toContain('挪到');
+      expect(contents).toContain('移除 条目 1: a');
+      expect(contents).not.toContain('复制');
+      // 文案只在 tooltip 里，按钮本身是纯图标
+      expect(wrapper.text()).not.toContain('克隆');
       expect(wrapper.find('.custom-copy').exists()).toBe(true);
       expect(wrapper.find('.custom-up').exists()).toBe(true);
       expect(wrapper.find('.custom-down').exists()).toBe(true);
       expect(wrapper.find('.custom-move').exists()).toBe(true);
       expect(wrapper.find('.custom-remove').exists()).toBe(true);
       expect(
-        wrapper
-          .findAllComponents({ name: 'TMButton' })
-          .find((btn) => btn.text().includes('克隆'))
-          ?.props('type'),
+        actionTooltips(wrapper)
+          .find((tooltip) => tooltip.props('content') === '克隆')
+          ?.findComponent({ name: 'TMButton' })
+          .props('type'),
       ).toBe('success');
-      expect(wrapper.findComponent({ name: 'TMTooltip' }).props('content')).toBe('移除 条目 1: a');
 
       await wrapper.find('.expand-button').trigger('click');
-      await wrapper
-        .findAll('button')
-        .find((btn) => btn.text().includes('挪到'))
-        ?.trigger('click');
+      await actionButton(wrapper, '挪到')?.trigger('click');
       await wrapper
         .findAll('button')
         .find((btn) => btn.text().includes('取消'))
@@ -728,6 +743,7 @@ describe('GroupList container', () => {
             name: 'list',
             actionButtons: [
               { text: '详情', props: { class: 'custom-detail' }, handler },
+              { text: '更多', icon: markRaw(Sort), props: { class: 'custom-icon' }, handler },
               { text: '隐藏', display: () => false, handler },
             ],
             items: [{ name: 'text', type: 'text', text: 'text' }],
@@ -740,6 +756,15 @@ describe('GroupList container', () => {
       expect(wrapper.text()).not.toContain('隐藏');
       const buttons = wrapper.findAll('.custom-detail');
       expect(buttons).toHaveLength(2);
+      // 无 icon 的自定义按钮仍把文案渲染在按钮里，避免变成不可见的空白按钮
+      expect(buttons[0].text()).toContain('详情');
+      expect(actionTooltipContents(wrapper)).toContain('详情');
+
+      // 有 icon 时按钮只留图标，文案移到 tooltip
+      const iconButtons = wrapper.findAll('.custom-icon');
+      expect(iconButtons).toHaveLength(2);
+      expect(iconButtons[0].text()).toBe('');
+      expect(actionTooltipContents(wrapper)).toContain('更多');
 
       await buttons[1].trigger('click');
       expect(handler).toHaveBeenCalledTimes(1);

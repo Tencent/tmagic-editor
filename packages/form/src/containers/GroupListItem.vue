@@ -12,39 +12,38 @@
           </slot>
         </div>
         <div class="m-fields-group-list-item-actions">
-          <TMagicButton
-            v-if="copyable && !isCompare"
-            link
-            size="default"
-            type="primary"
-            :icon="DocumentCopy"
-            :disabled="disabled"
-            v-bind="config.copyButtonConfig?.props"
-            @click="copyHandler"
-            >{{ actionButtonText(config.copyButtonConfig, 'copy') }}</TMagicButton
-          >
+          <TMagicTooltip v-if="copyable && !isCompare" :content="actionButtonText(config.copyButtonConfig, 'copy')">
+            <TMagicButton
+              size="small"
+              type="primary"
+              :icon="DocumentCopy"
+              :disabled="disabled"
+              v-bind="config.copyButtonConfig?.props"
+              @click="copyHandler"
+            ></TMagicButton>
+          </TMagicTooltip>
 
           <template v-if="movable && !isCompare">
-            <TMagicButton
-              v-show="index !== 0"
-              link
-              size="default"
-              :disabled="disabled"
-              :icon="Top"
-              v-bind="config.moveUpButtonConfig?.props"
-              @click="changeOrder(-1)"
-              >{{ actionButtonText(config.moveUpButtonConfig, 'moveUp') }}</TMagicButton
-            >
-            <TMagicButton
-              v-show="index !== length - 1"
-              link
-              size="default"
-              :disabled="disabled"
-              :icon="Bottom"
-              v-bind="config.moveDownButtonConfig?.props"
-              @click="changeOrder(1)"
-              >{{ actionButtonText(config.moveDownButtonConfig, 'moveDown') }}</TMagicButton
-            >
+            <TMagicTooltip :content="actionButtonText(config.moveUpButtonConfig, 'moveUp')">
+              <TMagicButton
+                v-show="index !== 0"
+                size="small"
+                :disabled="disabled"
+                :icon="Top"
+                v-bind="config.moveUpButtonConfig?.props"
+                @click="changeOrder(-1)"
+              ></TMagicButton>
+            </TMagicTooltip>
+            <TMagicTooltip :content="actionButtonText(config.moveDownButtonConfig, 'moveDown')">
+              <TMagicButton
+                v-show="index !== length - 1"
+                size="small"
+                :disabled="disabled"
+                :icon="Bottom"
+                v-bind="config.moveDownButtonConfig?.props"
+                @click="changeOrder(1)"
+              ></TMagicButton>
+            </TMagicTooltip>
           </template>
 
           <TMagicPopover
@@ -55,16 +54,16 @@
             :visible="moveSpecifyLocationVisible"
           >
             <template #reference>
-              <TMagicButton
-                link
-                size="small"
-                type="primary"
-                :icon="Position"
-                :disabled="disabled"
-                v-bind="config.moveToButtonConfig?.props"
-                @click="moveSpecifyLocationVisible = true"
-                >{{ actionButtonText(config.moveToButtonConfig, 'moveTo') }}</TMagicButton
-              >
+              <TMagicTooltip :content="actionButtonText(config.moveToButtonConfig, 'moveTo')">
+                <TMagicButton
+                  size="small"
+                  type="primary"
+                  :icon="Position"
+                  :disabled="disabled"
+                  v-bind="config.moveToButtonConfig?.props"
+                  @click="moveSpecifyLocationVisible = true"
+                ></TMagicButton>
+              </TMagicTooltip>
             </template>
             <div>
               <div>
@@ -91,8 +90,7 @@
           >
             <TMagicButton
               v-show="showDelete"
-              size="default"
-              link
+              size="small"
               class="delete-button"
               :icon="Delete"
               :disabled="disabled"
@@ -102,18 +100,19 @@
           </TMagicTooltip>
 
           <template v-if="!isCompare">
-            <TMagicButton
-              v-for="(item, i) in customButtons"
-              :key="i"
-              link
-              size="default"
-              type="primary"
-              :icon="item.button.icon"
-              :disabled="item.disabled"
-              v-bind="item.button.props"
-              @click="item.onClick"
-              >{{ item.button.text }}</TMagicButton
-            >
+            <!-- 没有 icon 的自定义按钮只能靠文案区分，此时文案仍渲染在按钮里 -->
+            <TMagicTooltip v-for="(item, i) in customButtons" :key="i" :content="item.button.text">
+              <TMagicButton
+                size="small"
+                type="primary"
+                :icon="item.button.icon"
+                :disabled="item.disabled"
+                v-bind="item.button.props"
+                @click="item.onClick"
+              >
+                <template v-if="!item.button.icon">{{ item.button.text }}</template>
+              </TMagicButton>
+            </TMagicTooltip>
           </template>
 
           <span v-if="itemExtra" v-html="itemExtra" class="m-form-tip"></span>

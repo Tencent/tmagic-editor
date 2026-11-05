@@ -69,6 +69,11 @@
       align-items: center;
       flex-shrink: 0;
       gap: 8px;
+
+      // design 包给相邻按钮加了 12px margin，这里统一交给 gap 控制
+      .tmagic-design-button + .tmagic-design-button {
+        margin-left: 0;
+      }
     }
   }
 
