@@ -76,8 +76,20 @@
         display: flex;
         align-items: center;
 
+        // Element Plus 的 link 按钮左右 padding 是 2px，TDesign 的 text 变体默认
+        // 为 calc(var(--td-comp-paddingLR-l) - 1px)（15px），会把工具栏图标按钮撑宽。
+        .t-button--variant-text {
+          padding-left: 2px;
+          padding-right: 2px;
+        }
+
         .tmagic-design-icon {
           margin-right: 10px;
+        }
+
+        .delete-icon-wrapper {
+          display: inline-flex;
+          align-items: center;
         }
       }
     }

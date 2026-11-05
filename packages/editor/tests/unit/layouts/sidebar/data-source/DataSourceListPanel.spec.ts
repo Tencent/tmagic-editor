@@ -187,8 +187,8 @@ describe('DataSourceListPanel', () => {
     await wrapper.find('.edit-btn').trigger('click');
     expect(editHandler).toHaveBeenCalledWith('d1');
     await wrapper.find('.remove-btn').trigger('click');
-    expect(messageBoxConfirm).toHaveBeenCalled();
-    await new Promise((r) => setTimeout(r, 0));
+    // 确认已下沉到 DataSourceList 的 Popconfirm，面板不再弹出 MessageBox
+    expect(messageBoxConfirm).not.toHaveBeenCalled();
     expect(dataSourceService.remove).toHaveBeenCalledWith('d1', { historySource: 'tree-contextmenu' });
     await wrapper.find('.ctx-btn').trigger('click');
     expect(nodeContentMenuHandler).toHaveBeenCalled();
@@ -216,5 +216,33 @@ describe('DataSourceListPanel', () => {
     const events = eventBusOn.mock.calls.map((c: any[]) => c[0]);
     expect(events).toContain('edit-data-source');
     expect(events).toContain('remove-data-source');
+  });
+
+  test('eventBus remove-data-source 执行删除', () => {
+    mountIt();
+    const handler = eventBusOn.mock.calls.find((c: any[]) => c[0] === 'remove-data-source')?.[1];
+    handler?.('d2');
+    expect(dataSourceService.remove).toHaveBeenCalledWith('d2', { historySource: 'tree-contextmenu' });
+  });
+
+  test('eventBus 编辑事件重置定位信息并打开编辑', () => {
+    mountIt();
+    const handlerOf = (name: string) => eventBusOn.mock.calls.find((c: any[]) => c[0] === name)?.[1];
+
+    handlerOf('edit-data-source')?.('d1');
+    handlerOf('edit-data-source-method')?.('d2', 'm1');
+    handlerOf('edit-data-source-field')?.('d3', ['f1']);
+
+    expect(editHandler).toHaveBeenCalledWith('d1');
+    expect(editHandler).toHaveBeenCalledWith('d2');
+    expect(editHandler).toHaveBeenCalledWith('d3');
+  });
+
+  test('addHandler 合并表单配置中的数组值', async () => {
+    editDialog.value = { show: editDialogShow };
+    dataSourceService.getFormValue.mockReturnValueOnce({ id: 'fv', type: 'http', fields: [{ name: 'a' }] });
+    const wrapper = mountIt();
+    await wrapper.find('.add-btn').trigger('click');
+    expect(dataSourceValues.value.fields).toEqual([{ name: 'a' }]);
   });
 });

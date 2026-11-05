@@ -19,12 +19,29 @@
       </div>
     </template>
     <template #tree-node-tool="{ data }">
-      <TMagicTooltip v-if="data.type === 'ds'" effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">
-        <Icon :icon="editable ? Edit : View" class="edit-icon" @click.stop="editHandler(`${data.key}`)"></Icon>
+      <TMagicTooltip v-if="data.type === 'ds'" effect="dark" :content="editable ? '编辑' : '查看'" placement="left">
+        <TMagicButton
+          link
+          :icon="editable ? Edit : View"
+          class="edit-icon"
+          @click.stop="editHandler(`${data.key}`)"
+        ></TMagicButton>
       </TMagicTooltip>
-      <TMagicTooltip v-if="data.type === 'ds' && editable" effect="dark" content="删除" placement="bottom">
-        <Icon :icon="Close" class="edit-icon" @click.stop="removeHandler(`${data.key}`)"></Icon>
-      </TMagicTooltip>
+      <TMagicPopconfirm
+        v-if="data.type === 'ds' && editable"
+        title="确定删除?"
+        placement="right"
+        :teleported="true"
+        @confirm="removeHandler(`${data.key}`)"
+      >
+        <template #reference>
+          <span class="delete-icon-wrapper" @click.stop>
+            <TMagicTooltip effect="dark" content="删除" placement="right">
+              <TMagicButton link :icon="Close" class="edit-icon"></TMagicButton>
+            </TMagicTooltip>
+          </span>
+        </template>
+      </TMagicPopconfirm>
       <slot name="data-source-panel-tool" :data="data"></slot>
     </template>
   </Tree>
@@ -35,9 +52,8 @@ import { computed } from 'vue';
 import { Close, Edit, View } from '@element-plus/icons-vue';
 
 import { DepData, DepTargetType, Id, MNode } from '@tmagic/core';
-import { TMagicTooltip } from '@tmagic/design';
+import { TMagicButton, TMagicPopconfirm, TMagicTooltip } from '@tmagic/design';
 
-import Icon from '@editor/components/Icon.vue';
 import Tree from '@editor/components/Tree.vue';
 import { useFilter } from '@editor/hooks/use-filter';
 import { useNodeStatus } from '@editor/hooks/use-node-status';
@@ -156,7 +172,7 @@ const editHandler = (id: string) => {
   emit('edit', id);
 };
 
-const removeHandler = async (id: string) => {
+const removeHandler = (id: string) => {
   emit('remove', id);
 };
 

@@ -20,12 +20,29 @@
     </template>
 
     <template #tree-node-tool="{ data }">
-      <TMagicTooltip v-if="data.type === 'code'" effect="dark" :content="editable ? '编辑' : '查看'" placement="bottom">
-        <Icon :icon="editable ? Edit : View" class="edit-icon" @click.stop="editCode(`${data.key}`)"></Icon>
+      <TMagicTooltip v-if="data.type === 'code'" effect="dark" :content="editable ? '编辑' : '查看'" placement="left">
+        <TMagicButton
+          link
+          :icon="editable ? Edit : View"
+          class="edit-icon"
+          @click.stop="editCode(`${data.key}`)"
+        ></TMagicButton>
       </TMagicTooltip>
-      <TMagicTooltip v-if="data.type === 'code' && editable" effect="dark" content="删除" placement="bottom">
-        <Icon :icon="Close" class="edit-icon" @click.stop="deleteCode(`${data.key}`, { historySource: 'tree' })"></Icon>
-      </TMagicTooltip>
+      <TMagicPopconfirm
+        v-if="data.type === 'code' && editable"
+        title="确定删除该代码块吗？"
+        placement="right"
+        :teleported="true"
+        @confirm="deleteCode(`${data.key}`, { historySource: 'tree' })"
+      >
+        <template #reference>
+          <span class="delete-icon-wrapper" @click.stop="deleteClickHandler(`${data.key}`)">
+            <TMagicTooltip effect="dark" content="删除" placement="right">
+              <TMagicButton link :icon="Close" class="edit-icon"></TMagicButton>
+            </TMagicTooltip>
+          </span>
+        </template>
+      </TMagicPopconfirm>
       <slot name="code-block-panel-tool" :id="data.key" :data="data"></slot>
     </template>
   </Tree>
@@ -37,9 +54,8 @@ import { Close, Edit, View } from '@element-plus/icons-vue';
 
 import type { Id, MNode } from '@tmagic/core';
 import { DepTargetType } from '@tmagic/core';
-import { tMagicMessage, tMagicMessageBox, TMagicTooltip } from '@tmagic/design';
+import { TMagicButton, tMagicMessage, TMagicPopconfirm, TMagicTooltip } from '@tmagic/design';
 
-import Icon from '@editor/components/Icon.vue';
 import Tree from '@editor/components/Tree.vue';
 import { useFilter } from '@editor/hooks/use-filter';
 import { useNodeStatus } from '@editor/hooks/use-node-status';
@@ -142,29 +158,38 @@ const editCode = (id: string) => {
   emit('edit', id);
 };
 
-const deleteCode = async (id: string, { historySource }: { historySource?: HistoryOpSource } = {}) => {
+/** 返回不能删除的原因，可删除时返回 undefined */
+const getDeleteErrorType = (id: string): CodeDeleteErrorType | undefined => {
   const currentCode = codeList.value.find((codeItem) => codeItem.id === id);
-  const existBinds = Boolean(currentCode?.items?.length);
-  const undeleteableList = codeBlockService.getUndeletableList() || [];
-  if (!existBinds && !undeleteableList.includes(id)) {
-    await tMagicMessageBox.confirm('确定删除该代码块吗？', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    });
+  if (currentCode?.items?.length) {
+    return CodeDeleteErrorType.BIND;
+  }
 
-    // 无绑定关系，且不在不可删除列表中
-    emit('remove', id, { historySource });
-  } else {
+  return (codeBlockService.getUndeletableList() || []).includes(id) ? CodeDeleteErrorType.UNDELETEABLE : undefined;
+};
+
+/** 删除确认由 TMagicPopconfirm 完成，这里只做校验与删除 */
+const deleteCode = (id: string, { historySource }: { historySource?: HistoryOpSource } = {}) => {
+  const errorType = getDeleteErrorType(id);
+
+  if (errorType) {
     if (typeof props.customError === 'function') {
-      props.customError(id, existBinds ? CodeDeleteErrorType.BIND : CodeDeleteErrorType.UNDELETEABLE);
+      props.customError(id, errorType);
+    } else if (errorType === CodeDeleteErrorType.BIND) {
+      tMagicMessage.error('代码块存在绑定关系，不可删除');
     } else {
-      if (existBinds) {
-        tMagicMessage.error('代码块存在绑定关系，不可删除');
-      } else {
-        tMagicMessage.error('代码块不可删除');
-      }
+      tMagicMessage.error('代码块不可删除');
     }
+    return;
+  }
+
+  emit('remove', id, { historySource });
+};
+
+/** 不可删除的代码块点击后直接说明原因，无需等待确认 */
+const deleteClickHandler = (id: string) => {
+  if (getDeleteErrorType(id)) {
+    deleteCode(id, { historySource: 'tree' });
   }
 };
 

@@ -50,7 +50,7 @@
 import { computed, inject, ref, useTemplateRef, watch } from 'vue';
 import { mergeWith } from 'lodash-es';
 
-import { tMagicMessageBox, TMagicScrollbar } from '@tmagic/design';
+import { TMagicScrollbar } from '@tmagic/design';
 
 import ContentMenu from '@editor/components/ContentMenu.vue';
 import SearchInput from '@editor/components/SearchInput.vue';
@@ -133,13 +133,8 @@ const addHandler = (type: string) => {
   editDialog.value.show();
 };
 
-const removeHandler = async (id: string) => {
-  await tMagicMessageBox.confirm('确定删除?', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning',
-  });
-
+/** 删除确认由 DataSourceList 中的 TMagicPopconfirm 完成，这里只负责执行删除 */
+const removeHandler = (id: string) => {
   dataSourceService.remove(id, { historySource: 'tree-contextmenu' });
 };
 
