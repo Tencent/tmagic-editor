@@ -435,15 +435,24 @@ const display = computed((): boolean => {
   return value;
 });
 
-const fieldsProps = computed(() => ({
-  size: props.size,
-  config: props.config,
-  name: name.value,
-  disabled: disabled.value,
-  prop: itemProp.value,
-  key: (props.config as Record<string, any>)[mForm?.keyProps],
-  style: props.config.fieldStyle,
-}));
+const fieldsProps = computed(() => {
+  const configKey = (props.config as Record<string, any>)[mForm?.keyProps];
+  const version = (mForm?.fieldVersion as number | undefined) ?? 0;
+  const isContainer = Boolean(items.value);
+  const keepConfigKey = isContainer || version === 0;
+
+  return {
+    size: props.size,
+    config: props.config,
+    name: name.value,
+    disabled: disabled.value,
+    prop: itemProp.value,
+    // 换了数据实体时重挂叶子字段，清掉字段实例内由旧 model 派生的本地状态；
+    // 容器字段（tab / group-list 等）保持原 key，激活 tab、滚动、展开态不随之丢失。
+    key: keepConfigKey ? configKey : `${version}-${itemProp.value}-${configKey ?? ''}`,
+    style: props.config.fieldStyle,
+  };
+});
 
 const formItemProps = computed(() => ({
   prop: itemProp.value,

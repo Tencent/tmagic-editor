@@ -71,7 +71,7 @@ const mountedHandlers: any[] = [];
 vi.mock('@editor/layouts/props-panel/FormPanel.vue', () => ({
   default: defineComponent({
     name: 'FormPanel',
-    props: ['config', 'values', 'disabledShowSrc'],
+    props: ['config', 'values', 'formKey', 'disabledShowSrc'],
     emits: ['submit', 'submit-error', 'form-error', 'mounted', 'unmounted'],
     setup(_p, { emit, expose }) {
       mountedHandlers.push(emit);
@@ -162,6 +162,42 @@ describe('PropsPanel', () => {
     mount(PropsPanel, { props: {} as any });
     await new Promise((r) => setTimeout(r, 0));
     expect(propsService.getPropsConfig).toHaveBeenCalled();
+  });
+
+  test('把当前节点 id 作为 formKey 传给两个 FormPanel', async () => {
+    const wrapper = mount(PropsPanel, { props: {} as any });
+    await wrapper.vm.$nextTick();
+    await new Promise((r) => setTimeout(r, 0));
+    await wrapper.vm.$nextTick();
+
+    const panels = wrapper.findAllComponents({ name: 'FormPanel' });
+    expect(panels.length).toBeGreaterThan(0);
+    panels.forEach((panel) => expect(panel.props('formKey')).toBe('n1'));
+  });
+
+  test('formKey 与 values 同步更新，不早于异步返回的新节点值', async () => {
+    const node = ref<any>({ id: 'n1', type: 'text' });
+    editorService.get.mockImplementation((k: string) => (k === 'node' ? node.value : [node.value]));
+    let release!: () => void;
+    const wrapper = mount(PropsPanel, { props: {} as any });
+    await new Promise((r) => setTimeout(r, 0));
+    const panel = () => wrapper.findComponent({ name: 'FormPanel' });
+    expect(panel().props('formKey')).toBe('n1');
+
+    propsService.getPropsConfig.mockImplementationOnce(
+      () => new Promise((resolve) => (release = () => resolve([{ name: 'y' }]))),
+    );
+    node.value = { id: 'n2', type: 'text' };
+    await nextTick();
+
+    expect(panel().props('formKey')).toBe('n1');
+    expect(panel().props('values').id).toBe('n1');
+
+    release();
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(panel().props('formKey')).toBe('n2');
+    expect(panel().props('values').id).toBe('n2');
   });
 
   test('node 为空时清空 config', async () => {

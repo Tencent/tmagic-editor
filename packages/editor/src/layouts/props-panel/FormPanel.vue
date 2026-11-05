@@ -12,6 +12,7 @@
         :size="propsPanelSize"
         :init-values="values"
         :config="config"
+        :form-key="formKey"
         :type-match-valid="enablePropsFormValidate"
         :context="formContext"
         :validate-on-init="enablePropsFormValidate"
@@ -72,6 +73,8 @@ defineOptions({
 const props = defineProps<{
   config: FormConfig;
   values: FormValue;
+  /** 当前选中节点的 id：切换节点后让 MForm 重挂叶子字段，避免表单实例状态串台 */
+  formKey?: string | number;
   disabledShowSrc?: boolean;
   labelWidth?: string;
   codeValueKey?: string;

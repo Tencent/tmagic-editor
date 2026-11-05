@@ -8,6 +8,7 @@ import { defineComponent, h } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import DataSourceMethodSelect from '@editor/fields/DataSourceMethodSelect.vue';
+import { getFieldType } from '@editor/utils';
 
 const dataSourceService = {
   get: vi.fn(() => [
@@ -198,5 +199,51 @@ describe('DataSourceMethodSelect', () => {
       props: baseProps({ model: { dataSourceMethod: ['ds1', '__set_data__'], params: {} } }) as any,
     });
     expect(wrapper.find('.fake-params').exists()).toBe(true);
+  });
+
+  test('切换同类型节点后参数字段按新节点的方法重建，不残留旧节点的参数配置', async () => {
+    dataSourceService.get.mockReturnValue([
+      {
+        id: 'ds1',
+        type: 'http',
+        title: 'DS1',
+        methods: [
+          { name: 'doFetch', params: [{ name: 'p1', type: 'text' }] },
+          { name: 'doSave', params: [{ name: 'p2', type: 'number' }] },
+        ],
+      },
+    ]);
+    dataSourceService.getDataSourceById.mockReturnValue({ id: 'ds1', methods: [] });
+
+    const wrapper = mount(DataSourceMethodSelect, {
+      props: baseProps({ model: { dataSourceMethod: ['ds1', 'doFetch'], params: {} } }) as any,
+    });
+    const params = () => wrapper.findComponent({ name: 'CodeParams' }).props('paramsConfig') as any[];
+    expect(params()[0].name).toBe('p1');
+
+    // 属性面板复用同一个字段实例，只把 model 换成另一个节点的事件动作
+    await wrapper.setProps({ model: { dataSourceMethod: ['ds1', 'doSave'], params: {} } });
+
+    expect(params()[0].name).toBe('p2');
+  });
+
+  test('设置数据方法的 data 参数按数据源字段类型切换控件', () => {
+    dataSourceService.getDataSourceById.mockReturnValue({ id: 'ds1', methods: [{ name: '__set_data__' }] });
+    const wrapper = mount(DataSourceMethodSelect, {
+      props: baseProps({ model: { dataSourceMethod: ['ds1', '__set_data__'], params: {} } }) as any,
+    });
+    const params = wrapper.findComponent({ name: 'CodeParams' }).props('paramsConfig') as any[];
+    const dataConfig = params.find((item) => item.name === 'data');
+
+    vi.mocked(getFieldType)
+      .mockReturnValueOnce('number')
+      .mockReturnValueOnce('string')
+      .mockReturnValueOnce('boolean')
+      .mockReturnValueOnce('unknown');
+
+    expect(dataConfig.type(null, { model: { field: 'f1' } })).toBe('number');
+    expect(dataConfig.type(null, { model: { field: 'f1' } })).toBe('text');
+    expect(dataConfig.type(null, { model: { field: 'f1' } })).toBe('switch');
+    expect(dataConfig.type(null, { model: { field: 'f1' } })).toBe('vs-code');
   });
 });

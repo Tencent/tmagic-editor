@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, inject, ref, watch } from 'vue';
+import { computed, inject } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 import { isEmpty, map } from 'lodash-es';
 
@@ -132,16 +132,14 @@ const getParamItemsConfig = (codeId?: Id): CodeParamStatement[] => {
 };
 
 const codeDsl = computed(() => codeBlockService.getCodeDsl());
-const paramsConfig = ref<CodeParamStatement[]>(getParamItemsConfig(props.model[props.name]));
 
-watch(
-  () => props.model[props.name],
-  (v, preV) => {
-    if (v !== preV) {
-      paramsConfig.value = getParamItemsConfig(v);
-    }
-  },
-);
+/**
+ * 参数字段配置跟随当前 model / codeDsl 派生，而不是 setup 期的一次性快照。
+ *
+ * 同类型组件切换选中时字段实例会被复用，且新节点的 codeId 可能与旧节点相同，
+ * 按值 watch 不会触发，参数配置会停留在上一个节点上。
+ */
+const paramsConfig = computed<CodeParamStatement[]>(() => getParamItemsConfig(props.model[props.name]));
 
 const selectConfig: SelectConfig = {
   type: 'select',
@@ -161,8 +159,8 @@ const selectConfig: SelectConfig = {
 };
 
 const onCodeIdChangeHandler = (value: any) => {
-  // 通过下拉框选择的codeId变化后修正model的值，避免写入其他codeId的params
-  paramsConfig.value = getParamItemsConfig(value);
+  // model 尚未写入新值（由 MForm 收到 change 后统一写回），参数字段配置先按新 codeId 算
+  const nextParamsConfig = getParamItemsConfig(value);
 
   const changeRecords = [
     {
@@ -173,8 +171,8 @@ const onCodeIdChangeHandler = (value: any) => {
 
   changeRecords.push({
     propPath: props.prop.replace(`${props.name}`, 'params'),
-    value: paramsConfig.value.length
-      ? createValues(mForm, paramsConfig.value as unknown as FormItemConfig[], {}, props.model.params)
+    value: nextParamsConfig.length
+      ? createValues(mForm, nextParamsConfig as unknown as FormItemConfig[], {}, props.model.params)
       : {},
   });
 

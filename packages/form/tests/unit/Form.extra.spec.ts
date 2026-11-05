@@ -882,3 +882,227 @@ describe('Form.vue —— 配置变化是否触发重挂', () => {
     expect(wrapper.find('input').element).not.toBe(before);
   });
 });
+
+describe('Form.vue —— 数据实体切换（formKey）', () => {
+  // 模拟「在 setup 期从 model 派生配置」的字段（如事件动作里的代码块 / 数据源方法参数）
+  const snapshotField = defineComponent({
+    name: 'SnapshotField',
+    props: ['model', 'name', 'config'],
+    setup(props: any) {
+      const snapshot = ref(props.model?.[props.name]);
+      return () => h('span', { class: 'snapshot-field' }, `${snapshot.value}`);
+    },
+  });
+
+  const makeConfig = () => [
+    {
+      type: 'tab',
+      items: [
+        { title: '属性', items: [{ name: 'id', type: 'text', text: 'ID' }] },
+        {
+          title: '事件',
+          items: [
+            {
+              type: 'group-list',
+              name: 'events',
+              expandAll: true,
+              items: [{ type: 'entity-snapshot', name: 'label', text: '事件' }],
+            },
+          ],
+        },
+      ],
+    },
+  ];
+
+  const mountEntityForm = (props: Record<string, any>) =>
+    mount(MForm, {
+      global: {
+        plugins: [
+          ElementPlus as any,
+          [MagicForm as any, { fields: { 'entity-snapshot': { component: snapshotField } } }] as any,
+        ],
+      },
+      props: { config: makeConfig(), ...props },
+    });
+
+  const flush = async () => {
+    await nextTick();
+    await Promise.resolve();
+    await nextTick();
+  };
+
+  const nodeA = { id: 'A', type: 'button', events: [{ label: 'A-click' }] };
+  const nodeB = { id: 'B', type: 'button', events: [{ label: 'B-click' }] };
+
+  test('同类型节点切换时叶子字段重挂，不再残留上一个节点的配置', async () => {
+    const wrapper = mountEntityForm({ formKey: 'A', initValues: nodeA });
+    await flush();
+    expect(wrapper.find('.snapshot-field').text()).toBe('A-click');
+
+    await wrapper.setProps({ formKey: 'B', initValues: nodeB });
+    await flush();
+
+    expect(wrapper.vm.values.events[0].label).toBe('B-click');
+    expect(wrapper.find('.snapshot-field').text()).toBe('B-click');
+    expect((wrapper.vm.formState as any).fieldVersion).toBe(1);
+  });
+
+  test('同一实体的值更新不重挂字段，输入焦点/DOM 保持不变', async () => {
+    const wrapper = mountEntityForm({ formKey: 'A', initValues: nodeA });
+    await flush();
+    const before = wrapper.find('.snapshot-field').element;
+
+    await wrapper.setProps({ initValues: { ...nodeA, events: [{ label: 'A-click-2' }] } });
+    await flush();
+
+    expect(wrapper.find('.snapshot-field').element).toBe(before);
+    expect((wrapper.vm.formState as any).fieldVersion).toBe(0);
+    expect(wrapper.vm.values.events[0].label).toBe('A-click-2');
+  });
+
+  test('切换实体保留 tab 容器实例，激活 tab / 滚动状态不重置', async () => {
+    const wrapper = mountEntityForm({ formKey: 'A', initValues: nodeA });
+    await flush();
+    const tabsUid = (wrapper.findComponent({ name: 'MFormTabs' }).vm as any).$.uid;
+
+    await wrapper.setProps({ formKey: 'B', initValues: nodeB });
+    await flush();
+
+    expect((wrapper.findComponent({ name: 'MFormTabs' }).vm as any).$.uid).toBe(tabsUid);
+    expect(wrapper.find('.snapshot-field').text()).toBe('B-click');
+  });
+
+  test('快速切换实体时只采用最后一次 initValue 的结果', async () => {
+    const pending: ((v: any) => void)[] = [];
+    const config: any = [
+      {
+        type: 'tab',
+        onInitValue: (_mForm: any, { formValue }: any) =>
+          new Promise((resolve) => pending.push((v) => resolve({ ...formValue, ...v }))),
+        items: [{ title: '属性', items: [{ name: 'id', type: 'text', text: 'ID' }] }],
+      },
+    ];
+    const wrapper = mount(MForm, {
+      global: { plugins: [ElementPlus as any, MagicForm as any] },
+      props: { config, formKey: 'A', initValues: nodeA },
+    });
+    await nextTick();
+    expect(pending.length).toBe(1);
+
+    await wrapper.setProps({ formKey: 'B', initValues: nodeB });
+    await nextTick();
+    expect(pending.length).toBe(2);
+
+    // 故意让旧实体的异步初始化后完成
+    pending[1]({ id: 'B' });
+    await flush();
+    pending[0]({ id: 'A' });
+    await flush();
+
+    expect(wrapper.vm.values.id).toBe('B');
+    expect(wrapper.vm.initialized).toBe(true);
+  });
+});
+
+describe('Container.vue —— 值处理与对比分支', () => {
+  const emitField = defineComponent({
+    name: 'EmitField',
+    props: ['model', 'name', 'config'],
+    emits: ['change'],
+    setup(_props: any, { emit }: any) {
+      return () =>
+        h('button', { class: 'emit-field', onClick: () => emit('change', '  hello  ', { changeRecords: [] }) });
+    },
+  });
+
+  const mountEmitForm = (config: any[], props: Record<string, any> = {}) =>
+    mount(MForm, {
+      global: {
+        plugins: [
+          ElementPlus as any,
+          [MagicForm as any, { fields: { 'emit-field': { component: emitField } } }] as any,
+        ],
+      },
+      props: { config, initValues: { title: 'old' }, ...props },
+    });
+
+  const flush = async () => {
+    await nextTick();
+    await Promise.resolve();
+    await nextTick();
+  };
+
+  test('filter / trim / onChange 回调链按最新表单值处理字段改动', async () => {
+    const getFormValueInFilter = vi.fn();
+    const getFormValueInChange = vi.fn();
+    const wrapper = mountEmitForm([
+      {
+        type: 'emit-field',
+        name: 'title',
+        text: '标题',
+        filter: (_mForm: any, value: any, ctx: any) => {
+          getFormValueInFilter(ctx.getFormValue('title'));
+          return value;
+        },
+        trim: true,
+        onChange: (_mForm: any, value: any, ctx: any) => {
+          getFormValueInChange(ctx.getFormValue('title'));
+          // 读取 model proxy 的字段，验证其按 props.model 读穿
+          void ctx.model.title;
+          return value;
+        },
+      },
+    ]);
+    await flush();
+
+    await wrapper.find('.emit-field').trigger('click');
+    await flush();
+
+    expect(getFormValueInFilter).toHaveBeenCalledWith('old');
+    expect(getFormValueInChange).toHaveBeenCalledWith('old');
+    expect(wrapper.vm.values.title).toBe('hello');
+  });
+
+  test('onChange 抛错时不影响表单继续可用', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const wrapper = mountEmitForm([
+      {
+        type: 'emit-field',
+        name: 'title',
+        onChange: () => {
+          throw new Error('boom');
+        },
+      },
+    ]);
+    await flush();
+
+    await wrapper.find('.emit-field').trigger('click');
+    await flush();
+
+    expect(errorSpy).toHaveBeenCalled();
+    expect(wrapper.vm.initialized).toBe(true);
+    errorSpy.mockRestore();
+  });
+
+  test('对比模式支持自定义 showDiff 与 selfDiffFieldTypes', async () => {
+    const showDiff = vi.fn(() => true);
+    const selfDiffTypes = vi.fn((defaults: string[]) => [...defaults]);
+    const wrapper = mountForm({
+      config: [{ type: 'text', name: 'title', text: '标题' }],
+      initValues: { title: 'new' },
+      lastValues: { title: 'old' },
+      isCompare: true,
+      showDiff,
+      selfDiffFieldTypes: selfDiffTypes,
+    });
+    await flush();
+
+    expect(showDiff).toHaveBeenCalled();
+    expect(selfDiffTypes).toHaveBeenCalled();
+    expect(wrapper.findComponent({ name: 'MFormContainer' }).exists()).toBe(true);
+
+    await wrapper.setProps({ selfDiffFieldTypes: ['text'] });
+    await flush();
+    expect(wrapper.findComponent({ name: 'MFormContainer' }).exists()).toBe(true);
+  });
+});

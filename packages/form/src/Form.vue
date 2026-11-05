@@ -122,6 +122,17 @@ const props = withDefaults(
      */
     showDiff?: (_data: { curValue: any; lastValue: any; config: any }) => boolean;
     /**
+     * 当前表单绑定的数据实体标识（编辑器里一般是节点 id）。
+     *
+     * 配置结构相同但实体切换时（例如在两个同类型组件之间切换选中），`initialized` 不会
+     * 置回 false，整棵表单树会被复用。字段组件在 setup 期从 model 派生的本地状态
+     * （事件动作的参数配置等）仍属于上一个实体，出现「值来自新节点、配置来自旧节点」的串台。
+     *
+     * 该值变化时只重挂叶子字段组件，容器（tab / group-list）保持稳定，激活 tab、滚动位置
+     * 等视图状态不会丢失；同一实体的值更新（如编辑后重新下发 initValues）不会触发重挂。
+     */
+    formKey?: string | number;
+    /**
      * 自定义「自接管对比」的字段类型（仅在对比模式下生效）。
      *
      * 自接管对比的字段不会渲染前后两份独立组件，而是只渲染一次并由字段组件内部展示前后差异
@@ -173,6 +184,8 @@ const tMagicFormRef = useTemplateRef('tMagicForm');
 const initialized = ref(false);
 const values = ref<FormValue>({});
 const lastValuesProcessed = ref<FormValue>({});
+/** 数据实体版本：`formKey` 变化时递增，供 Container 重挂叶子字段以清理实例内的本地状态 */
+const fieldVersion = ref(0);
 
 /**
  * 当前表单生效的主题名称：
@@ -240,6 +253,7 @@ const coreState: FormState = reactive<FormState>({
   },
   values,
   lastValuesProcessed,
+  fieldVersion,
   $emit: emit as (_event: string, ..._args: any[]) => void,
   ...createFormStateBase({ $message: tMagicMessage, $messageBox: tMagicMessageBox }),
 });
@@ -288,9 +302,17 @@ const changeRecords = shallowRef<ChangeRecord[]>([]);
 const isSameConfigShape = (config: unknown, preConfig: unknown) =>
   isEqualWith(config, preConfig, (a, b) => (typeof a === 'function' && typeof b === 'function' ? true : undefined));
 
+// initValue / onInitValue 可能是异步的，快速切换实体时只让最后一次结果落到表单上
+let initSeq = 0;
+/** 已渲染的数据实体：只有换了实体才递增 fieldVersion，同一实体的值更新不重挂字段 */
+let renderedFormKey = props.formKey;
+
 watch(
-  [() => props.config, () => props.initValues],
+  [() => props.config, () => props.initValues, () => props.formKey],
   async ([config], [preConfig]) => {
+    initSeq += 1;
+    const seq = initSeq;
+    const { formKey } = props;
     changeRecords.value = [];
 
     if (!isSameConfigShape(toRaw(config), toRaw(preConfig))) {
@@ -301,7 +323,13 @@ watch(
       initValues: props.initValues,
       config: props.config,
     }).then((value) => {
+      if (seq !== initSeq) return;
       values.value = value;
+      // 必须等新实体的值落位后再换 leaf key，否则字段会以旧 model 重新挂载
+      if (formKey !== renderedFormKey) {
+        renderedFormKey = formKey;
+        fieldVersion.value += 1;
+      }
       // 字段的值初始化写入统一在这里执行，字段组件自身不再改写 model。
       // 必须放在赋值之后：effect 与动态 type / display 回调读到的 formValue 才是这一轮的值。
       applyMountValueEffects(formState, props.config, values.value);
@@ -321,6 +349,7 @@ watch(
         initValues: props.lastValues,
         config: props.config,
       }).then((value) => {
+        if (seq !== initSeq) return;
         lastValuesProcessed.value = value;
         // 对比模式下待对比的那份值同样要规整，否则会与当前值比出「格式差异」这种假差异
         applyMountValueEffects(formState, props.config, lastValuesProcessed.value);

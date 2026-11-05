@@ -7,6 +7,7 @@
       :class="{ 'show-style-panel': showStylePanel }"
       :config="curFormConfig"
       :values="values"
+      :form-key="formKey"
       :disabledShowSrc="disabledShowSrc"
       @submit="(v, eventData, error) => submit(v, eventData, error, 'props')"
       @submit-error="errorHandler"
@@ -24,6 +25,7 @@
       code-value-key="style"
       :config="styleFormConfig"
       :values="values"
+      :form-key="formKey"
       :disabledShowSrc="disabledShowSrc"
       @submit="(v, eventData, error) => submit(v, eventData, error, 'style')"
       @submit-error="errorHandler"
@@ -103,6 +105,11 @@ const values = ref<FormValue>({});
 const curFormConfig = ref<any>([]);
 const node = computed(() => editorService.get('node'));
 const nodes = computed(() => editorService.get('nodes'));
+// 同类型组件的配置结构完全一致，MForm 不会重建整棵表单树；用节点 id 标识数据实体，
+// 让叶子字段在切换选中时重挂，避免上一个节点的字段本地状态（如事件动作参数）串到新节点。
+// 必须跟随 values 而不是 node：values 在 getPropsConfig 异步返回后才更新，
+// 若 key 先于 values 变化，叶子字段会以旧节点的值重挂，新值到达后不再重挂。
+const formKey = computed(() => values.value.id ?? '');
 
 const styleFormConfig = [
   {

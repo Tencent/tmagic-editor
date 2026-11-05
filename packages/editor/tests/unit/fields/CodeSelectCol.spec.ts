@@ -4,7 +4,7 @@
  * Copyright (C) 2025 Tencent.
  */
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { defineComponent, h } from 'vue';
+import { defineComponent, h, nextTick, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import CodeSelectCol from '@editor/fields/CodeSelectCol.vue';
@@ -116,6 +116,20 @@ describe('CodeSelectCol', () => {
   test('选择无 params 的代码块不渲染 CodeParams', () => {
     const wrapper = mount(CodeSelectCol, { props: baseProps({ model: { codeId: 'c2', params: {} } }) as any });
     expect(wrapper.find('.fake-params').exists()).toBe(false);
+  });
+
+  test('代码块 DSL 异步就绪后参数字段配置随之补齐', async () => {
+    const dsl = ref<any>(null);
+    codeBlockService.getCodeDsl.mockImplementation(() => dsl.value);
+
+    const wrapper = mount(CodeSelectCol, { props: baseProps() as any });
+    expect(wrapper.find('.fake-params').exists()).toBe(false);
+
+    dsl.value = { c1: { name: 'C1', params: [{ name: 'p1', type: 'text' }] } };
+    await nextTick();
+
+    expect(wrapper.find('.fake-params').exists()).toBe(true);
+    expect((wrapper.findComponent({ name: 'CodeParams' }).props('paramsConfig') as any[])[0].name).toBe('p1');
   });
 
   test('onCodeIdChangeHandler emit change 包含 changeRecords', async () => {

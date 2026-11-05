@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts" setup name="">
-import { computed, inject, ref } from 'vue';
+import { computed, inject } from 'vue';
 import { Edit, View } from '@element-plus/icons-vue';
 
 import type { Id } from '@tmagic/core';
@@ -85,6 +85,7 @@ const notEditable = computed(() => filterFunction(mForm, props.config.notEditabl
 const isCompare = computed(() => Boolean(mForm?.isCompare));
 
 const dataSources = computed(() => dataSourceService.get('dataSources'));
+const codeOptions = inject('codeOptions', {});
 
 const isCustomMethod = computed(() => {
   const [id, name] = props.model[props.name];
@@ -125,7 +126,7 @@ const getParamItemsConfig = ([dataSourceId, methodName]: [Id, string] = ['', '']
           return type;
         },
         language: 'javascript',
-        options: inject('codeOptions', {}),
+        options: codeOptions,
         autosize: {
           minRows: 1,
           maxRows: 10,
@@ -146,7 +147,16 @@ const getParamItemsConfig = ([dataSourceId, methodName]: [Id, string] = ['', '']
   }));
 };
 
-const paramsConfig = ref<CodeParamStatement[]>(getParamItemsConfig(props.model[props.name || 'dataSourceMethod']));
+/**
+ * 参数字段配置跟随当前 model 派生，而不是 setup 期的一次性快照。
+ *
+ * 属性面板在同类型组件之间切换选中时会复用表单字段实例，此时 model 已换成新节点；
+ * 快照会让「新节点的方法」配上「旧节点的参数字段」，看起来像两个组件的事件配置混在了一起。
+ * 数据源列表异步就绪时也能随 computed 自动补齐参数配置。
+ */
+const paramsConfig = computed<CodeParamStatement[]>(() =>
+  getParamItemsConfig(props.model[props.name || 'dataSourceMethod']),
+);
 
 const methodsOptions = computed(
   () =>
@@ -176,7 +186,8 @@ const cascaderConfig = computed<CascaderConfig>(() => ({
  * 参数值修改更新
  */
 const onChangeHandler = (value: any) => {
-  paramsConfig.value = getParamItemsConfig(value);
+  // model 尚未写入新值（由 MForm 收到 change 后统一写回），参数字段配置先按新选中的方法算
+  const nextParamsConfig = getParamItemsConfig(value);
 
   const changeRecords = [
     {
@@ -187,8 +198,8 @@ const onChangeHandler = (value: any) => {
 
   changeRecords.push({
     propPath: props.prop.replace(`${props.name}`, 'params'),
-    value: paramsConfig.value.length
-      ? createValues(mForm, paramsConfig.value as unknown as FormItemConfig[], {}, props.model.params)
+    value: nextParamsConfig.length
+      ? createValues(mForm, nextParamsConfig as unknown as FormItemConfig[], {}, props.model.params)
       : {},
   });
 
