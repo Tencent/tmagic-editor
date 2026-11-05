@@ -1084,7 +1084,7 @@ importers:
         specifier: 1.8.4
         version: link:../../packages/core
       '@tmagic/react-runtime-help':
-        specifier: 0.2.3-beta.1
+        specifier: 0.2.3
         version: link:../react-runtime-help
       '@tmagic/stage':
         specifier: 1.8.4
@@ -1136,10 +1136,10 @@ importers:
   runtime/react-runtime-help:
     dependencies:
       '@tmagic/core':
-        specifier: '>=1.8.4-beta.1'
+        specifier: '>=1.8.4'
         version: link:../../packages/core
       '@tmagic/stage':
-        specifier: '>=1.8.4-beta.1'
+        specifier: '>=1.8.4'
         version: link:../../packages/stage
       lodash-es:
         specifier: ^4.18.1
@@ -1185,7 +1185,7 @@ importers:
         specifier: 1.8.4
         version: link:../../packages/stage
       '@tmagic/vue-runtime-help':
-        specifier: ^2.0.6-beta.1
+        specifier: ^2.0.6
         version: link:../vue-runtime-help
       axios:
         specifier: ^1.20.0
@@ -1234,10 +1234,10 @@ importers:
   runtime/vue-runtime-help:
     dependencies:
       '@tmagic/core':
-        specifier: '>=1.8.4-beta.1'
+        specifier: '>=1.8.4'
         version: link:../../packages/core
       '@tmagic/stage':
-        specifier: '>=1.8.4-beta.1'
+        specifier: '>=1.8.4'
         version: link:../../packages/stage
       typescript:
         specifier: 'catalog:'

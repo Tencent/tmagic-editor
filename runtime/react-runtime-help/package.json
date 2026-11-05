@@ -1,5 +1,5 @@
 {
-  "version": "0.2.3-beta.1",
+  "version": "0.2.3",
   "name": "@tmagic/react-runtime-help",
   "type": "module",
   "sideEffects": false,
@@ -30,8 +30,8 @@
     "lodash-es": "^4.18.1"
   },
   "peerDependencies": {
-    "@tmagic/core": ">=1.8.4-beta.1",
-    "@tmagic/stage": ">=1.8.4-beta.1",
+    "@tmagic/core": ">=1.8.4",
+    "@tmagic/stage": ">=1.8.4",
     "lodash-es": "^4.17.21",
     "react": ">=18.3.1",
     "typescript": "catalog:"
