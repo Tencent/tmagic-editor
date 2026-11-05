@@ -52,12 +52,16 @@ const clickConfirm = async () => {
   confirmBtn?.click();
 };
 
+/** 删除图标外层还有 Tooltip，需按文案定位 Popconfirm 自己的浮层 */
+const getPopconfirmPopper = (text: string) =>
+  Array.from(document.querySelectorAll('.el-popper')).find((el) => (el.textContent || '').includes(text));
+
 /** 浮层需挂载到 body，且 placement 真正作用到 popper 上 */
-const expectRightPlacement = async (wrapper: { element: Element }) => {
+const expectRightPlacement = async (wrapper: { element: Element }, text: string) => {
   await vi.waitFor(() => {
-    expect(document.querySelector('.el-popper')?.getAttribute('data-popper-placement')).toBe('right');
+    expect(getPopconfirmPopper(text)?.getAttribute('data-popper-placement')).toBe('right');
   });
-  const popper = document.querySelector('.el-popper');
+  const popper = getPopconfirmPopper(text);
   expect(popper).toBeTruthy();
   expect(wrapper.element.contains(popper!)).toBe(false);
 };
@@ -70,7 +74,7 @@ describe('侧栏删除 Popconfirm（真实 element-plus）', () => {
     await vi.waitFor(() => {
       expect(document.body.textContent).toContain('确定删除?');
     });
-    await expectRightPlacement(wrapper);
+    await expectRightPlacement(wrapper, '确定删除?');
     expect(wrapper.emitted('remove')).toBeFalsy();
 
     await clickConfirm();
@@ -88,7 +92,7 @@ describe('侧栏删除 Popconfirm（真实 element-plus）', () => {
     await vi.waitFor(() => {
       expect(document.body.textContent).toContain('确定删除该代码块吗？');
     });
-    await expectRightPlacement(wrapper);
+    await expectRightPlacement(wrapper, '确定删除该代码块吗？');
     expect(wrapper.emitted('remove')).toBeFalsy();
 
     await clickConfirm();

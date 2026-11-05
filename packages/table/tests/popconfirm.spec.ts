@@ -124,8 +124,10 @@ describe('TMagicPopconfirm placement（真实 element-plus）', () => {
   ])('placement=%s 作用到 popper 的 %s', async (placement, expected) => {
     const wrapper = mountPopconfirm(placement);
     await wrapper.find('.ref').trigger('click');
+    // 取最后挂载的 popper，避免命中此前用例残留的浮层
+    const popper = () => Array.from(document.querySelectorAll('.el-popper')).at(-1);
     await vi.waitFor(() => {
-      expect(document.querySelector('.el-popper')?.getAttribute('data-popper-placement')).toBe(expected);
+      expect(popper()?.getAttribute('data-popper-placement')).toBe(expected);
     });
     wrapper.unmount();
   });
