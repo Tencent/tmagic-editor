@@ -3,7 +3,7 @@
   "name": "tmagic",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@11.21.0",
+  "packageManager": "pnpm@12.16.1",
   "scripts": {
     "bootstrap": "pnpm i && pnpm build",
     "clean:top": "rimraf packages/*/dist packages/*/types runtime/*/dist runtime/*/types vue-components/*/dist vue-components/*/types react-components/*/dist react-components/*/types playground/dist coverage .vitest dwt* temp packages/cli/lib",

@@ -10,7 +10,7 @@ TMagic Editor 是魔方平台的可视化编辑器核心库，提供拖拽式组
 编辑器本体使用 Vue 3；UI 通过 `@tmagic/design` + adapter 接入 Element Plus 或 TDesign Vue Next。
 
 **技术栈：** Vue 3, TypeScript, Vite, rolldown, vitest, VitePress, Element Plus / TDesign Vue Next
-**环境：** Node.js `^20.19.0 || >=22.12.0`，pnpm `11.21.0`
+**环境：** Node.js `^20.19.0 || >=22.12.0`，pnpm `12.16.1`
 **当前版本：** `1.8.0-beta.25`
 **主仓库：** `https://git.woa.com/vft-magic/tmagic-editor.git`
 **开源仓库：** `https://github.com/Tencent/tmagic-editor.git`
