@@ -95,6 +95,26 @@ import type {
 
 import Table from './Table.vue';
 
+/**
+ * PopconfirmProps 的复合方位沿用 TDesign 命名（如 right-top），
+ * Element Plus 使用 popper.js 的 *-start / *-end 命名，未转换时这些取值会被 Popper 忽略。
+ */
+const elementPlusPlacements: Record<string, string> = {
+  'top-left': 'top-start',
+  'top-right': 'top-end',
+  'bottom-left': 'bottom-start',
+  'bottom-right': 'bottom-end',
+  'left-top': 'left-start',
+  'left-bottom': 'left-end',
+  'right-top': 'right-start',
+  'right-bottom': 'right-end',
+};
+
+const popconfirmProps = (props: PopconfirmProps): PopconfirmProps => {
+  const placement = props.placement ? elementPlusPlacements[props.placement] : undefined;
+  return placement ? { ...props, placement: placement as PopconfirmProps['placement'] } : props;
+};
+
 const adapter: DesignPluginOptions = {
   adapterType: 'element-plus',
   useZIndex,
@@ -329,7 +349,7 @@ const adapter: DesignPluginOptions = {
 
     popconfirm: {
       component: ElPopconfirm as any,
-      props: (props: PopconfirmProps) => props,
+      props: popconfirmProps,
     },
   },
   loading: ElLoading.directive,

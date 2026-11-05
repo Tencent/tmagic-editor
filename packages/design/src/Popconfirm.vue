@@ -24,7 +24,11 @@ defineOptions({
 
 const emit = defineEmits(['confirm', 'cancel']);
 
-const props = defineProps<PopconfirmProps>();
+// Boolean 类型的属性缺省时会被 Vue 转成 false，会把浮层强制内联渲染到侧栏等 overflow 容器中，
+// 导致 placement 计算出的位置被裁剪。与 PopconfirmProps 注释及底层组件默认值保持一致。
+const props = withDefaults(defineProps<PopconfirmProps>(), {
+  teleported: true,
+});
 
 const ui = getDesignConfig('components')?.popconfirm;
 

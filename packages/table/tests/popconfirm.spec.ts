@@ -18,7 +18,9 @@
 import { describe, expect, test, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 
-import { setDesignConfig } from '@tmagic/design';
+// 必须与 setDesignConfig 来自同一模块实例：从 @tmagic/design/src 导入 src/Popconfirm.vue 时，
+// 它读取的是源码里独立的 config 模块，未注入 adapter 就会退化成原生的 <el-popconfirm> 标签。
+import { setDesignConfig, TMagicPopconfirm } from '@tmagic/design';
 
 import elementPlusAdapter from '../../element-plus-adapter/src/index';
 import ActionsColumn from '../src/ActionsColumn.vue';
@@ -101,8 +103,41 @@ describe('ActionsColumn popconfirm (real element-plus)', () => {
       (e.textContent || '').includes('确定删除?'),
     );
     expect(popper).toBeTruthy();
-    expect(popper.style.width).toBe('240px');
+    expect(popper?.style.width).toBe('240px');
 
+    wrapper.unmount();
+  });
+});
+
+describe('TMagicPopconfirm placement（真实 element-plus）', () => {
+  const mountPopconfirm = (placement: string) =>
+    mount(TMagicPopconfirm, {
+      props: { title: '确认内容', placement } as any,
+      slots: { reference: '<button class="ref">ref</button>' },
+      attachTo: document.body,
+    });
+
+  test.each([
+    ['right', 'right'],
+    ['right-top', 'right-start'],
+    ['top-left', 'top-start'],
+  ])('placement=%s 作用到 popper 的 %s', async (placement, expected) => {
+    const wrapper = mountPopconfirm(placement);
+    await wrapper.find('.ref').trigger('click');
+    await vi.waitFor(() => {
+      expect(document.querySelector('.el-popper')?.getAttribute('data-popper-placement')).toBe(expected);
+    });
+    wrapper.unmount();
+  });
+
+  test('默认 teleported=true，浮层挂到 body 而非内联渲染', async () => {
+    const wrapper = mountPopconfirm('right');
+    expect(wrapper.props('teleported')).toBe(true);
+    await wrapper.find('.ref').trigger('click');
+    await vi.waitFor(() => {
+      expect(document.querySelector('.el-popper')).toBeTruthy();
+    });
+    expect(wrapper.element.contains(document.querySelector('.el-popper')!)).toBe(false);
     wrapper.unmount();
   });
 });
