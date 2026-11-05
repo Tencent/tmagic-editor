@@ -8,6 +8,7 @@
     <template v-if="val">
       <TMagicTooltip v-if="!isCompare" content="清除" placement="top">
         <TMagicButton
+          class="m-fields-ui-select__clear"
           style="padding: 0"
           type="danger"
           :icon="Close"
@@ -20,6 +21,7 @@
 
       <TMagicTooltip content="点击选中组件" placement="top">
         <TMagicButton
+          class="m-fields-ui-select__name"
           link
           style="padding: 0; margin: 0"
           :disabled="disabled"
@@ -27,7 +29,7 @@
           @click="selectNode(val)"
           @mouseenter="highlight(val)"
           @mouseleave="unhighlight"
-          >{{ `${toName}_${val}` }}</TMagicButton
+          ><span class="m-fields-ui-select__label">{{ `${toName}_${val}` }}</span></TMagicButton
         >
       </TMagicTooltip>
     </template>

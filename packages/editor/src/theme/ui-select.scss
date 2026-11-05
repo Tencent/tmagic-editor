@@ -1,9 +1,40 @@
 .m-fields-ui-select {
   cursor: pointer;
+  min-width: 0;
+  max-width: 100%;
+
   i {
     margin-right: 3px;
   }
   span {
     color: var(--el-color-primary, #2882e0);
+  }
+
+  .m-fields-ui-select__clear {
+    flex: none;
+  }
+
+  .m-fields-ui-select__name {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+
+    // 按钮组件会把默认插槽再包一层 span，解除它的最小宽度后文案才能收缩打点
+    > span,
+    .t-button__text {
+      display: block;
+      min-width: 0;
+      max-width: 100%;
+    }
+  }
+
+  .m-fields-ui-select__label {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
   }
 }

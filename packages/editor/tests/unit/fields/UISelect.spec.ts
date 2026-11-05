@@ -32,11 +32,12 @@ vi.mock('@tmagic/design', () => ({
     name: 'TMagicButton',
     props: ['type', 'icon', 'disabled', 'size', 'link'],
     emits: ['click', 'mouseenter', 'mouseleave'],
-    setup(_p, { emit, slots }) {
+    setup(_p, { attrs, emit, slots }) {
       return () =>
         h(
           'button',
           {
+            class: attrs.class,
             onClick: (e: Event) => emit('click', e),
             onMouseenter: () => emit('mouseenter'),
             onMouseleave: () => emit('mouseleave'),
@@ -79,6 +80,16 @@ describe('UISelect', () => {
     expect(wrapper.html()).toContain('name_n1_n1');
   });
 
+  test('组件名超长时保留完整文案并交给样式打点', () => {
+    const longName = '弹窗-团被抢走了_26714348';
+    editorService.getNodeById.mockReturnValueOnce({ name: longName });
+    const wrapper = mount(UISelect, { props: baseProps({ model: { to: 'n1' } }) as any });
+
+    expect(wrapper.find('.m-fields-ui-select__clear').exists()).toBe(true);
+    expect(wrapper.find('.m-fields-ui-select__name').exists()).toBe(true);
+    expect(wrapper.find('.m-fields-ui-select__label').text()).toBe(`${longName}_n1`);
+  });
+
   test('startSelect 启用 uiSelectMode 并注册事件', async () => {
     const addSpy = vi.spyOn(globalThis.document, 'addEventListener');
     const wrapper = mount(UISelect, { props: baseProps() as any });
@@ -86,6 +97,16 @@ describe('UISelect', () => {
     expect(uiService.set).toHaveBeenCalledWith('uiSelectMode', true);
     expect(addSpy).toHaveBeenCalled();
     addSpy.mockRestore();
+  });
+
+  test('选中组件后回写 id 并退出选择模式', async () => {
+    const wrapper = mount(UISelect, { props: baseProps() as any });
+    await wrapper.find('button').trigger('click');
+
+    globalThis.document.dispatchEvent(new CustomEvent('ui-select', { detail: { id: 'n2' } }));
+
+    expect(wrapper.emitted('change')?.[0]?.[0]).toBe('n2');
+    expect(uiService.set).toHaveBeenLastCalledWith('uiSelectMode', false);
   });
 
   test('cancelHandler 关闭 uiSelectMode', async () => {
