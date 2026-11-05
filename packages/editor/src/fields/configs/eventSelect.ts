@@ -240,7 +240,7 @@ export const createActionsConfig = (config: EventSelectConfig): GroupListConfig 
     expandAll: true,
     enableToggleMode: false,
     titlePrefix: '动作',
-    labelPosition: 'top',
+    labelWidth: '90px',
     flat: true,
     ...stickyAddButton('新增动作'),
     items: [

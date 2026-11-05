@@ -176,9 +176,9 @@ export const advancedTabConfig: TabPaneConfig = {
     {
       name: 'created',
       text: 'Created',
-      labelPosition: 'top',
       type: 'code-select',
       titleExtra: '组件初始化时执行',
+      labelWidth: '90px',
       rules: [
         { typeMatch: true, trigger: 'change' },
         {
@@ -194,8 +194,8 @@ export const advancedTabConfig: TabPaneConfig = {
     {
       name: 'mounted',
       text: 'Mounted',
-      labelPosition: 'top',
       type: 'code-select',
+      labelWidth: '90px',
       titleExtra: '组件挂载到dom时执行',
       rules: [
         { typeMatch: true, trigger: 'change' },
@@ -213,7 +213,7 @@ export const advancedTabConfig: TabPaneConfig = {
       name: 'display',
       text: 'Display',
       titleExtra: '控制组件是否渲染，关系的代码块返回值为false时不渲染',
-      labelPosition: 'top',
+      labelWidth: '90px',
       type: 'code-select',
       rules: [
         { typeMatch: true, trigger: 'change' },
