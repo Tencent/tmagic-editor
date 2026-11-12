@@ -103,14 +103,14 @@ describe('StyleSetter/Layout.vue', () => {
     });
   });
 
-  test('display 选项含 inline/flex/block/inline-block/none', () => {
+  test('display 选项含常用布局模式', () => {
     const wrapper = mount(Layout, {
       props: { values: { position: 'static', display: 'flex' } } as any,
     });
     const configs = wrapper.findAllComponents({ name: 'FakeMContainer' }).map((c) => c.props('config') as any);
     const displayItem = configs.find((it: any) => it.name === 'display');
     const values = displayItem.options.map((o: any) => o.value);
-    expect(values).toEqual(['inline', 'flex', 'block', 'inline-block', 'none']);
+    expect(values).toEqual(['inline', 'flex', 'block', 'inline-block', 'none', 'inline-flex', 'grid', 'inline-grid']);
   });
 
   test('lastValues/isCompare 透传到 MContainer 与 Box', () => {

@@ -1,0 +1,7 @@
+<template>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+    <path
+      d="M960 128a64 64 0 0 1 64 64v640a64 64 0 0 1-64 64H64a64 64 0 0 1-64-64V192a64 64 0 0 1 64-64h896z m0 64H64v640h896V192zM416 256v512H368V256h48zM656 256v512H608V256h48zM768 368v48H256V368h512zM768 608v48H256V608h512z"
+    ></path>
+  </svg>
+</template>

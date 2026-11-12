@@ -1,5 +1,10 @@
+export { default as AlignItemsBaseline } from './Baseline.vue';
 export { default as AlignItemsCenter } from './Center.vue';
+export { default as AlignItemsEnd } from './End.vue';
 export { default as AlignItemsFlexEnd } from './FlexEnd.vue';
 export { default as AlignItemsFlexStart } from './FlexStart.vue';
+export { default as AlignItemsNormal } from './Normal.vue';
 export { default as AlignItemsSpaceAround } from './SpaceAround.vue';
 export { default as AlignItemsSpaceBetween } from './SpaceBetween.vue';
+export { default as AlignItemsStart } from './Start.vue';
+export { default as AlignItemsStretch } from './Stretch.vue';

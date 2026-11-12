@@ -8,14 +8,35 @@ import type { validateDataSourceFieldSelect } from '@editor/utils/type-match-rul
 
 import BackgroundPosition from './components/BackgroundPosition.vue';
 import {
+  AlignItemsBaseline,
   AlignItemsCenter,
+  AlignItemsEnd,
   AlignItemsFlexEnd,
   AlignItemsFlexStart,
+  AlignItemsNormal,
   AlignItemsSpaceAround,
   AlignItemsSpaceBetween,
+  AlignItemsStart,
+  AlignItemsStretch,
 } from './icons/align-items';
-import { BackgroundNoRepeat, BackgroundRepeat, BackgroundRepeatX, BackgroundRepeatY } from './icons/background-repeat';
-import { DisplayBlock, DisplayFlex, DisplayInline, DisplayInlineBlock, DisplayNone } from './icons/display';
+import {
+  BackgroundNoRepeat,
+  BackgroundRepeat,
+  BackgroundRepeatRound,
+  BackgroundRepeatSpace,
+  BackgroundRepeatX,
+  BackgroundRepeatY,
+} from './icons/background-repeat';
+import {
+  DisplayBlock,
+  DisplayFlex,
+  DisplayGrid,
+  DisplayInline,
+  DisplayInlineBlock,
+  DisplayInlineFlex,
+  DisplayInlineGrid,
+  DisplayNone,
+} from './icons/display';
 import {
   FlexDirectionColumn,
   FlexDirectionColumnReverse,
@@ -28,8 +49,17 @@ import {
   JustifyContentFlexStart,
   JustifyContentSpaceAround,
   JustifyContentSpaceBetween,
+  JustifyContentSpaceEvenly,
 } from './icons/justify-content';
-import { AlignCenter, AlignLeft, AlignRight } from './icons/text-align';
+import {
+  AlignCenter,
+  AlignEnd,
+  AlignJustify,
+  AlignLeft,
+  AlignMatchParent,
+  AlignRight,
+  AlignStart,
+} from './icons/text-align';
 
 /**
  * 「布局」面板配置。
@@ -71,6 +101,9 @@ export const createLayoutConfig = (theme: string): FormConfig => [
         icon: markRaw(DisplayNone),
         tooltip: '隐藏 none',
       },
+      { value: 'inline-flex', icon: markRaw(DisplayInlineFlex), tooltip: '内联弹性布局 inline-flex' },
+      { value: 'grid', icon: markRaw(DisplayGrid), tooltip: '网格布局 grid' },
+      { value: 'inline-grid', icon: markRaw(DisplayInlineGrid), tooltip: '内联网格布局 inline-grid' },
     ],
   }),
   defineFormItem({
@@ -121,6 +154,7 @@ export const createLayoutConfig = (theme: string): FormConfig => [
         icon: markRaw(JustifyContentSpaceAround),
         tooltip: '横向平分 space-around',
       },
+      { value: 'space-evenly', icon: markRaw(JustifyContentSpaceEvenly), tooltip: '等间距分布 space-evenly' },
     ],
     display: (_mForm, { model }: { model: Record<any, any> }) => model.display === 'flex',
   }),
@@ -145,6 +179,11 @@ export const createLayoutConfig = (theme: string): FormConfig => [
         icon: markRaw(AlignItemsSpaceAround),
         tooltip: '横向平分 space-around',
       },
+      { value: 'stretch', icon: markRaw(AlignItemsStretch), tooltip: '拉伸填满 stretch' },
+      { value: 'baseline', icon: markRaw(AlignItemsBaseline), tooltip: '基线对齐 baseline' },
+      { value: 'normal', icon: markRaw(AlignItemsNormal), tooltip: '默认 normal' },
+      { value: 'start', icon: markRaw(AlignItemsStart), tooltip: '起始对齐 start' },
+      { value: 'end', icon: markRaw(AlignItemsEnd), tooltip: '结束对齐 end' },
     ],
     display: (_mForm, { model }: { model: Record<any, any> }) => model.display === 'flex',
   }),
@@ -222,9 +261,9 @@ export const createLayoutConfig = (theme: string): FormConfig => [
     items: [
       {
         type: 'data-source-field-select',
-        text: '透明度（%）',
+        text: '透明度（0-1）',
         name: 'opacity',
-        labelWidth: '90px',
+        labelWidth: '100px',
         dataSourceFieldType: ['string', 'number'],
         fieldConfig: {
           type: 'text',
@@ -445,6 +484,8 @@ export const createBackgroundConfig = (): FormConfig => [
         icon: markRaw(BackgroundRepeat),
         tooltip: '垂直和水平方向重复 repeat',
       },
+      { value: 'space', icon: markRaw(BackgroundRepeatSpace), tooltip: '不裁剪、均匀留白 space' },
+      { value: 'round', icon: markRaw(BackgroundRepeatRound), tooltip: '缩放铺满 round' },
     ],
   }),
   defineFormItem({
@@ -502,9 +543,9 @@ export const createFontConfig = (validateDataSourceField: typeof validateDataSou
     fieldConfig: {
       type: 'select',
       allowCreate: true,
-      options: ['normal', 'bold']
+      options: ['normal', 'bold', 'bolder', 'lighter']
         .concat(
-          Array(7)
+          Array(9)
             .fill(1)
             .map((x, i) => `${i + 1}00`),
         )
@@ -575,10 +616,16 @@ export const createFontConfig = (validateDataSourceField: typeof validateDataSou
     type: 'radioGroup',
     childType: 'button',
     labelWidth: '68px',
+    // 7 个值统一用图标按钮：带中文文案会因字数不同撑出不同宽度，换行后列线和边框错开。
+    // 中文说明放在 tooltip 里，与 display / justifyContent 等布局选项保持一致。
     options: [
-      { value: 'left', icon: markRaw(AlignLeft), tooltip: '左对齐 row', text: '左对齐' },
-      { value: 'center', icon: markRaw(AlignCenter), tooltip: '居中对齐 center', text: '居中对齐' },
-      { value: 'right', icon: markRaw(AlignRight), tooltip: '右对齐 right', text: '右对齐' },
+      { value: 'left', icon: markRaw(AlignLeft), tooltip: '左对齐 left' },
+      { value: 'center', icon: markRaw(AlignCenter), tooltip: '居中对齐 center' },
+      { value: 'right', icon: markRaw(AlignRight), tooltip: '右对齐 right' },
+      { value: 'start', icon: markRaw(AlignStart), tooltip: '起始对齐 start' },
+      { value: 'end', icon: markRaw(AlignEnd), tooltip: '结束对齐 end' },
+      { value: 'justify', icon: markRaw(AlignJustify), tooltip: '两端对齐 justify' },
+      { value: 'match-parent', icon: markRaw(AlignMatchParent), tooltip: '按父级方向对齐 match-parent' },
     ],
   }),
 ];
@@ -680,10 +727,12 @@ export const createBorderDirectionConfig = (direction: string) =>
         type: 'data-source-field-select',
         fieldConfig: {
           type: 'select',
-          options: ['solid', 'dashed', 'dotted'].map((item) => ({
-            value: item,
-            text: item,
-          })),
+          options: ['none', 'hidden', 'dotted', 'dashed', 'solid', 'double', 'groove', 'ridge', 'inset', 'outset'].map(
+            (item) => ({
+              value: item,
+              text: item,
+            }),
+          ),
         },
       },
     ],
