@@ -1,3 +1,9 @@
+## [1.8.5](https://github.com/Tencent/tmagic-editor/compare/v1.8.4...v1.8.5) (2026-11-13)
+
+
+### Features
+
+* **editor:** 补全样式面板 CSS 枚举选项并补齐图标 ([0e8b676](https://github.com/Tencent/tmagic-editor/commit/0e8b676fe7e4aacbce8036db70cf8f4ddb96e22e))
 ## [1.8.4](https://github.com/Tencent/tmagic-editor/compare/v1.8.3...v1.8.4) (2026-11-05)
 
 
