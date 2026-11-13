@@ -96,7 +96,10 @@ export const useEditorDsl = (app = inject<TMagicApp>('app'), runtimeApi: Runtime
         }
         throw new Error('error');
       }
-      if (!selectedId.value) throw new Error('error');
+      // 新增页面/页面片时 parentId 就是 root，不需要选中锚点。
+      // 空 DSL（items: []）下 selectedId 一直是 undefined，旧逻辑会直接抛错，
+      // 导致「无页面时新增页面」失败（issue #653）。
+      if (!isPageNode(config) && !selectedId.value) throw new Error('error');
       if (!parentId) throw new Error('error');
 
       const parent = getNodePath(parentId, [root.value]).pop();
