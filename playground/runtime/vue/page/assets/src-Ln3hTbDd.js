@@ -1,0 +1,2 @@
+import{ft as e,nt as t,ot as n}from"./src-BTmtxcT-.js";import{r,t as i}from"./use-app-CeRTdSAr.js";var a=[`src`],o=n({name:`tmagic-img`,__name:`index`,props:{config:{},iteratorIndex:{},iteratorContainerId:{},containerIndex:{},pageFragmentContainerId:{},model:{},disabled:{type:Boolean}},setup(n){let o=n,s=()=>{o.config.url&&(window.location.href=o.config.url)},c=r(o);return i(c),(r,i)=>(e(),t(`img`,{src:n.config.src,onClick:s},null,8,a))}});export{o as default};
+//# sourceMappingURL=src-Ln3hTbDd.js.map
