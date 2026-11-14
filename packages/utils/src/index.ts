@@ -154,21 +154,44 @@ export const getNodeInfo = (id: Id, root: { id: Id; items?: MNode[] } | null, sk
 export const filterXSS = (str: string) =>
   str.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 
+/**
+ * 把 url 拆成 path、query、hash 三段
+ *
+ * 没有直接用 URL 解析，是因为这里拿到的可能是不带协议的相对地址，
+ * URL 会对它们做规范化编码，把原有的参数顺序和编码形式都改掉
+ */
+const splitUrl = (url: string) => {
+  const hashIndex = url.indexOf('#');
+  const hash = hashIndex > -1 ? url.slice(hashIndex) : '';
+  const withoutHash = hashIndex > -1 ? url.slice(0, hashIndex) : url;
+  const queryIndex = withoutHash.indexOf('?');
+
+  return {
+    path: queryIndex > -1 ? withoutHash.slice(0, queryIndex) : withoutHash,
+    query: queryIndex > -1 ? withoutHash.slice(queryIndex + 1) : '',
+    hasQuery: queryIndex > -1,
+    hash,
+  };
+};
+
 export const getUrlParam = (param: string, url?: string) => {
   const u = url || location.href;
-  const reg = new RegExp(`[?&#]${param}=([^&#]+)`, 'gi');
+  const { query } = splitUrl(u);
 
-  const matches = u.match(reg);
-  let strArr;
-  if (matches && matches.length > 0) {
-    strArr = matches[matches.length - 1].split('=');
-    if (strArr && strArr.length > 1) {
-      // 过滤XSS字符
-      return filterXSS(strArr[1]);
+  let value = '';
+  for (const pair of query.split('&')) {
+    // 只按第一个 = 切分，值里出现的 = 要原样保留
+    const eqIndex = pair.indexOf('=');
+    // 用全等比较参数名：原来的正则没有转义，`a.b` 会匹配到 `axb`、`a[0]` 被当成字符组，
+    // 且带了 i 标记，`id` 会匹配到 `ID`
+    if ((eqIndex > -1 ? pair.slice(0, eqIndex) : pair) === param) {
+      // 同名参数取最后一个，与原有行为保持一致
+      value = eqIndex > -1 ? pair.slice(eqIndex + 1) : '';
     }
-    return '';
   }
-  return '';
+
+  // 过滤XSS字符
+  return filterXSS(value);
 };
 
 /**
@@ -183,36 +206,42 @@ export const getUrlParam = (param: string, url?: string) => {
  * @return {string} [返回处理后的url]
  */
 export const setUrlParam = (name: string, value: string, url = globalThis.location.href) => {
-  const reg = new RegExp(`[?&#]${name}=([^&#]*)`, 'gi');
+  const { path, query, hash } = splitUrl(url);
 
-  const matches = url.match(reg);
+  // 值里有 & = 空格等字符时不做编码会把 query 拆坏
+  const extra = value ? `${name}=${encodeURIComponent(value)}` : '';
 
-  const key = `{key${new Date().getTime()}}`;
-  let strArr;
+  let replaced = false;
+  const params: string[] = [];
 
-  if (matches && matches.length > 0) {
-    strArr = matches[matches.length - 1];
-  } else {
-    strArr = '';
-  }
+  for (const pair of query.split('&')) {
+    if (!pair) {
+      continue;
+    }
 
-  const extra = `${name}=${value}`;
+    const eqIndex = pair.indexOf('=');
+    if ((eqIndex > -1 ? pair.slice(0, eqIndex) : pair) !== name) {
+      params.push(pair);
+      continue;
+    }
 
-  // 当原url中含有要替换的属性:value不为空时，仅对值做替换,为空时，直接把参数删除掉
-  if (strArr) {
-    const first = strArr.charAt(0);
-    url = url.replace(strArr, key);
-    url = url.replace(key, value ? first + extra : '');
-  } else if (value) {
-    // 当原url中不含有要替换的属性且value值不为空时,直接在url后面添加参数字符串
-    if (url.indexOf('?') > -1) {
-      url += `&${extra}`;
-    } else {
-      url += `?${extra}`;
+    // 同名参数只保留一个
+    if (!replaced) {
+      replaced = true;
+      // 当原url中含有要替换的属性:value不为空时，仅对值做替换,为空时，直接把参数删除掉
+      if (extra) {
+        params.push(extra);
+      }
     }
   }
-  // 其它情况直接返回原url
-  return url;
+
+  // 当原url中不含有要替换的属性且value值不为空时，追加到 query 末尾
+  if (!replaced && extra) {
+    params.push(extra);
+  }
+
+  // query 必须拼在 hash 前面，否则 `#section` 之后再挂 `?c=9` 就不是参数了
+  return `${path}${params.length ? `?${params.join('&')}` : ''}${hash}`;
 };
 
 export const getSearchObj = (
@@ -225,14 +254,11 @@ export const getSearchObj = (
 };
 
 export const delQueStr = (url: string, ref: string[] | string) => {
-  let str = '';
-  if (url.indexOf('?') !== -1) {
-    str = url.substring(url.indexOf('?') + 1);
-  } else {
+  const { path, query, hasQuery, hash } = splitUrl(url);
+
+  if (!hasQuery) {
     return url;
   }
-  let arr = [];
-  let returnurl = '';
 
   const isHit = Array.isArray(ref)
     ? function (v: string) {
@@ -242,26 +268,19 @@ export const delQueStr = (url: string, ref: string[] | string) => {
         return v === ref;
       };
 
-  if (str.indexOf('&') !== -1) {
-    arr = str.split('&');
-    for (let i = 0, len = arr.length; i < len; i++) {
-      if (!isHit(arr[i].split('=')[0])) {
-        returnurl = `${returnurl + arr[i].split('=')[0]}=${arr[i].split('=')[1]}&`;
-      }
+  const params = query.split('&').filter((pair) => {
+    if (!pair) {
+      return false;
     }
 
-    return returnurl
-      ? `${url.substr(0, url.indexOf('?'))}?${returnurl.substr(0, returnurl.length - 1)}`
-      : url.substr(0, url.indexOf('?'));
-  }
+    // 只按第一个 = 切分：`token=YWJjZA==` 的值要整体保留，`flag` 这种没有值的参数
+    // 也不能被拼成 `flag=undefined`
+    const eqIndex = pair.indexOf('=');
+    return !isHit(eqIndex > -1 ? pair.slice(0, eqIndex) : pair);
+  });
 
-  arr = str.split('=');
-
-  if (isHit(arr[0])) {
-    return url.substr(0, url.indexOf('?'));
-  }
-
-  return url;
+  // 原来这里会丢掉 #hash
+  return `${path}${params.length ? `?${params.join('&')}` : ''}${hash}`;
 };
 
 export const isObject = (obj: any) => Object.prototype.toString.call(obj) === '[object Object]';
