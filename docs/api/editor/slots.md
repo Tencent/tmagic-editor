@@ -268,7 +268,7 @@
 
 - **详情：** 画布
 
-- **默认：** [Stage.vue](https://github.com/Tencent/tmagic-editor/blob/master/packages/editor/src/layouts/workspace/Stage.vue)
+- **默认：** [Stage.vue](https://github.com/Tencent/tmagic-editor/blob/master/packages/editor/src/layouts/workspace/viewer/Stage.vue)
 
 ## stage-top
 
