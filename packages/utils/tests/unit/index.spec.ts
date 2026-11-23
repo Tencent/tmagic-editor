@@ -249,6 +249,16 @@ describe('getUrlParam', () => {
     const value = util.getUrlParam('a', url);
     expect(value).toBe('');
   });
+
+  test('参数名按字面匹配，不当正则', () => {
+    expect(util.getUrlParam('a.b', 'https://x.com/p?a.b=1&axb=2')).toBe('1');
+    expect(util.getUrlParam('a[0]', 'https://x.com/p?a[0]=1')).toBe('1');
+    expect(util.getUrlParam('a(', 'https://x.com/p?a(=1')).toBe('1');
+  });
+
+  test('参数名大小写敏感', () => {
+    expect(util.getUrlParam('id', 'https://x.com/p?id=1&ID=2')).toBe('1');
+  });
 });
 
 describe('setUrlParam', () => {
@@ -257,6 +267,22 @@ describe('setUrlParam', () => {
 
     expect(util.setUrlParam('a', '1', 'https://www.tmagic.com?c&d')).toBe('https://www.tmagic.com?c&d&a=1');
     expect(util.setUrlParam('a', '1', 'https://www.tmagic.com?b=1')).toBe('https://www.tmagic.com?b=1&a=1');
+  });
+
+  test('值需要转义', () => {
+    expect(util.setUrlParam('q', 'a&b=c d', 'https://x.com/p')).toBe('https://x.com/p?q=a%26b%3Dc%20d');
+  });
+
+  test('hash 存在时新参数插在 hash 之前', () => {
+    expect(util.setUrlParam('c', '9', 'https://x.com/p#section')).toBe('https://x.com/p?c=9#section');
+  });
+
+  test('值中的 $& 不会被当作替换模式', () => {
+    expect(util.setUrlParam('a', '$&', 'https://x.com/p?a=1')).toBe('https://x.com/p?a=%24%26');
+  });
+
+  test('value 为空时删除该参数', () => {
+    expect(util.setUrlParam('a', '', 'https://x.com/p?a=1&b=2')).toBe('https://x.com/p?b=2');
   });
 });
 
@@ -271,6 +297,19 @@ describe('delQueStr', () => {
     expect(util.delQueStr('https://www.tmagic.com?a=1', 'a')).toBe('https://www.tmagic.com');
     expect(util.delQueStr('https://www.tmagic.com?a=1&b=2', ['a', 'b'])).toBe('https://www.tmagic.com');
     expect(util.delQueStr('https://www.tmagic.com?a=1&b=2', ['a'])).toBe('https://www.tmagic.com?b=2');
+  });
+
+  test('保留值中第二个等号之后的字符', () => {
+    expect(util.delQueStr('https://x.com/p?token=YWJjZA==&debug=1', 'debug')).toBe('https://x.com/p?token=YWJjZA==');
+  });
+
+  test('保留无值参数', () => {
+    expect(util.delQueStr('https://x.com/p?flag&debug=1', 'debug')).toBe('https://x.com/p?flag');
+  });
+
+  test('保留 hash', () => {
+    expect(util.delQueStr('https://x.com/p?a=1&debug=1#section', 'debug')).toBe('https://x.com/p?a=1#section');
+    expect(util.delQueStr('https://x.com/p?debug=1#section', 'debug')).toBe('https://x.com/p#section');
   });
 });
 
