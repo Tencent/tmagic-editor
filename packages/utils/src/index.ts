@@ -154,21 +154,35 @@ export const getNodeInfo = (id: Id, root: { id: Id; items?: MNode[] } | null, sk
 export const filterXSS = (str: string) =>
   str.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 
-export const getUrlParam = (param: string, url?: string) => {
-  const u = url || location.href;
-  const reg = new RegExp(`[?&#]${param}=([^&#]+)`, 'gi');
+/**
+ * 拆出 path、query（不含 ?）与 hash（含 #）
+ *
+ * 不用 URL 对象：它要求入参是合法的绝对地址，且会把已有参数重新编码
+ */
+const splitUrl = (url: string) => {
+  const hashIndex = url.indexOf('#');
+  const rest = hashIndex === -1 ? url : url.slice(0, hashIndex);
+  const queryIndex = rest.indexOf('?');
 
-  const matches = u.match(reg);
-  let strArr;
-  if (matches && matches.length > 0) {
-    strArr = matches[matches.length - 1].split('=');
-    if (strArr && strArr.length > 1) {
-      // 过滤XSS字符
-      return filterXSS(strArr[1]);
-    }
-    return '';
-  }
-  return '';
+  return {
+    path: queryIndex === -1 ? rest : rest.slice(0, queryIndex),
+    query: queryIndex === -1 ? '' : rest.slice(queryIndex + 1),
+    hash: hashIndex === -1 ? '' : url.slice(hashIndex),
+  };
+};
+
+const joinUrl = (path: string, query: string, hash: string) => `${path}${query ? `?${query}` : ''}${hash}`;
+
+/** 按参数名逐段比较，不把参数名当正则，也避免 i 标志带来的大小写误匹配 */
+const isParamOf = (name: string, pair: string) => pair.split('=')[0] === name;
+
+export const getUrlParam = (param: string, url?: string) => {
+  const { query, hash } = splitUrl(url || location.href);
+  // URLSearchParams 不会抛错，也不要求 url 是合法地址
+  const value =
+    new URLSearchParams(query).getAll(param).pop() ?? new URLSearchParams(hash.slice(1)).getAll(param).pop();
+
+  return value ? filterXSS(value) : '';
 };
 
 /**
@@ -183,36 +197,24 @@ export const getUrlParam = (param: string, url?: string) => {
  * @return {string} [返回处理后的url]
  */
 export const setUrlParam = (name: string, value: string, url = globalThis.location.href) => {
-  const reg = new RegExp(`[?&#]${name}=([^&#]*)`, 'gi');
+  const { path, query, hash } = splitUrl(url);
+  const pairs = query ? query.split('&') : [];
+  const index = pairs.findIndex((pair) => isParamOf(name, pair));
 
-  const matches = url.match(reg);
-
-  const key = `{key${new Date().getTime()}}`;
-  let strArr;
-
-  if (matches && matches.length > 0) {
-    strArr = matches[matches.length - 1];
-  } else {
-    strArr = '';
-  }
-
-  const extra = `${name}=${value}`;
-
-  // 当原url中含有要替换的属性:value不为空时，仅对值做替换,为空时，直接把参数删除掉
-  if (strArr) {
-    const first = strArr.charAt(0);
-    url = url.replace(strArr, key);
-    url = url.replace(key, value ? first + extra : '');
-  } else if (value) {
-    // 当原url中不含有要替换的属性且value值不为空时,直接在url后面添加参数字符串
-    if (url.indexOf('?') > -1) {
-      url += `&${extra}`;
-    } else {
-      url += `?${extra}`;
+  if (index === -1) {
+    // 原url中不含有该参数且value不为空时，追加到已有参数之后
+    if (value) {
+      pairs.push(`${name}=${encodeURIComponent(value)}`);
     }
+  } else if (value) {
+    // 原位替换，不动其它参数
+    pairs[index] = `${name}=${encodeURIComponent(value)}`;
+  } else {
+    // value为空时删除该参数
+    pairs.splice(index, 1);
   }
-  // 其它情况直接返回原url
-  return url;
+
+  return joinUrl(path, pairs.join('&'), hash);
 };
 
 export const getSearchObj = (
@@ -225,43 +227,16 @@ export const getSearchObj = (
 };
 
 export const delQueStr = (url: string, ref: string[] | string) => {
-  let str = '';
-  if (url.indexOf('?') !== -1) {
-    str = url.substring(url.indexOf('?') + 1);
-  } else {
+  const { path, query, hash } = splitUrl(url);
+
+  if (!query) {
     return url;
   }
-  let arr = [];
-  let returnurl = '';
 
-  const isHit = Array.isArray(ref)
-    ? function (v: string) {
-        return ~ref.indexOf(v);
-      }
-    : function (v: string) {
-        return v === ref;
-      };
+  const names = Array.isArray(ref) ? ref : [ref];
+  const pairs = query.split('&').filter((pair) => !names.includes(pair.split('=')[0]));
 
-  if (str.indexOf('&') !== -1) {
-    arr = str.split('&');
-    for (let i = 0, len = arr.length; i < len; i++) {
-      if (!isHit(arr[i].split('=')[0])) {
-        returnurl = `${returnurl + arr[i].split('=')[0]}=${arr[i].split('=')[1]}&`;
-      }
-    }
-
-    return returnurl
-      ? `${url.substr(0, url.indexOf('?'))}?${returnurl.substr(0, returnurl.length - 1)}`
-      : url.substr(0, url.indexOf('?'));
-  }
-
-  arr = str.split('=');
-
-  if (isHit(arr[0])) {
-    return url.substr(0, url.indexOf('?'));
-  }
-
-  return url;
+  return joinUrl(path, pairs.join('&'), hash);
 };
 
 export const isObject = (obj: any) => Object.prototype.toString.call(obj) === '[object Object]';
