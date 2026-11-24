@@ -11,6 +11,13 @@ import Stage from '@editor/layouts/workspace/viewer/Stage.vue';
 
 const { stageInstance, stageHandlers } = vi.hoisted(() => {
   const handlers: Record<string, any[]> = {};
+  // 测试环境不展开 overflow 缩写，这里用 data 属性模拟计算样式
+  const fakeWindow = {
+    getComputedStyle: (el: HTMLElement) => ({
+      overflowX: el.dataset.overflowX ?? '',
+      overflowY: el.dataset.overflowY ?? '',
+    }),
+  };
   return {
     stageHandlers: handlers,
     stageInstance: {
@@ -27,10 +34,13 @@ const { stageInstance, stageHandlers } = vi.hoisted(() => {
         getNextElementFromPoint: vi.fn(async () => document.createElement('div')),
       },
       renderer: {
-        contentWindow: { document: { querySelector: vi.fn(() => null) } },
+        contentWindow: {
+          document: { defaultView: fakeWindow as any, querySelector: vi.fn(() => null) },
+        },
         getTargetElement: vi.fn(),
+        getElementsFromPoint: vi.fn(() => [] as HTMLElement[]),
       },
-      mask: { scrollTop: 0, scrollLeft: 0 },
+      mask: { scrollTop: 0, scrollLeft: 0, page: null as HTMLElement | null },
     },
   };
 });
@@ -122,6 +132,9 @@ class FakeResizeObserver {
 beforeEach(() => {
   vi.clearAllMocks();
   Object.keys(stageHandlers).forEach((k) => delete stageHandlers[k]);
+  stageInstance.mask.page = null;
+  stageInstance.renderer.getElementsFromPoint.mockReturnValue([]);
+  editorService.select.mockReset();
   uiService.get.mockImplementation((k: string) => {
     if (k === 'stageRect') return { width: 800, height: 600 };
     if (k === 'stageContainerRect') return { width: 800, height: 600 };
@@ -168,6 +181,37 @@ const createDropEvent = (raw: string) => {
 const waitMacrotask = () => new Promise((r) => setTimeout(r, 10));
 
 const COMPONENT_LIST_JSON = '{"dragType":"component-list","data":{"name":"text","style":{}}}';
+
+type Rect = { top: number; left: number; bottom: number; right: number };
+
+const setRect = (el: HTMLElement, rect: Rect) => {
+  Object.defineProperty(el, 'getBoundingClientRect', {
+    value: () => ({ ...rect, width: rect.right - rect.left, height: rect.bottom - rect.top }),
+    configurable: true,
+  });
+  return el;
+};
+
+/** 命中链上的容器：overflow 只用于模拟计算样式，已不参与滚动容器判定 */
+const createScrollContainer = (rect: Rect, overflow = 'auto') => {
+  const el = setRect(document.createElement('div'), rect);
+  el.dataset.overflowX = overflow;
+  el.dataset.overflowY = overflow;
+  return el;
+};
+
+const createNodeEl = (id: string, rect: Rect = { top: 20, left: 20, bottom: 40, right: 40 }) => {
+  const el = setRect(document.createElement('div'), rect);
+  el.dataset.id = id;
+  return el;
+};
+
+const createStagePage = () => {
+  const pageEl = setRect(document.createElement('div'), { top: 0, left: 0, bottom: 100, right: 100 });
+  pageEl.dataset.id = 'p1';
+  stageInstance.mask.page = pageEl;
+  return pageEl;
+};
 
 describe('Stage', () => {
   test('挂载并创建 stage', async () => {
@@ -515,41 +559,218 @@ describe('Stage', () => {
     stageHandlers['runtime-ready']?.[0]?.({ updatePageId: vi.fn() });
   });
 
-  test('dblclick 调用 stageOverlayService.openOverlay 当元素被裁剪', async () => {
-    const win = {
-      getComputedStyle: () => ({ overflowX: 'auto', overflowY: 'visible' }),
-    };
-    const parent = document.createElement('div');
-    Object.defineProperty(parent, 'ownerDocument', {
-      value: { defaultView: win, documentElement: document.documentElement },
-      configurable: true,
-    });
-    Object.defineProperty(parent, 'getBoundingClientRect', {
-      value: () => ({ top: 100, left: 100, bottom: 200, right: 200 }),
-      configurable: true,
-    });
-    Object.defineProperty(parent, 'scrollWidth', { value: 100, configurable: true });
-    Object.defineProperty(parent, 'clientWidth', { value: 100, configurable: true });
-    Object.defineProperty(parent, 'scrollHeight', { value: 100, configurable: true });
-    Object.defineProperty(parent, 'clientHeight', { value: 100, configurable: true });
-    const el: any = document.createElement('div');
-    el.dataset.id = 'compInside';
-    Object.defineProperty(el, 'ownerDocument', {
-      value: { defaultView: win, documentElement: document.documentElement },
-      configurable: true,
-    });
-    Object.defineProperty(el, 'getBoundingClientRect', {
-      value: () => ({ top: 50, left: 100, bottom: 150, right: 150 }),
-      configurable: true,
-    });
-    Object.defineProperty(el, 'parentElement', { value: parent, configurable: true });
-    stageInstance.actionManager.getElementFromPoint.mockResolvedValueOnce(el);
-    editorService.getNodeById.mockReturnValue(null);
-    mountIt({ disabledStageOverlay: false });
+  test('dblclick 遍历命中链找到有子元素没显示全的滚动容器并打开 overlay', async () => {
+    const pageEl = createStagePage();
+    const scroller = createScrollContainer({ top: 10, left: 10, bottom: 60, right: 60 });
+    scroller.dataset.id = 'scroller';
+    pageEl.appendChild(scroller);
+    // 被裁掉的子元素不需要出现在命中链里
+    const child = createNodeEl('child', { top: 70, left: 20, bottom: 90, right: 40 });
+    scroller.appendChild(child);
+    const decoration = document.createElement('span');
+    scroller.appendChild(decoration);
+    const zeroSized = createNodeEl('zero', { top: 0, left: 0, bottom: 0, right: 0 });
+    scroller.appendChild(zeroSized);
+    stageInstance.renderer.getElementsFromPoint.mockReturnValueOnce([scroller, pageEl]);
+    mountIt();
     await nextTick();
-    expect(stageHandlers.dblclick).toBeDefined();
-    await stageHandlers.dblclick[0]({ clientX: 0, clientY: 0 } as any);
-    expect(stageOverlayService.openOverlay).toHaveBeenCalled();
+    await stageHandlers.dblclick[0]({ clientX: 30, clientY: 30 } as any);
+    expect(stageInstance.renderer.getElementsFromPoint).toHaveBeenCalled();
+    expect(stageOverlayService.openOverlay).toHaveBeenCalledWith(scroller);
+    expect(editorService.select).not.toHaveBeenCalled();
+  });
+
+  test('dblclick 子元素完整显示时不算滚动容器，改为向上选中', async () => {
+    const pageEl = createStagePage();
+    const scroller = createScrollContainer({ top: 10, left: 10, bottom: 60, right: 60 });
+    scroller.dataset.id = 'container';
+    pageEl.appendChild(scroller);
+    const child = createNodeEl('child');
+    scroller.appendChild(child);
+    stageInstance.renderer.getElementsFromPoint.mockReturnValueOnce([child, scroller, pageEl]);
+    mountIt();
+    await nextTick();
+    await stageHandlers.dblclick[0]({ clientX: 30, clientY: 30 } as any);
+    expect(stageOverlayService.openOverlay).not.toHaveBeenCalled();
+    expect(editorService.select).toHaveBeenCalledWith('container');
+  });
+
+  test('dblclick overflow: visible 且子元素完整显示、内容不溢出时不打开 overlay', async () => {
+    const pageEl = createStagePage();
+    const container = createScrollContainer({ top: 10, left: 10, bottom: 60, right: 60 }, 'visible');
+    container.dataset.id = 'container';
+    pageEl.appendChild(container);
+    const child = createNodeEl('child', { top: 20, left: 20, bottom: 40, right: 40 });
+    container.appendChild(child);
+    stageInstance.renderer.getElementsFromPoint.mockReturnValueOnce([container, pageEl]);
+    mountIt();
+    await nextTick();
+    await stageHandlers.dblclick[0]({ clientX: 30, clientY: 30 } as any);
+    expect(stageOverlayService.openOverlay).not.toHaveBeenCalled();
+    expect(editorService.select).toHaveBeenCalledWith('p1');
+  });
+
+  test('dblclick 轮播容器 computed overflow 为 visible 但内容溢出时打开 overlay', async () => {
+    const pageEl = createStagePage();
+    const section = createNodeEl('63459219', { top: 0, left: 0, bottom: 100, right: 100 });
+    const tab = createNodeEl('71516886', { top: 0, left: 0, bottom: 60, right: 100 });
+    const swiper = createScrollContainer({ top: 10, left: 10, bottom: 50, right: 60 }, 'visible');
+    swiper.dataset.id = '54144686';
+    // 轮播内部的包裹层没有节点 id，不能抢在轮播容器前面
+    const wrapper = setRect(document.createElement('div'), { top: 10, left: 10, bottom: 50, right: 60 });
+    const slide = setRect(document.createElement('div'), { top: 10, left: 10, bottom: 50, right: 50 });
+    const inner = createNodeEl('83133012', { top: 10, left: 10, bottom: 50, right: 50 });
+    inner.appendChild(createNodeEl('8325255', { top: 20, left: 20, bottom: 30, right: 40 }));
+    slide.appendChild(inner);
+    wrapper.appendChild(slide);
+    swiper.appendChild(wrapper);
+    tab.appendChild(swiper);
+    section.appendChild(tab);
+    pageEl.appendChild(section);
+
+    // 未展示的 slide 让内容宽度超出容器；祖先的 scrollWidth 也会被一起撑大
+    Object.defineProperty(swiper, 'scrollWidth', { value: 913 });
+    Object.defineProperty(swiper, 'clientWidth', { value: 343 });
+    Object.defineProperty(wrapper, 'scrollWidth', { value: 913 });
+    Object.defineProperty(wrapper, 'clientWidth', { value: 343 });
+    for (const ancestor of [tab, section]) {
+      Object.defineProperty(ancestor, 'scrollWidth', { value: 929 });
+      Object.defineProperty(ancestor, 'clientWidth', { value: 375 });
+    }
+
+    stageInstance.renderer.getElementsFromPoint.mockReturnValueOnce([
+      inner,
+      slide,
+      wrapper,
+      swiper,
+      tab,
+      section,
+      pageEl,
+    ]);
+    mountIt();
+    await nextTick();
+    await stageHandlers.dblclick[0]({ clientX: 30, clientY: 30 } as any);
+    expect(stageOverlayService.openOverlay).toHaveBeenCalledWith(swiper);
+    expect(editorService.select).not.toHaveBeenCalled();
+  });
+
+  test('dblclick 页面自身是可视区域边界，不作为滚动容器', async () => {
+    const pageEl = createStagePage();
+    const child = createNodeEl('child', { top: 120, left: 20, bottom: 140, right: 40 });
+    pageEl.appendChild(child);
+    stageInstance.renderer.getElementsFromPoint.mockReturnValueOnce([pageEl]);
+    mountIt();
+    await nextTick();
+    await stageHandlers.dblclick[0]({ clientX: 30, clientY: 30 } as any);
+    expect(stageOverlayService.openOverlay).not.toHaveBeenCalled();
+    expect(editorService.select).not.toHaveBeenCalled();
+  });
+
+  test('dblclick 不把 iframe 级容器当作滚动容器', async () => {
+    const pageEl = createStagePage();
+    const iframeContainer = createScrollContainer({ top: 10, left: 10, bottom: 60, right: 60 });
+    const child = createNodeEl('child', { top: 70, left: 20, bottom: 90, right: 40 });
+    iframeContainer.appendChild(child);
+    stageInstance.renderer.getElementsFromPoint.mockReturnValueOnce([iframeContainer, pageEl]);
+    mountIt();
+    await nextTick();
+    await stageHandlers.dblclick[0]({ clientX: 30, clientY: 30 } as any);
+    expect(stageOverlayService.openOverlay).not.toHaveBeenCalled();
+  });
+
+  test('dblclick disabledStageOverlay 时不打开 overlay，继续向上选中', async () => {
+    const pageEl = createStagePage();
+    const scroller = createScrollContainer({ top: 10, left: 10, bottom: 60, right: 60 });
+    scroller.dataset.id = 'container';
+    pageEl.appendChild(scroller);
+    const child = createNodeEl('child', { top: 70, left: 20, bottom: 90, right: 40 });
+    scroller.appendChild(child);
+    stageInstance.renderer.getElementsFromPoint.mockReturnValueOnce([child, scroller, pageEl]);
+    mountIt({ disabledStageOverlay: true });
+    await nextTick();
+    await stageHandlers.dblclick[0]({ clientX: 30, clientY: 30 } as any);
+    expect(stageOverlayService.openOverlay).not.toHaveBeenCalled();
+    expect(editorService.select).toHaveBeenCalledWith('container');
+  });
+
+  test('dblclick 命中链为空时不打开 overlay', async () => {
+    createStagePage();
+    mountIt();
+    await nextTick();
+    await stageHandlers.dblclick[0]({ clientX: 30, clientY: 30 } as any);
+    expect(stageOverlayService.openOverlay).not.toHaveBeenCalled();
+  });
+
+  test('dblclick mask.page 未就绪时回退到页面元素查询', async () => {
+    const pageEl = createStagePage();
+    const scroller = createScrollContainer({ top: 10, left: 10, bottom: 60, right: 60 });
+    scroller.dataset.id = 'scroller';
+    pageEl.appendChild(scroller);
+    const child = createNodeEl('child', { top: 70, left: 20, bottom: 90, right: 40 });
+    scroller.appendChild(child);
+    stageInstance.mask.page = null;
+    (stageInstance.renderer.contentWindow.document.querySelector as any).mockReturnValueOnce(pageEl);
+    stageInstance.renderer.getElementsFromPoint.mockReturnValueOnce([scroller, pageEl]);
+    mountIt();
+    await nextTick();
+    await stageHandlers.dblclick[0]({ clientX: 30, clientY: 30 } as any);
+    expect(stageOverlayService.openOverlay).toHaveBeenCalledWith(scroller);
+  });
+
+  test('dblclick 连续双击不受单击重置影响，一路选中到页面后重新开始', async () => {
+    const pageEl = createStagePage();
+    const container = createNodeEl('container');
+    const comp = createNodeEl('comp');
+    pageEl.appendChild(container);
+    container.appendChild(comp);
+    // node 恒为 comp，模拟单击每次把选中重置到最内层元素
+    stageInstance.renderer.getElementsFromPoint.mockReturnValue([comp, container, pageEl]);
+    const stageSelect = vi.fn();
+    editorService.get.mockImplementation((k: string) => {
+      if (k === 'stage') return { select: stageSelect };
+      if (k === 'stageLoading') return false;
+      if (k === 'nodes') return [{ id: 'comp' }];
+      if (k === 'root') return { id: 'r', items: [{ id: 'p1' }] };
+      if (k === 'page') return { id: 'p1' };
+      if (k === 'node') return { id: 'comp' };
+      return null;
+    });
+    mountIt();
+    await nextTick();
+    const event = { clientX: 30, clientY: 30 } as any;
+    await stageHandlers.dblclick[0](event);
+    expect(editorService.select).toHaveBeenNthCalledWith(1, 'container');
+    await stageHandlers.dblclick[0](event);
+    expect(editorService.select).toHaveBeenNthCalledWith(2, 'p1');
+    // 选到页面后再次双击重新从父容器开始，不会停在单击重置的最内层元素上
+    await stageHandlers.dblclick[0](event);
+    expect(editorService.select).toHaveBeenNthCalledWith(3, 'container');
+    expect(editorService.select).toHaveBeenCalledTimes(3);
+    expect(stageSelect).toHaveBeenNthCalledWith(1, 'container');
+    expect(stageSelect).toHaveBeenNthCalledWith(2, 'p1');
+    expect(stageSelect).toHaveBeenNthCalledWith(3, 'container');
+  });
+
+  test('dblclick 换到新的命中链后从父容器重新开始', async () => {
+    const pageEl = createStagePage();
+    const container = createNodeEl('container');
+    const comp = createNodeEl('comp');
+    pageEl.appendChild(container);
+    container.appendChild(comp);
+    const otherContainer = createNodeEl('other-container');
+    const otherComp = createNodeEl('other-comp');
+    pageEl.appendChild(otherContainer);
+    otherContainer.appendChild(otherComp);
+    const getEls = stageInstance.renderer.getElementsFromPoint;
+    getEls.mockReturnValueOnce([comp, container, pageEl]);
+    getEls.mockReturnValueOnce([otherComp, otherContainer, pageEl]);
+    mountIt();
+    await nextTick();
+    const event = { clientX: 30, clientY: 30 } as any;
+    await stageHandlers.dblclick[0](event);
+    expect(editorService.select).toHaveBeenNthCalledWith(1, 'container');
+    await stageHandlers.dblclick[0](event);
+    expect(editorService.select).toHaveBeenNthCalledWith(2, 'other-container');
   });
 
   test('dblclick beforeDblclick 返回 false 时不处理', async () => {

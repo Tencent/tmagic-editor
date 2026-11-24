@@ -111,57 +111,62 @@ const zoom = computed(() => uiService.get('zoom'));
 const node = computed(() => editorService.get('node'));
 
 /**
- * 判断元素是否被非页面级的滚动容器裁剪（未完整显示）
+ * 双击选中进度：上次双击选中的节点 id
  *
- * 从元素向上遍历祖先节点，跳过页面/页面片容器，
- * 检查是否存在设置了 overflow 的滚动容器将该元素裁剪，
- * 只有元素未被完整显示时才需要打开 overlay 以展示完整内容
+ * 单击先于双击触发，会把当前选中重置到鼠标下最内层元素，
+ * 所以层级的推进不能读当前选中状态，只能由双击自己记录。
  */
-const isClippedByScrollContainer = (el: HTMLElement): boolean => {
-  const win = el.ownerDocument.defaultView;
-  if (!win) return false;
+let lastDblclickSelectedId: string | undefined;
 
-  // 收集所有页面和页面片的 id
-  const root = editorService.get('root');
-  const pageIds = new Set(root?.items?.map((item) => `${item.id}`) ?? []);
+/**
+ * 遍历鼠标位置下的元素链，找出「有子元素没显示全」的滚动容器
+ *
+ * 被裁掉的子元素不参与 elementsFromPoint 命中，无需找回它们：
+ * 需要定位的是承载这些子元素的容器，交给 openOverlay 展开完整内容。
+ * 可视区域以页面（页面片）为界：容器可视区与页面矩形求交后，
+ * 只要有可选中子元素没完整落在该区域内，或容器内容本身就溢出了，
+ * 这个容器就是需要展开的滚动容器。
+ *
+ * 轮播等组件靠内部样式完成裁剪，容器自身的 computed overflow 可能是 visible，
+ * 因此不能拿 overflow 当门槛；openOverlay 也是按 scrollWidth/scrollHeight 展开，
+ * 内容溢出本身就是最可靠的信号。
+ * 页面自身是可视区域边界而不是滚动容器；iframe 级容器、以及 swiper-wrapper
+ * 这类没有节点 id 的纯 DOM 包裹层也不参与，否则会抢在真正的容器前面。
+ */
+const findScrollContainer = (els: HTMLElement[]): HTMLElement | null => {
+  const doc = stage?.renderer?.contentWindow?.document;
+  const pageEl = stage?.mask?.page ?? doc?.querySelector<HTMLElement>('.magic-ui-page, .magic-ui-page-fragment');
+  if (!pageEl) return null;
 
-  // el 本身就是页面或页面片，无需判断
-  const elId = getIdFromEl()(el);
-  if (elId && pageIds.has(elId)) return false;
+  const pageRect = pageEl.getBoundingClientRect();
 
-  let parent = el.parentElement;
+  for (const el of els) {
+    if (el === pageEl || !pageEl.contains(el) || !getIdFromEl()(el)) continue;
 
-  while (parent && parent !== el.ownerDocument.documentElement) {
-    const parentId = getIdFromEl()(parent);
+    const rect = el.getBoundingClientRect();
+    const visibleLeft = Math.max(rect.left, pageRect.left);
+    const visibleTop = Math.max(rect.top, pageRect.top);
+    const visibleRight = Math.min(rect.right, pageRect.right);
+    const visibleBottom = Math.min(rect.bottom, pageRect.bottom);
 
-    // 到达页面或页面片层级，不再继续向上查找
-    if (parentId && pageIds.has(parentId)) {
-      return false;
-    }
+    // 轮播里未展示的 slide、超长列表等内容没落在容器里
+    if (el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight) return el;
 
-    const { overflowX, overflowY } = win.getComputedStyle(parent);
-
-    if (
-      ['auto', 'scroll', 'hidden'].includes(overflowX) ||
-      ['auto', 'scroll', 'hidden'].includes(overflowY) ||
-      parent.scrollWidth > parent.clientWidth ||
-      parent.scrollHeight > parent.clientHeight
-    ) {
-      // 比较元素与容器的可视区域，判断元素是否被裁剪
-      const elRect = el.getBoundingClientRect();
-      const containerRect = parent.getBoundingClientRect();
+    for (const child of el.querySelectorAll<HTMLElement>('*')) {
+      if (!getIdFromEl()(child)) continue;
+      const childRect = child.getBoundingClientRect();
+      if (!childRect.width || !childRect.height) continue;
       if (
-        elRect.top < containerRect.top ||
-        elRect.left < containerRect.left ||
-        elRect.bottom > containerRect.bottom ||
-        elRect.right > containerRect.right
+        childRect.left < visibleLeft ||
+        childRect.top < visibleTop ||
+        childRect.right > visibleRight ||
+        childRect.bottom > visibleBottom
       ) {
-        return true;
+        return el;
       }
     }
-    parent = parent.parentElement;
   }
-  return false;
+  return null;
 };
 
 watchEffect(() => {
@@ -183,31 +188,43 @@ watchEffect(() => {
     }
 
     const el = (await stage?.actionManager?.getElementFromPoint(event)) || null;
-    if (!el) return;
 
-    const id = getIdFromEl()(el);
+    if (el) {
+      const id = getIdFromEl()(el);
+      if (id) {
+        const node = editorService.getNodeById(id);
+        if (node?.type === 'page-fragment-container' && node.pageFragmentId) {
+          await editorService.select(node.pageFragmentId);
+          return;
+        }
+      }
+    }
 
-    if (id) {
-      const node = editorService.getNodeById(id);
-      if (node?.type === 'page-fragment-container' && node.pageFragmentId) {
-        await editorService.select(node.pageFragmentId);
+    // 命中链只取一次：优先找需要展开的滚动容器，找不到再沿链向上选中
+    const els = stage?.renderer?.getElementsFromPoint(event) ?? [];
+
+    if (!props.disabledStageOverlay) {
+      const scrollContainer = findScrollContainer(els);
+      if (scrollContainer) {
+        stageOverlayService.openOverlay(scrollContainer);
         return;
       }
     }
 
-    if (!props.disabledStageOverlay && isClippedByScrollContainer(el)) {
-      stageOverlayService.openOverlay(el);
-      return;
-    }
+    if (!el) return;
 
-    const nextEl = (await stage?.actionManager?.getNextElementFromPoint(event)) || null;
-    if (nextEl) {
-      const nextId = getIdFromEl()(nextEl);
-      if (nextId) {
-        await editorService.select(nextId);
-        editorService.get('stage')?.select(nextId);
-      }
-    }
+    // 单击已把选中重置到链首，用上次双击选中的节点在链中的位置推进：
+    // 连续双击即可从组件一路选中到页面；换了位置（链里找不到上次节点）或已经选到
+    // 页面，则重新从父容器开始，保证每次双击都有选中反馈。
+    const ids = els.map((item) => getIdFromEl()(item)).filter((id): id is string => Boolean(id));
+    const lastIndex = lastDblclickSelectedId ? ids.indexOf(lastDblclickSelectedId) : -1;
+    const nextIndex = lastIndex >= 0 && lastIndex + 1 < ids.length ? lastIndex + 1 : 1;
+    const nextId = ids[nextIndex];
+    if (!nextId) return;
+
+    lastDblclickSelectedId = nextId;
+    await editorService.select(nextId);
+    editorService.get('stage')?.select(nextId);
   });
 
   editorService.set('stage', markRaw(stage));
