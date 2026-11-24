@@ -55,6 +55,8 @@ export default class StageCore extends EventEmitter {
   public flashHighlight: StageFlashHighlight | null = null;
 
   private pageResizeObserver: ResizeObserver | null = null;
+  /** 监听选中元素内容尺寸变化，用于异步内容的选框刷新 */
+  private moveableResizeObserver: ResizeObserver | null = null;
   private autoScrollIntoView: boolean | undefined;
   private customizedRender?: CustomizeRender;
   /** 非点击画布选中组件时，是否对选中区域做高亮闪烁提示，默认开启 */
@@ -203,6 +205,10 @@ export default class StageCore extends EventEmitter {
         // 组件有更新，需要set
         this.actionManager.setSelectedEl(el);
         this.actionManager.updateMoveable(el);
+        // 内容尺寸可能不是本轮同步渲染就确定的（例如图片 setAttribute 后才开始加载，
+        // 加载完成才会撑开容器）。此时上面的 updateMoveable 量到的仍是旧尺寸，
+        // 选框会一直停留在旧大小。这里再监听一次该元素的尺寸变化，变化后重新对齐。
+        this.updateMoveableOnResize(el);
       }
     });
   }
@@ -322,13 +328,14 @@ export default class StageCore extends EventEmitter {
    * 销毁实例
    */
   public destroy(): void {
-    const { mask, renderer, actionManager, flashHighlight, pageResizeObserver } = this;
+    const { mask, renderer, actionManager, flashHighlight, pageResizeObserver, moveableResizeObserver } = this;
 
     renderer?.destroy();
     mask?.destroy();
     actionManager?.destroy();
     flashHighlight?.destroy();
     pageResizeObserver?.disconnect();
+    moveableResizeObserver?.disconnect();
 
     this.removeAllListeners();
 
@@ -354,6 +361,34 @@ export default class StageCore extends EventEmitter {
   /**
    * 监听页面大小变化
    */
+  /**
+   * 选中元素的内容尺寸变化后重新对齐选框。
+   *
+   * 组件更新后内容尺寸不一定在本轮同步渲染就确定：图片要等加载完成才会把容器撑开，
+   * 视频、字体同理。只调用一次 updateMoveable 会量到旧尺寸，选框停在旧大小上。
+   * 这里对同一个元素只保留一个 observer，尺寸真正变化时再刷新一次。
+   */
+  private updateMoveableOnResize(el: HTMLElement): void {
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+
+    this.moveableResizeObserver?.disconnect();
+    this.moveableResizeObserver = new ResizeObserver(() => {
+      this.moveableResizeObserver?.disconnect();
+      this.moveableResizeObserver = null;
+
+      // 元素可能在异步期间已被替换或取消选中
+      if (!this.actionManager?.isSelectedEl(el)) {
+        return;
+      }
+
+      this.mask?.setLayout(el);
+      this.actionManager.updateMoveable(el);
+    });
+    this.moveableResizeObserver.observe(el);
+  }
+
   private observePageResize(page: HTMLElement): void {
     if (this.pageResizeObserver) {
       this.pageResizeObserver.disconnect();

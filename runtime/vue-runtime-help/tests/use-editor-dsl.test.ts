@@ -116,6 +116,55 @@ describe('useEditorDsl add', () => {
     expect(dsl.items[0].items?.map((item) => item.id)).toEqual(['btn', 'n1']);
   });
 
+  test('空 DSL（没有任何页面）时新增页面不应抛错（issue #653）', () => {
+    const app = new Core({});
+    let runtime: Runtime = {};
+
+    (window as any).magic = {
+      onRuntimeReady: (rt: Runtime) => {
+        runtime = rt;
+      },
+    };
+
+    useEditorDsl(app);
+
+    // 与 issue 中的复现数据一致：根节点存在但 items 为空
+    const dsl = { type: NodeType.ROOT, id: 'app', items: [] } as unknown as MApp;
+    runtime.updateRootConfig?.(dsl);
+
+    // 没有任何页面时 selectedId 一直是 undefined；
+    // 新增页面只需挂到 root 下，不应该因为缺少选中节点而失败。
+    expect(() =>
+      runtime.add?.({
+        config: { id: 'p9', type: NodeType.PAGE, items: [] } as any,
+        parentId: 'app',
+        root: dsl,
+        index: 0,
+      }),
+    ).not.toThrow();
+
+    expect(dsl.items.map((item) => item.id)).toEqual(['p9']);
+  });
+
+  test('空 DSL 时新增普通节点仍然要求选中节点', () => {
+    const app = new Core({});
+    let runtime: Runtime = {};
+
+    (window as any).magic = {
+      onRuntimeReady: (rt: Runtime) => {
+        runtime = rt;
+      },
+    };
+
+    useEditorDsl(app);
+
+    const dsl = { type: NodeType.ROOT, id: 'app', items: [] } as unknown as MApp;
+    runtime.updateRootConfig?.(dsl);
+
+    // 普通组件必须挂在某个父容器里，没有选中节点时依旧要报错
+    expect(() => runtime.add?.({ config: { id: 'n1', type: 'text' } as any, parentId: 'app', root: dsl })).toThrow();
+  });
+
   test('连续按递增 index 插入时保持顺序', () => {
     const { runtime, dsl } = setup();
     runtime.select?.('btn');

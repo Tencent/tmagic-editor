@@ -351,4 +351,46 @@ describe('StageCore', () => {
     vi.useRealTimers();
     stage.destroy();
   });
+  test('内容尺寸异步变化后重新对齐选框（issue #666）', async () => {
+    vi.useFakeTimers();
+
+    const observers: { cb: ResizeObserverCallback; el: Element }[] = [];
+    const originalResizeObserver = globalThis.ResizeObserver;
+    globalThis.ResizeObserver = class {
+      private cb: ResizeObserverCallback;
+      constructor(cb: ResizeObserverCallback) {
+        this.cb = cb;
+      }
+      observe(el: Element) {
+        observers.push({ cb: this.cb, el });
+      }
+      unobserve() {}
+      disconnect() {}
+    } as any;
+
+    const { host, page, stage } = createStage();
+    await stage.mount(host);
+    mountRuntime(stage);
+
+    const node = globalThis.document.createElement('div');
+    setIdToEl()(node, 'img-node');
+    node.style.cssText = 'position:absolute;width:10px;height:10px;';
+    page.appendChild(node);
+    await stage.select('img-node');
+
+    const spy = vi.spyOn(stage.actionManager!, 'updateMoveable');
+    await stage.update({ config: { id: 'img-node' } } as any);
+    vi.advanceTimersByTime(10);
+
+    const before = spy.mock.calls.length;
+    // 模拟图片加载完成后容器被撑开
+    observers[observers.length - 1].cb([] as any, {} as any);
+
+    // 内容尺寸变化后必须再刷新一次选框，否则选框停留在旧尺寸
+    expect(spy.mock.calls.length).toBeGreaterThan(before);
+
+    globalThis.ResizeObserver = originalResizeObserver;
+    vi.useRealTimers();
+    stage.destroy();
+  });
 });
