@@ -1,3 +1,23 @@
+/**
+ * 把脚本地址解析成绝对 URL。
+ * 已有协议（http/https/blob/data 等）或协议相对地址原样返回；
+ * 解析失败（例如非浏览器环境缺少 base）时退回原值，不阻断加载。
+ */
+const resolveScriptUrl = (url: string, document: Document): string => {
+  if (!url) return url;
+  // 已有协议或协议相对地址，浏览器会自行处理
+  if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(url) || url.startsWith('//')) return url;
+
+  const baseURI = document?.baseURI;
+  if (!baseURI || typeof URL === 'undefined') return url;
+
+  try {
+    return new URL(url, baseURI).href;
+  } catch {
+    return url;
+  }
+};
+
 export const asyncLoadJs = (() => {
   // 正在加载或加载成功的存入此Map中
   const documentMap = new Map();
@@ -12,13 +32,20 @@ export const asyncLoadJs = (() => {
     // 正在加载或已经加载成功的，直接返回
     if (loaded.get(url)) return loaded.get(url);
 
+    // 相对路径必须解析成绝对 URL 再赋给 script.src。
+    // 直接传相对路径时，浏览器按**当前文档**的 base 解析，
+    // 脚本内部再动态加载的相对引用也会落到文档目录，
+    // 而不是脚本自己所在的目录。并发加载两个不同目录下的脚本时，
+    // 后加载的会串到前一个的目录里（issue #589）。
+    const resolvedUrl = resolveScriptUrl(url, document);
+
     const load = new Promise<void>((resolve, reject) => {
       const script = document.createElement('script');
       script.type = 'text/javascript';
       if (crossOrigin) {
         script.crossOrigin = crossOrigin;
       }
-      script.src = url;
+      script.src = resolvedUrl;
       document.body.appendChild(script);
       script.onload = () => {
         resolve();
