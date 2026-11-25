@@ -249,6 +249,24 @@ describe('getUrlParam', () => {
     const value = util.getUrlParam('a', url);
     expect(value).toBe('');
   });
+
+  test('参数名中含有正则元字符', () => {
+    expect(util.getUrlParam('a.b', 'http://www.tmagic.com?a.b=1&axb=2')).toBe('1');
+    expect(util.getUrlParam('a[0]', 'http://www.tmagic.com?a[0]=1')).toBe('1');
+    expect(util.getUrlParam('a(', 'http://www.tmagic.com?a(=1')).toBe('1');
+  });
+
+  test('参数名区分大小写', () => {
+    expect(util.getUrlParam('id', 'http://www.tmagic.com?id=1&ID=2')).toBe('1');
+  });
+
+  test('值中含有 =', () => {
+    expect(util.getUrlParam('token', 'http://www.tmagic.com?token=YWJjZA==')).toBe('YWJjZA==');
+  });
+
+  test('同名参数取最后一个', () => {
+    expect(util.getUrlParam('a', 'http://www.tmagic.com?a=1&a=2')).toBe('2');
+  });
 });
 
 describe('setUrlParam', () => {
@@ -257,6 +275,25 @@ describe('setUrlParam', () => {
 
     expect(util.setUrlParam('a', '1', 'https://www.tmagic.com?c&d')).toBe('https://www.tmagic.com?c&d&a=1');
     expect(util.setUrlParam('a', '1', 'https://www.tmagic.com?b=1')).toBe('https://www.tmagic.com?b=1&a=1');
+  });
+
+  test('值需要编码', () => {
+    expect(util.setUrlParam('q', 'a&b=c d', 'https://www.tmagic.com')).toBe('https://www.tmagic.com?q=a%26b%3Dc%20d');
+  });
+
+  test('url 带有 hash', () => {
+    expect(util.setUrlParam('c', '9', 'https://www.tmagic.com#section')).toBe('https://www.tmagic.com?c=9#section');
+    expect(util.setUrlParam('a', '2', 'https://www.tmagic.com?a=1#section')).toBe(
+      'https://www.tmagic.com?a=2#section',
+    );
+  });
+
+  test('值中含有 $& 替换模式', () => {
+    expect(util.setUrlParam('a', '$&', 'https://www.tmagic.com?a=1')).toBe('https://www.tmagic.com?a=%24%26');
+  });
+
+  test('值为空时删除参数', () => {
+    expect(util.setUrlParam('a', '', 'https://www.tmagic.com?a=1&b=2')).toBe('https://www.tmagic.com?b=2');
   });
 });
 
@@ -271,6 +308,23 @@ describe('delQueStr', () => {
     expect(util.delQueStr('https://www.tmagic.com?a=1', 'a')).toBe('https://www.tmagic.com');
     expect(util.delQueStr('https://www.tmagic.com?a=1&b=2', ['a', 'b'])).toBe('https://www.tmagic.com');
     expect(util.delQueStr('https://www.tmagic.com?a=1&b=2', ['a'])).toBe('https://www.tmagic.com?b=2');
+  });
+
+  test('保留值中多余的 =', () => {
+    expect(util.delQueStr('https://www.tmagic.com?token=YWJjZA==&debug=1', 'debug')).toBe(
+      'https://www.tmagic.com?token=YWJjZA==',
+    );
+  });
+
+  test('保留没有值的参数', () => {
+    expect(util.delQueStr('https://www.tmagic.com?flag&debug=1', 'debug')).toBe('https://www.tmagic.com?flag');
+  });
+
+  test('保留 hash', () => {
+    expect(util.delQueStr('https://www.tmagic.com?a=1&debug=1#section', 'debug')).toBe(
+      'https://www.tmagic.com?a=1#section',
+    );
+    expect(util.delQueStr('https://www.tmagic.com?debug=1#section', 'debug')).toBe('https://www.tmagic.com#section');
   });
 });
 
