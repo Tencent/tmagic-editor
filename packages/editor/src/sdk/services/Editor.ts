@@ -880,12 +880,12 @@ class Editor extends BaseService {
 
     // 多节点必须使用 changeRecordList 为每个节点提供独立的记录；
     // 否则同一份 changeRecords 会被复用到每个节点上，nodeUpdateHandler / 历史回放都会按错误的 propPath 处理。
-    const updateData = await Promise.all(
-      nodes.map((node, index) => {
-        const recordsForNode = changeRecordList ? (changeRecordList[index] ?? []) : (changeRecords ?? []);
-        return this.doUpdate(node, { ...data, changeRecords: recordsForNode });
-      }),
-    );
+    const updateData: Awaited<ReturnType<typeof this.doUpdate>>[] = [];
+    // A node update can replace the parent object needed by the next update.
+    for (const [index, node] of nodes.entries()) {
+      const recordsForNode = changeRecordList ? (changeRecordList[index] ?? []) : (changeRecords ?? []);
+      updateData.push(await this.doUpdate(node, { ...data, changeRecords: recordsForNode }));
+    }
 
     // 校验错误信息在 pushOpHistory 之前落库，保证历史快照包含本次变更对应的错误状态。
     this.applyInvalidInfo(config, invalidInfo);
