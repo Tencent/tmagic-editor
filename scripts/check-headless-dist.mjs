@@ -69,12 +69,13 @@ for (const { specifier, expects } of targets) {
     if (missing.length) throw new Error('missing exports: ' + missing.join(', '));
   `;
 
+  const requireFrom = path.join(cwd, 'index.js');
   for (const [kind, code] of [
     ['import', `const mod = await import('${specifier}');${assertExports}`],
     [
       'require',
       `const { createRequire } = await import('node:module');
-       const mod = createRequire(process.cwd() + '/index.js')('${specifier}');${assertExports}`,
+       const mod = createRequire(${JSON.stringify(requireFrom)})('${specifier}');${assertExports}`,
     ],
   ]) {
     try {
