@@ -937,6 +937,19 @@ describe('update', () => {
     expect(node?.text).toBe('text');
   });
 
+  test('同批更新父节点和子节点时保留两个修改', async () => {
+    editorService.set('root', cloneDeep(root));
+    await editorService.select(NodeId.PAGE_ID);
+
+    await editorService.update([
+      { id: NodeId.PAGE_ID, type: NodeType.PAGE, style: { width: 480 } },
+      { id: NodeId.NODE_ID, type: 'text', text: 'batch text' },
+    ]);
+
+    expect(editorService.getNodeById(NodeId.PAGE_ID)?.style?.width).toBe(480);
+    expect(editorService.getNodeById(NodeId.NODE_ID)?.text).toBe('batch text');
+  });
+
   test('replace=true 时整节点替换，不 merge 保留旧字段', async () => {
     editorService.set('root', cloneDeep(root));
     await editorService.select(NodeId.PAGE_ID);
